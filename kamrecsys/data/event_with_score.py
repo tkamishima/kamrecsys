@@ -138,10 +138,6 @@ class EventWithScoreData(EventData, ScoreUtilMixin):
         event_feature : optional, array_like, shape=(n_events, variable)
             feature of events
 
-        Notes
-        -----
-        Currently, support only n_stypes == 1 case
-
         .. waraning::
         
             Multiple scores (n_stypes > 1) are not supported.
