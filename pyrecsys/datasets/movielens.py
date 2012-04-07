@@ -10,6 +10,7 @@ Load sample Movielens data sets
 
 import sys
 import os
+import codecs
 import logging
 import numpy as np
 
@@ -163,16 +164,16 @@ def load_movielens100k(infile=None):
     data.set_features(0, x['eid'], x['feature'])
 
     # load item's feature file
-    #todo: change type of name field: string => unicode
     infile = os.path.join(os.path.dirname(__file__),
                           'samples', 'movielens100k.item')
-    fdtype = np.dtype([('name', 'S81'),
+    fdtype = np.dtype([('name', 'U81'),
                        ('date', np.dtype([('day', np.int),
                                           ('month', np.int),
                                           ('year', np.int)])),
                        ('genre', 'i1', 18),
                        ('imdb', 'S134')])
     dtype = np.dtype([('eid', np.int), ('feature', fdtype)])
+    infile = codecs.open(infile, 'r', 'utf_8')
     x = np.genfromtxt(fname=infile, delimiter='\t', dtype=dtype)
     data.set_features(1, x['eid'], x['feature'])
 
@@ -290,7 +291,6 @@ def load_movielens1m(infile=None):
                     event_feature=x['event_feature'])
 
     # load user's feature file
-    #todo: change type of name field: string => unicode
     infile = os.path.join(os.path.dirname(__file__),
                           'samples', 'movielens1m.user')
     fdtype = np.dtype([('gender', np.int), ('age', np.int),
@@ -302,7 +302,8 @@ def load_movielens1m(infile=None):
     # load item's feature file
     infile = os.path.join(os.path.dirname(__file__),
                           'samples', 'movielens1m.item')
-    fdtype = np.dtype([('name', 'S82'),
+    infile = codecs.open(infile, 'r', 'utf_8')
+    fdtype = np.dtype([('name', 'U82'),
                        ('year', np.int),
                        ('genre', 'i1', 18)])
     dtype = np.dtype([('eid', np.int), ('feature', fdtype)])

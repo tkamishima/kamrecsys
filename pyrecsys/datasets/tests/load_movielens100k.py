@@ -68,17 +68,17 @@ doctest pyrecsys.datasets.load_movielens100k
 >>> print len(data.feature[0])
 943
 >>> print data.feature[1][:5]
-[ ('Toy Story (1995)', (1, 1, 1995), [0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 'http://us.imdb.com/M/title-exact?Toy%20Story%20(1995)')
- ('GoldenEye (1995)', (1, 1, 1995), [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0], 'http://us.imdb.com/M/title-exact?GoldenEye%20(1995)')
- ('Four Rooms (1995)', (1, 1, 1995), [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0], 'http://us.imdb.com/M/title-exact?Four%20Rooms%20(1995)')
- ('Get Shorty (1995)', (1, 1, 1995), [1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 'http://us.imdb.com/M/title-exact?Get%20Shorty%20(1995)')
- ('Copycat (1995)', (1, 1, 1995), [0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0], 'http://us.imdb.com/M/title-exact?Copycat%20(1995)')]
+[ (u'Toy Story (1995)', (1, 1, 1995), [0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 'http://us.imdb.com/M/title-exact?Toy%20Story%20(1995)')
+ (u'GoldenEye (1995)', (1, 1, 1995), [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0], 'http://us.imdb.com/M/title-exact?GoldenEye%20(1995)')
+ (u'Four Rooms (1995)', (1, 1, 1995), [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0], 'http://us.imdb.com/M/title-exact?Four%20Rooms%20(1995)')
+ (u'Get Shorty (1995)', (1, 1, 1995), [1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 'http://us.imdb.com/M/title-exact?Get%20Shorty%20(1995)')
+ (u'Copycat (1995)', (1, 1, 1995), [0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0], 'http://us.imdb.com/M/title-exact?Copycat%20(1995)')]
 >>> print data.feature[1][-5:]
-[ ("Mat' i syn (1997)", (6, 2, 1998), [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 'http://us.imdb.com/M/title-exact?Mat%27+i+syn+(1997)')
- ('B. Monkey (1998)', (6, 2, 1998), [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0], 'http://us.imdb.com/M/title-exact?B%2E+Monkey+(1998)')
- ('Sliding Doors (1998)', (1, 1, 1998), [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0], 'http://us.imdb.com/Title?Sliding+Doors+(1998)')
- ('You So Crazy (1994)', (1, 1, 1994), [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 'http://us.imdb.com/M/title-exact?You%20So%20Crazy%20(1994)')
- ('Scream of Stone (Schrei aus Stein) (1991)', (8, 3, 1996), [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 'http://us.imdb.com/M/title-exact?Schrei%20aus%20Stein%20(1991)')]
+[ (u"Mat' i syn (1997)", (6, 2, 1998), [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 'http://us.imdb.com/M/title-exact?Mat%27+i+syn+(1997)')
+ (u'B. Monkey (1998)', (6, 2, 1998), [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0], 'http://us.imdb.com/M/title-exact?B%2E+Monkey+(1998)')
+ (u'Sliding Doors (1998)', (1, 1, 1998), [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0], 'http://us.imdb.com/Title?Sliding+Doors+(1998)')
+ (u'You So Crazy (1994)', (1, 1, 1994), [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 'http://us.imdb.com/M/title-exact?You%20So%20Crazy%20(1994)')
+ (u'Scream of Stone (Schrei aus Stein) (1991)', (8, 3, 1996), [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 'http://us.imdb.com/M/title-exact?Schrei%20aus%20Stein%20(1991)')]
 >>> print len(data.feature[1])
 1682
 >>> from pyrecsys.datasets import movielens100k_info

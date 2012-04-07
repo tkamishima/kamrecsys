@@ -10,17 +10,16 @@ Instruction
    <http://www.grouplens.org/node/73>`_.
 2. Unpack this ml-1m.zip, and place the following files at this directory:
    ratings.dat, users.dat, movies.dat
-3．Original file, movies.dat, is encoded with so-called Windows Latin1. If you
-   prefer other encoding, such as UTF-8, you need to convert accordingly.
-4. Run this script. As default, converted files are generated at
+3. Run this script. As default, converted files are generated at
    ../pyrecsys/datasets/samples/ directory. If you want change the target
    directory, you need to specify it as the first argument of this script.
-5. Remove original files, if you do not need them.
+4. Remove original files, if you do not need them.
 """
 
 import os
 import sys
 import re
+import codecs
 
 # set directories
 
@@ -46,6 +45,11 @@ outfile.write(
 # This data set consists of:
 # * 1,000,209 ratings (1-5) from 6040 users on 3706 movies. 
 # * Each user has rated at least 20 movies. 
+#
+# Notes
+# -----
+# There are 3883 movies in an original file, but 3706 movies are actually
+# rated.
 #
 # Format
 # ------
@@ -116,15 +120,14 @@ infile.close()
 outfile.close()
 
 # convert item files ----------------------------------------------------------
-#todo: convert items file encoding: Windows Latain1 => UTF8
 
-infile = open(os.path.join(pwd, 'movies.dat'), 'r')
-outfile = open(os.path.join(target, stem + '.item'), 'w')
+infile = codecs.open(os.path.join(pwd, 'movies.dat'), 'r', 'cp1252')
+outfile = codecs.open(os.path.join(target, stem + '.item'), 'w', 'utf_8')
 
 outfile.write(
 """# Item feature file for ``movielens1m.event``.
-# 
-# The number of movies is 3706.
+#
+# The number of movies is 3883.
 #
 # Format
 # ------
@@ -151,8 +154,8 @@ year_p = re.compile(r'\((\d\d\d\d)\)$')
 
 for line in infile.readlines():
     f = line.rstrip('\r\n').split("::")
-    if f[0] == '3845': # for buggy character in original file
-        f[1] = re.sub('\&\#8230\;', '... ', f[1])
+    if f[0] == u'3845': # for buggy character in original file
+        f[1] = re.sub(u'\&\#8230\;', u'\u2026', f[1])
     outfile.write(f[0] + "\t" + f[1] + "\t")
     year = year_p.search(f[1]).group(1)
     outfile.write(year + '\t')
