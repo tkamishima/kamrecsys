@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Matrix Decomposition: latent factor model
+Evaluation: simple metrics for evaluating scores, relevance, etc.
 """
 
 #==============================================================================

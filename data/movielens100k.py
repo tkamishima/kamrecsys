@@ -10,10 +10,10 @@ Instruction
    <http://www.grouplens.org/node/73>`_.
 2. Unpack this ml-100k.zip, and place the following files at this directory:
    u.data, u.user, and u.item.
-4. Run this script. As default, converted files are generated at
+3. Run this script. As default, converted files are generated at
    ../pyrecsys/datasets/samples/ directory. If you want change the target
    directory, you need to specify it as the first argument of this script.
-5. Remove original files, if you do not need them.
+4. Remove original files, if you do not need them.
 """
 
 import os
