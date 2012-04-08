@@ -1,31 +1,26 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-PyRecSys: Algorithms for recommender systems in Python
+Matrix Decomposition: latent factor model
 """
 
 #==============================================================================
-# Module metadata variables
+# Evaluation: metrics
 #==============================================================================
-
-__author__ = "Toshihiro Kamishima ( http://www.kamishima.net/ )"
-__date__ = "2012/03/25"
-__version__ = "0.1.0"
-__copyright__ = "Copyright (c) 2012 Toshihiro Kamishima all rights reserved."
-__license__ = "MIT License: http://www.opensource.org/licenses/mit-license.php"
-__docformat__ = "restructuredtext en"
 
 #==============================================================================
 # Imports
 #==============================================================================
 
 import logging
+import sys
+import numpy as np
 
 #==============================================================================
 # Public symbols
 #==============================================================================
 
-__all__ = ['data', 'datasets', 'eval', 'md', 'recommenders']
+__all__ = ['score_mae', 'score_rmse']
 
 #==============================================================================
 # Constants
@@ -40,8 +35,46 @@ __all__ = ['data', 'datasets', 'eval', 'md', 'recommenders']
 #==============================================================================
 
 #==============================================================================
-# Functions 
+# # Functions
 #==============================================================================
+
+def score_mae(sc1, sc2):
+    """
+    MAE between true and estimated scores
+
+    Parameters
+    ----------
+    sc1, sc2 : float or array_like, shape(variable,), dtype=float
+        a pair of scores or vectors of scores to compare
+
+    Notes
+    -----
+    MAE (Mean Absolute Error) is a mean of the absolute values of the
+    differences between pairs of scores
+     """
+    sc1 = np.atleast_1d(np.asarray(sc1))
+    sc2 = np.atleast_1d(np.asarray(sc2))
+
+    return np.sum(np.abs(sc1 - sc2)) / np.float(sc1.shape[0])
+
+def score_rmse(sc1, sc2):
+    """
+    MAE between true and estimated scores
+
+    Parameters
+    ----------
+    sc1, sc2 : float or array_like, shape(variable,), dtype=float
+        a pair of scores or vectors of scores to compare
+
+    Notes
+    -----
+    RMSE (Root Mean Square Error) is a sqare root of a mean of the
+    squared sum of the differences between pairs of scores
+    """
+    sc1 = np.atleast_1d(np.asarray(sc1))
+    sc2 = np.atleast_1d(np.asarray(sc2))
+
+    return np.sqrt(np.sum((sc1 - sc2) ** 2) / np.float(sc1.shape[0]))
 
 #==============================================================================
 # Module initialization 
