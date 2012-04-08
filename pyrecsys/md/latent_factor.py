@@ -121,22 +121,26 @@ class EventScorePredictor(BaseEventScorePredictor):
         n_items = n_objects[1]
         k = self.k
 
+        # define dtype for parameters
+        self._dt = np.dtype([
+            ('mu', np.float),
+            ('bu', np.float, n_users + 1),
+            ('bi', np.float, n_items + 1),
+            ('p', np.float, (n_users + 1, k)),
+            ('q', np.float, (n_items + 1, k))
+        ])
+
         # memory allocation
         self.coef_ = np.zeros(1 + (n_users + 1) + (n_items + 1) +
                               (n_users + 1) * k + (n_items + 1) * k,
                               dtype=np.float)
 
         # set array's view
-        i = 0
-        self.mu_ = self.coef_[i:i + 1]
-        i += 1
-        self.bu_ = self.coef_[i:i + (n_users + 1)]
-        i += n_users + 1
-        self.bi_ = self.coef_[i:i + (n_items + 1)]
-        i += n_items + 1
-        self.p_ = self.coef_[i:i + (n_users + 1) * k].reshape((n_users + 1), k)
-        i += (n_users + 1) * k
-        self.q_ = self.coef_[i:i + (n_items + 1) * k].reshape((n_items + 1), k)
+        self.mu_ = self.coef_.view(self._dt)['mu']
+        self.bu_ = self.coef_.view(self._dt)['bu'][0]
+        self.bi_ = self.coef_.view(self._dt)['bi'][0]
+        self.p_ = self.coef_.view(self._dt)['p'][0]
+        self.q_ = self.coef_.view(self._dt)['q'][0]
 
         # set bias term
         self.mu_[0] = np.sum(sc) / np.float(n_events)
@@ -193,16 +197,11 @@ class EventScorePredictor(BaseEventScorePredictor):
         k = self.k
 
         # set array's view
-        i = 0
-        mu = coef[i:i + 1]
-        i += 1
-        bu = coef[i:i + (n_users + 1)]
-        i += n_users + 1
-        bi = coef[i:i + (n_items + 1)]
-        i += n_items + 1
-        p = coef[i:i + (n_users + 1) * k].reshape((n_users + 1), k)
-        i += (n_users + 1) * k
-        q = coef[i:i + (n_items + 1) * k].reshape((n_items + 1), k)
+        mu = coef.view(self._dt)['mu']
+        bu = coef.view(self._dt)['bu'][0]
+        bi = coef.view(self._dt)['bi'][0]
+        p = coef.view(self._dt)['p'][0]
+        q = coef.view(self._dt)['q'][0]
 
         # loss term
         esc = mu[0] + bu[ev[:, 0]] + bi[ev[:, 1]] +\
@@ -242,29 +241,19 @@ class EventScorePredictor(BaseEventScorePredictor):
         k = self.k
 
         # set input array's view
-        i = 0
-        mu = coef[i:i + 1]
-        i += 1
-        bu = coef[i:i + (n_users + 1)]
-        i += n_users + 1
-        bi = coef[i:i + (n_items + 1)]
-        i += n_items + 1
-        p = coef[i:i + (n_users + 1) * k].reshape((n_users + 1), k)
-        i += (n_users + 1) * k
-        q = coef[i:i + (n_items + 1) * k].reshape((n_items + 1), k)
+        mu = coef.view(self._dt)['mu']
+        bu = coef.view(self._dt)['bu'][0]
+        bi = coef.view(self._dt)['bi'][0]
+        p = coef.view(self._dt)['p'][0]
+        q = coef.view(self._dt)['q'][0]
 
         # create empty gradient
         grad = np.zeros_like(coef)
-        i = 0
-        grad_mu = grad[i:i + 1]
-        i += 1
-        grad_bu = grad[i:i + (n_users + 1)]
-        i += n_users + 1
-        grad_bi = grad[i:i + (n_items + 1)]
-        i += n_items + 1
-        grad_p = grad[i:i + (n_users + 1) * k].reshape((n_users + 1), k)
-        i += (n_users + 1) * k
-        grad_q = grad[i:i + (n_items + 1) * k].reshape((n_items + 1), k)
+        grad_mu = grad.view(self._dt)['mu']
+        grad_bu = grad.view(self._dt)['bu'][0]
+        grad_bi = grad.view(self._dt)['bi'][0]
+        grad_p = grad.view(self._dt)['p'][0]
+        grad_q = grad.view(self._dt)['q'][0]
 
         # gradient of loss term
         neg_res = -(sc - (mu[0] + bu[ev[:, 0]] + bi[ev[:, 1]] +
