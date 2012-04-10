@@ -22,6 +22,13 @@ Optionally depends on the following python modules:
 * PyMC
 * OpenOpt (FuncDesigner)
 
+Algorithms
+==========
+
+* Matrix Decomposition
+
+  * Latent Factor Model
+
 DataSets
 ========
 

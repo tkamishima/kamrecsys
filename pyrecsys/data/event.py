@@ -146,7 +146,7 @@ class EventData(BaseData, EventUtilMixin):
                np.max(event_otypes) >= n_otypes:
                 raise ValueError, "Illegal event_otypes specification"
             self.s_event = event_otypes.shape[0]
-            self.event_otypes = event_otypes
+            self.event_otypes = np.asarray(event_otypes)
         self.n_events = 0
         self.event = None
         self.event_feature = None
@@ -173,9 +173,9 @@ class EventData(BaseData, EventUtilMixin):
 
         self.n_events = self.event.shape[0]
         if event_feature is not None:
-            self.event_feature = event_feature.copy()
+            self.event_feature = np.asarray(event_feature).copy()
         else:
-            self.event_feature = event_feature
+            self.event_feature = None
 
 
 class EventWithScoreData(EventData):
@@ -238,8 +238,8 @@ class EventWithScoreData(EventData):
 
         super(EventWithScoreData, self).set_events(event, event_feature)
 
-        self.score = score
-        self.score_domain = score_domain
+        self.score = np.asanyarray(score)
+        self.score_domain = np.asanyarray(score_domain)
 
 #==============================================================================
 # Functions 
