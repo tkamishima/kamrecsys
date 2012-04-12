@@ -8,5 +8,5 @@ Load sample data sets
 # Imports
 #==============================================================================
 
-from .movielens import *
-from .others import *
+from ._movielens import *
+from ._others import *
