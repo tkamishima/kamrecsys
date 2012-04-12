@@ -12,7 +12,7 @@ import logging
 import numpy as np
 from abc import ABCMeta
 
-from .base import BaseData
+from ._base import BaseData
 
 #==============================================================================
 # Public symbols

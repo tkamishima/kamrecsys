@@ -16,12 +16,11 @@ import logging
 from abc import ABCMeta, abstractmethod
 import numpy as np
 
-from .data import BaseData, EventData, EventUtilMixin
+from .data import BaseData, EventData, EventWithScoreData, EventUtilMixin
 
 #==============================================================================
 # Public symbols
 #==============================================================================
-from pyrecsys.data.event import EventWithScoreData
 
 __all__ = ['BaseRecommender', 'BaseEventRecommender',
            'BaseEventItemFinder', 'BaseEventScorePredictor']
