@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Load sample data sets
+Sample Data Sets
 """
 
 #==============================================================================
