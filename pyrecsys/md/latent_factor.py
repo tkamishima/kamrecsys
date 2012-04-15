@@ -123,7 +123,7 @@ class EventScorePredictor(BaseEventScorePredictor):
 
         # define dtype for parameters
         self._dt = np.dtype([
-            ('mu', np.float),
+            ('mu', np.float, (1,)),
             ('bu', np.float, n_users + 1),
             ('bi', np.float, n_items + 1),
             ('p', np.float, (n_users + 1, k)),
@@ -136,7 +136,7 @@ class EventScorePredictor(BaseEventScorePredictor):
                               dtype=np.float)
 
         # set array's view
-        self.mu_ = self.coef_.view(self._dt)['mu']
+        self.mu_ = self.coef_.view(self._dt)['mu'][0]
         self.bu_ = self.coef_.view(self._dt)['bu'][0]
         self.bi_ = self.coef_.view(self._dt)['bi'][0]
         self.p_ = self.coef_.view(self._dt)['p'][0]
@@ -197,7 +197,7 @@ class EventScorePredictor(BaseEventScorePredictor):
         k = self.k
 
         # set array's view
-        mu = coef.view(self._dt)['mu']
+        mu = coef.view(self._dt)['mu'][0]
         bu = coef.view(self._dt)['bu'][0]
         bi = coef.view(self._dt)['bi'][0]
         p = coef.view(self._dt)['p'][0]
@@ -241,7 +241,7 @@ class EventScorePredictor(BaseEventScorePredictor):
         k = self.k
 
         # set input array's view
-        mu = coef.view(self._dt)['mu']
+        mu = coef.view(self._dt)['mu'][0]
         bu = coef.view(self._dt)['bu'][0]
         bi = coef.view(self._dt)['bi'][0]
         p = coef.view(self._dt)['p'][0]
@@ -249,7 +249,7 @@ class EventScorePredictor(BaseEventScorePredictor):
 
         # create empty gradient
         grad = np.zeros_like(coef)
-        grad_mu = grad.view(self._dt)['mu']
+        grad_mu = grad.view(self._dt)['mu'][0]
         grad_bu = grad.view(self._dt)['bu'][0]
         grad_bi = grad.view(self._dt)['bi'][0]
         grad_p = grad.view(self._dt)['p'][0]
