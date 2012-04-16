@@ -102,6 +102,10 @@ class EventScorePredictor(BaseEventScorePredictor):
         self.q_ = None
         self.f_loss_ = np.inf
 
+        # private instance variables
+        self._dt = None
+        self._reg = 0.0
+
     def _init_coef(self, ev, sc, n_objects):
         """
         Initialize model parameters
