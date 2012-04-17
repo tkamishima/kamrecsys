@@ -61,6 +61,8 @@ class EventScorePredictor(BaseEventScorePredictor):
         latent factors of users
     `q_` : array_like
         latent factors of items
+    `i_loss_` : float
+        the loss value after initialization
     `f_loss_` : float
         the loss value after fitting
 
@@ -97,6 +99,7 @@ class EventScorePredictor(BaseEventScorePredictor):
         self.bi_ = None
         self.p_ = None
         self.q_ = None
+        self.i_loss_ = np.inf
         self.f_loss_ = np.inf
 
         # private instance variables
@@ -315,6 +318,9 @@ class EventScorePredictor(BaseEventScorePredictor):
         # check optimization parameters
         if not 'disp' in kwargs:
             kwargs['disp'] = False
+
+        # get final loss
+        self.i_loss_ = self.loss(self._coef, ev, sc, n_objects)
 
         # optimize model
         # fmin_bfgs is slow for large data, maybe because due to the
