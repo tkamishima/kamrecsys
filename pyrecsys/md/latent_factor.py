@@ -51,18 +51,16 @@ class EventScorePredictor(BaseEventScorePredictor):
 
     Attributes
     ----------
-    `coef_` : array_like, ndim=1
-        model parameters
     `mu_` : array_like
-        `coef_`'s view, global bias
+        global bias
     `bu_` : array_like
-        `coef_`'s view, users' biases
+        users' biases
     `bi_` : array_like
-        `coef_`'s view, items' biases
+        items' biases
     `p_` : array_like
-        `coef_`'s view, latent factors of users
+        latent factors of users
     `q_` : array_like
-        `coef_`'s view, latent factors of items
+        latent factors of items
     `f_loss_` : float
         the loss value after fitting
 
@@ -94,7 +92,6 @@ class EventScorePredictor(BaseEventScorePredictor):
 
         self.C = np.float(C)
         self.k = np.int(k)
-        self.coef_ = None
         self.mu_ = None
         self.bu_ = None
         self.bi_ = None
@@ -103,6 +100,7 @@ class EventScorePredictor(BaseEventScorePredictor):
         self.f_loss_ = np.inf
 
         # private instance variables
+        self._coef = None
         self._dt = None
 
     def _init_coef(self, ev, sc, n_objects):
@@ -134,16 +132,16 @@ class EventScorePredictor(BaseEventScorePredictor):
         ])
 
         # memory allocation
-        self.coef_ = np.zeros(1 + (n_users + 1) + (n_items + 1) +
+        self._coef = np.zeros(1 + (n_users + 1) + (n_items + 1) +
                               (n_users + 1) * k + (n_items + 1) * k,
                               dtype=np.float)
 
         # set array's view
-        self.mu_ = self.coef_.view(self._dt)['mu'][0]
-        self.bu_ = self.coef_.view(self._dt)['bu'][0]
-        self.bi_ = self.coef_.view(self._dt)['bi'][0]
-        self.p_ = self.coef_.view(self._dt)['p'][0]
-        self.q_ = self.coef_.view(self._dt)['q'][0]
+        self.mu_ = self._coef.view(self._dt)['mu'][0]
+        self.bu_ = self._coef.view(self._dt)['bu'][0]
+        self.bi_ = self._coef.view(self._dt)['bi'][0]
+        self.p_ = self._coef.view(self._dt)['p'][0]
+        self.q_ = self._coef.view(self._dt)['q'][0]
 
         # set bias term
         self.mu_[0] = np.sum(sc) / np.float(n_events)
@@ -321,14 +319,14 @@ class EventScorePredictor(BaseEventScorePredictor):
         # optimize model
         # fmin_bfgs is slow for large data, maybe because due to the
         # computation cost for the Hessian matrices.
-        self.coef_[:] = fmin_cg(self.loss,
-                                self.coef_,
+        self._coef[:] = fmin_cg(self.loss,
+                                self._coef,
                                 fprime=self.grad_loss,
                                 args=(ev, sc, n_objects),
                                 **kwargs)
 
         # get final loss
-        self.f_loss_ = self.loss(self.coef_, ev, sc, n_objects)
+        self.f_loss_ = self.loss(self._coef, ev, sc, n_objects)
 
         # clean up temporary instance variables
         del self._reg

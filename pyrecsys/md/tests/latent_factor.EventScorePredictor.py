@@ -12,7 +12,7 @@
 >>>
 >>> recommender = EventScorePredictor(C=0.1, k=2)
 >>> print vars(recommender)
-{'C': 0.1, 'n_otypes': 0, 'bu_': None, 'bi_': None, 'k': 2, 'p_': None, 'q_': None, 'f_loss_': inf, 'iid': None, 'coef_': None, 'eid': None, 'n_objects': None, '_dt': None, 'mu_': None}
+{'C': 0.1, 'n_otypes': 0, 'bu_': None, 'bi_': None, 'k': 2, 'p_': None, 'q_': None, '_coef': None, 'f_loss_': inf, 'iid': None, 'eid': None, 'n_objects': None, '_dt': None, 'mu_': None}
 >>>
 >>> recommender.fit(data, disp=True, gtol=1e-03)
 Optimization terminated successfully.

@@ -21,12 +21,12 @@ recommender._init_coef(ev, sc, n_objects)
 #recommender.fit(data, maxiter=10, disp=True)
 
 stmt = """
-recommender.grad_loss(recommender.coef_, ev, sc, n_objects)
+recommender.grad_loss(recommender._coef, ev, sc, n_objects)
 """
 
 t = timeit.Timer(stmt, setup)
 print t.timeit(100)
 
 stmt = """
-recommender.loss(recommender.coef_, ev, sc, n_objects)
+recommender.loss(recommender._coef, ev, sc, n_objects)
 """
