@@ -104,7 +104,6 @@ class EventScorePredictor(BaseEventScorePredictor):
 
         # private instance variables
         self._dt = None
-        self._reg = 0.0
 
     def _init_coef(self, ev, sc, n_objects):
         """
@@ -331,36 +330,39 @@ class EventScorePredictor(BaseEventScorePredictor):
         # get final loss
         self.f_loss_ = self.loss(self.coef_, ev, sc, n_objects)
 
+        # clean up temporary instance variables
+        del self._reg
+
     def raw_predict(self, ev):
-        """
-        predict score of given one event represented by internal ids
+            """
+            predict score of given one event represented by internal ids
 
-        Parameters
-        ----------
-        (user, item) : array_like
-            a target user's and item's ids. unknwon objects assumed to be
-            represented by n_object[event_otype]
+            Parameters
+            ----------
+            (user, item) : array_like
+                a target user's and item's ids. unknwon objects assumed to be
+                represented by n_object[event_otype]
 
-        Returns
-        -------
-        sc : float
-            score for a target pair of user and item
+            Returns
+            -------
+            sc : float
+                score for a target pair of user and item
 
-        Raises
-        ------
-        TypeError
-            shape of an input array is illegal
-        """
+            Raises
+            ------
+            TypeError
+                shape of an input array is illegal
+            """
 
-        if ev.ndim == 1:
-            return self.mu_[0] + self.bu_[ev[0]] + self.bi_[ev[1]] +\
-                   np.dot(self.p_[ev[0]], self.q_[ev[1]])
-        elif ev.ndim == 2:
-            return self.mu_[0] + self.bu_[ev[:, 0]] + self.bi_[ev[:, 1]] +\
-                   np.sum(self.p_[ev[:, 0], :] * self.q_[ev[:, 1], :],
-                          axis=1)
-        else:
-            raise TypeError
+            if ev.ndim == 1:
+                return self.mu_[0] + self.bu_[ev[0]] + self.bi_[ev[1]] +\
+                       np.dot(self.p_[ev[0]], self.q_[ev[1]])
+            elif ev.ndim == 2:
+                return self.mu_[0] + self.bu_[ev[:, 0]] + self.bi_[ev[:, 1]] +\
+                       np.sum(self.p_[ev[:, 0], :] * self.q_[ev[:, 1], :],
+                              axis=1)
+            else:
+                raise TypeError
 
 #==============================================================================
 # Functions
