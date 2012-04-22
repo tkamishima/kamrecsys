@@ -16,9 +16,11 @@ Instruction
 4. Remove original files, if you do not need them.
 """
 
+from __future__ import unicode_literals
+
 import os
 import sys
-import codecs
+import io
 
 # set directories
 
@@ -114,8 +116,8 @@ outfile.close()
 
 # convert item files ----------------------------------------------------------
 
-infile = codecs.open(os.path.join(pwd, 'u.item'), 'r', 'cp1252')
-outfile = codecs.open(os.path.join(target, stem + '.item'), 'w', 'utf_8')
+infile = io.open(os.path.join(pwd, 'u.item'), 'r', encoding='cp1252')
+outfile = io.open(os.path.join(target, stem + '.item'), 'w', encoding='utf_8')
 
 outfile.write(
 """# Item feature file for ``movielens100k.event``.

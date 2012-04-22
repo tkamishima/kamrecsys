@@ -65,7 +65,7 @@ class EventUtilMixin(object):
             for e in xrange(self.s_event):
                 new_data[:, e] = self.eid[self.event_otypes[e]][data[:, e]]
         else:
-            raise TypeError, "Shape of input is illegal"
+            raise TypeError("Shape of input is illegal")
 
         return new_data
 
@@ -86,8 +86,13 @@ class EventUtilMixin(object):
         -------
         new_ev : array_like
             array whose elements are represented by external ids
+
+        Raises
+        ------
+        TypeError
+            Shape of an input array is illegal
         """
-        if missing_values == None:
+        if missing_values is None:
             missing_values = self.n_objects[self.event_otypes]
         if ev.ndim == 1 and ev.shape[0] == self.s_event:
             new_ev = np.array([self.iid[self.event_otypes[e]].\
@@ -99,6 +104,8 @@ class EventUtilMixin(object):
                 iid = self.iid[self.event_otypes[e]]
                 new_ev[:, e] = [iid.get(i, missing_values[e])
                                 for i in ev[:, e]]
+        else:
+            raise TypeError('The shape of an input is illegal')
 
         return new_ev
 
@@ -144,7 +151,7 @@ class EventData(BaseData, EventUtilMixin):
             if event_otypes.ndim != 1 or\
                np.min(event_otypes) < 0 or\
                np.max(event_otypes) >= n_otypes:
-                raise ValueError, "Illegal event_otypes specification"
+                raise ValueError("Illegal event_otypes specification")
             self.s_event = event_otypes.shape[0]
             self.event_otypes = np.asarray(event_otypes)
         self.n_events = 0
@@ -213,7 +220,7 @@ class EventWithScoreData(EventData):
 
     def __init__(self, n_otypes=2, n_stypes=1, event_otypes=None):
         if n_stypes < 1:
-            raise ValueError, "n_styeps must be >= 1"
+            raise ValueError("n_styeps must be >= 1")
         super(EventWithScoreData, self).__init__(n_otypes=n_otypes,
                                                  event_otypes=event_otypes)
         self.n_stypes = n_stypes

@@ -72,7 +72,7 @@ class BaseData(object):
 
     def __init__(self, n_otypes=2):
         if n_otypes < 1:
-            raise ValueError, "n_otypes must be >= 1"
+            raise ValueError("n_otypes must be >= 1")
         self.n_otypes = n_otypes
         self.n_objects = np.zeros(self.n_otypes, dtype=int)
         self.eid = np.repeat(None, self.n_otypes)
@@ -123,7 +123,7 @@ class BaseData(object):
         try:
             return self.eid[otype][iid]
         except IndexError:
-            raise ValueError, "Illegal internal id"
+            raise ValueError("Illegal internal id")
 
     def to_iid(self, otype, eid):
         """
@@ -149,7 +149,7 @@ class BaseData(object):
         try:
             return self.iid[otype][eid]
         except KeyError:
-            raise ValueError, "Illegal external id"
+            raise ValueError("Illegal external id")
 
     @staticmethod
     def _gen_id(event):

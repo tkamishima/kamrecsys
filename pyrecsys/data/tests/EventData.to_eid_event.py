@@ -16,7 +16,7 @@ data.set_events(x['event'], x['score'], score_domain=(1.0, 5.0))
 # test to_eid_event
 check = data.to_eid_event(data.event)
 if np.logical_and.reduce((x['event'] == check).ravel()):
-    print "Ok"
+    print("Ok")
 
 
 # test to_eid_event / per line conversion
@@ -24,4 +24,4 @@ check = np.empty_like(data.event, dtype=x['event'].dtype)
 for i, j in enumerate(data.event):
     check[i, :] = data.to_eid_event(j)
 if np.logical_and.reduce((x['event'] == check).ravel()):
-    print "Ok"
+    print("Ok")

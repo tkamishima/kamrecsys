@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-""" 
+"""
 Convert MovieLens 1M data sets to PyRecSys Sample format
 
 Instruction
@@ -16,10 +16,12 @@ Instruction
 4. Remove original files, if you do not need them.
 """
 
+from __future__ import unicode_literals
+
 import os
 import sys
+import io
 import re
-import codecs
 
 # set directories
 
@@ -121,8 +123,8 @@ outfile.close()
 
 # convert item files ----------------------------------------------------------
 
-infile = codecs.open(os.path.join(pwd, 'movies.dat'), 'r', 'cp1252')
-outfile = codecs.open(os.path.join(target, stem + '.item'), 'w', 'utf_8')
+infile = io.open(os.path.join(pwd, 'movies.dat'), 'r', encoding='cp1252')
+outfile = io.open(os.path.join(target, stem + '.item'), 'w', encoding='utf_8')
 
 outfile.write(
 """# Item feature file for ``movielens1m.event``.
@@ -154,8 +156,8 @@ year_p = re.compile(r'\((\d\d\d\d)\)$')
 
 for line in infile.readlines():
     f = line.rstrip('\r\n').split("::")
-    if f[0] == u'3845': # for buggy character in original file
-        f[1] = re.sub(u'\&\#8230\;', u'\u2026', f[1])
+    if f[0] == '3845': # for buggy character in original file
+        f[1] = re.sub('&#8230;', '\u2026', f[1])
     outfile.write(f[0] + "\t" + f[1] + "\t")
     year = year_p.search(f[1]).group(1)
     outfile.write(year + '\t')

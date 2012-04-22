@@ -10,7 +10,7 @@ SYNOPSIS::
 Options
 -------
 -i <INPUT>, --in <INPUT>
-    file anme of event data
+    file name of event data
 -o <OUTPUT>, --out <OUTPUT>
     file name of a trained model
 -C <C>, --lambda <C>

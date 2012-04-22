@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from __future__ import print_function
 import os
 import numpy as np
 
@@ -15,11 +16,11 @@ data.set_events(x['event'], x['score'], score_domain=(1.0, 5.0))
 
 # test EventData.to_iid_event
 if np.array_equal(data.event, data.to_iid_event(x['event'])):
-    print "Ok"
+    print("Ok")
 
 # test EventData.to_iid_event / per line conversion
 check = np.empty_like(x['event'], dtype=np.int)
 for i, j in enumerate(x['event']):
     check[i, :] = data.to_iid_event(j)
 if np.array_equal(data.event, check):
-    print "Ok"
+    print("Ok")

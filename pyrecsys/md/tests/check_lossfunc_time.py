@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from __future__ import print_function
 import timeit
 
 setup = """
@@ -25,7 +26,7 @@ recommender.grad_loss(recommender._coef, ev, sc, n_objects)
 """
 
 t = timeit.Timer(stmt, setup)
-print t.timeit(100)
+print(t.timeit(100))
 
 stmt = """
 recommender.loss(recommender._coef, ev, sc, n_objects)
