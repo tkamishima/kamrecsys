@@ -86,8 +86,13 @@ class EventUtilMixin(object):
         -------
         new_ev : array_like
             array whose elements are represented by external ids
+
+        Raises
+        ------
+        TypeError
+            Shape of an input array is illegal
         """
-        if missing_values == None:
+        if missing_values is None:
             missing_values = self.n_objects[self.event_otypes]
         if ev.ndim == 1 and ev.shape[0] == self.s_event:
             new_ev = np.array([self.iid[self.event_otypes[e]].\
@@ -99,6 +104,8 @@ class EventUtilMixin(object):
                 iid = self.iid[self.event_otypes[e]]
                 new_ev[:, e] = [iid.get(i, missing_values[e])
                                 for i in ev[:, e]]
+        else:
+            raise TypeError('The shape of an input is illegal')
 
         return new_ev
 

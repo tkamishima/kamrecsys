@@ -157,7 +157,7 @@ year_p = re.compile(r'\((\d\d\d\d)\)$')
 for line in infile.readlines():
     f = line.rstrip('\r\n').split("::")
     if f[0] == '3845': # for buggy character in original file
-        f[1] = re.sub('\&\#8230\;', '\u2026', f[1])
+        f[1] = re.sub('&#8230;', '\u2026', f[1])
     outfile.write(f[0] + "\t" + f[1] + "\t")
     year = year_p.search(f[1]).group(1)
     outfile.write(year + '\t')

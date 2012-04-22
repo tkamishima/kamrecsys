@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Recommenders: abstract classeses
+Recommenders: abstract classes
 """
 
 #==============================================================================
