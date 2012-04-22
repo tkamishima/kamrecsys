@@ -366,7 +366,7 @@ class EventScorePredictor(BaseEventScorePredictor):
                        np.sum(self.p_[ev[:, 0], :] * self.q_[ev[:, 1], :],
                               axis=1)
             else:
-                raise TypeError
+                raise TypeError('argument has illegal shape')
 
 #==============================================================================
 # Functions

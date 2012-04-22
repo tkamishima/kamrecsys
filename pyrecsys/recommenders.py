@@ -120,7 +120,7 @@ class BaseRecommender(object):
         try:
             return self.eid[otype][iid]
         except IndexError:
-            raise ValueError, "Illegal internal id"
+            raise ValueError("Illegal internal id")
 
     def to_iid(self, otype, eid):
         """
@@ -147,7 +147,7 @@ class BaseRecommender(object):
         try:
             return self.iid[otype][eid]
         except KeyError:
-            raise ValueError, "Illegal external id"
+            raise ValueError("Illegal external id")
 
     def _set_object_info(self, data):
         """
@@ -164,7 +164,7 @@ class BaseRecommender(object):
             if input data is not :class:`pyrecsys.data.BaseData` class
         """
         if not isinstance(data, BaseData):
-            raise TypeError, "input data must data.BaseData class"
+            raise TypeError("input data must data.BaseData class")
 
         self.n_otypes = data.n_otypes
         self.n_objects = data.n_objects
@@ -206,7 +206,7 @@ class BaseEventRecommender(BaseRecommender, EventUtilMixin):
             if input data is not :class:`pyrecsys.data.EventData` class
         """
         if not isinstance(data, EventData):
-            raise TypeError, "input data must data.EventData class"
+            raise TypeError("input data must data.EventData class")
 
         self.event_otypes = data.event_otypes
         self.s_event = data.s_event
@@ -281,7 +281,7 @@ class BaseEventScorePredictor(BaseEventRecommender):
             class
         """
         if not isinstance(data, EventWithScoreData):
-            raise TypeError , "input data must data.EventWithScoreData class"
+            raise TypeError("input data must data.EventWithScoreData class")
 
         # import meta information of objects and events to this recommender
         self._set_object_info(data)
