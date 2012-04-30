@@ -20,8 +20,8 @@ from ..data import EventWithScoreData
 # Public symbols
 #==============================================================================
 
-__all__ = ['movielens100k_info', 'load_movielens100k', 'load_movielens_mini',
-           'movielens1m_info', 'load_movielens1m']
+__all__ = ['MOVIELENS100K_INFO', 'load_movielens100k', 'load_movielens_mini',
+           'MOVIELENS1M_INFO', 'load_movielens1m']
 
 #==============================================================================
 # Constants
@@ -29,7 +29,7 @@ __all__ = ['movielens100k_info', 'load_movielens100k', 'load_movielens_mini',
 
 # Conversion tables for mapping the numbers to names for the ``movielens100k``
 # data set. available tables are ``user_occupation`` and ``item_genre``.
-movielens100k_info = {
+MOVIELENS100K_INFO = {
     'user_occupation': np.array([
         'None', 'Other', 'Administrator', 'Artist', 'Doctor', 'Educator',
         'Engineer', 'Entertainment', 'Executive', 'Healthcare', 'Homemaker',
@@ -44,7 +44,7 @@ movielens100k_info = {
 #Conversion tables for mapping the numbers to names for the ``movielens1m``
 # data set. available tables are ``user_age``, ``user_occupation`` and
 # ``item_genre``.
-movielens1m_info = {
+MOVIELENS1M_INFO = {
     'user_age': np.array([
         'Under 18', '18-24', '25-34', '35-44', '45-49', '50-55', '56+']),
     'user_occupation': np.array([
@@ -167,9 +167,9 @@ def load_movielens100k(infile=None):
     infile = os.path.join(os.path.dirname(__file__),
                           'samples', 'movielens100k.item')
     fdtype = np.dtype([('name', 'U81'),
-                       ('date', np.dtype([('day', np.int),
-                                          ('month', np.int),
-                                          ('year', np.int)])),
+                       ('day', np.int),
+                       ('month', np.int),
+                       ('year', np.int),
                        ('genre', 'i1', 18),
                        ('imdb', 'S134')])
     dtype = np.dtype([('eid', np.int), ('feature', fdtype)])
