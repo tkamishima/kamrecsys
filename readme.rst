@@ -15,12 +15,7 @@ We tested this module under the following softwares:
 * Python 2.7.x (Python 3.x's are not supported)
 * NumPy 1.6.x or later
 * SciPy 0.10.x or later
-
-Optionally depends on the following python modules:
-
-* Scikit-learn
-* PyMC
-* OpenOpt (FuncDesigner)
+* Scikit-learn 0.10 or later
 
 Algorithms
 ==========
