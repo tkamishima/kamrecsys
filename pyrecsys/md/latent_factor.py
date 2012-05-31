@@ -102,6 +102,10 @@ class EventScorePredictor(BaseEventScorePredictor):
         self.i_loss_ = np.inf
         self.f_loss_ = np.inf
 
+        # check parameters
+        if self.k < 1:
+            raise ValueError("k must be >= 1")
+
         # private instance variables
         self._coef = None
         self._dt = None

@@ -11,6 +11,12 @@
 >>>
 >>> data = load_movielens_mini()
 >>>
+>>> try:
+...     recommender = EventScorePredictor(C=0.1, k=0)
+... except ValueError as ex:
+...     print(ex)
+...
+k must be >= 1
 >>> recommender = EventScorePredictor(C=0.1, k=2)
 >>> print(vars(recommender))
 {'C': 0.1, 'n_otypes': 0, 'bu_': None, 'bi_': None, 'k': 2, 'p_': None, 'q_': None, '_coef': None, 'f_loss_': inf, 'iid': None, 'i_loss_': inf, 'eid': None, 'n_objects': None, '_dt': None, 'mu_': None}
@@ -21,6 +27,7 @@ Optimization terminated successfully.
          Iterations: 28
          Function evaluations: 55
          Gradient evaluations: 55
+>>>
 >>> for u in [1, 3, 5]:
 ...     for i in [7, 9, 11]:
 ...         print(u, i, recommender.predict((u, i)))
@@ -39,6 +46,7 @@ Optimization terminated successfully.
 [ 4.00074631  4.98286036  3.44741578  3.89716398  4.20400627  3.66306486
   3.74684795  3.96853184  3.60148695]
 """
+
 from __future__ import print_function
 
 import sys
@@ -57,6 +65,11 @@ from pyrecsys.md.latent_factor import EventScorePredictor
 np.random.seed(1234)
 
 data = load_movielens_mini()
+
+try:
+    recommender = EventScorePredictor(C=0.1, k=0)
+except ValueError as ex:
+    print(ex)
 
 recommender = EventScorePredictor(C=0.1, k=2)
 print(vars(recommender))
