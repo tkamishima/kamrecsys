@@ -15,6 +15,7 @@ import logging
 import numpy as np
 
 from ..data import EventWithScoreData
+from ._base import SAMPLE_PATH
 
 #==============================================================================
 # Public symbols
@@ -143,8 +144,7 @@ def load_movielens100k(infile=None):
 
     # load event file
     if infile is None:
-        infile = os.path.join(os.path.dirname(__file__),
-                              'samples', 'movielens100k.event')
+        infile = os.path.join(SAMPLE_PATH, 'movielens100k.event')
     dtype = np.dtype([('event', np.int, 2),
                       ('score', np.float),
                       ('event_feature', np.dtype([('timestamp', np.int)]))])
@@ -155,8 +155,7 @@ def load_movielens100k(infile=None):
                     event_feature=x['event_feature'])
 
     # load user's feature file
-    infile = os.path.join(os.path.dirname(__file__),
-                          'samples', 'movielens100k.user')
+    infile = os.path.join(SAMPLE_PATH, 'movielens100k.user')
     fdtype = np.dtype([('age', np.int), ('gender', np.int),
                        ('occupation', np.int), ('zip', 'S5')])
     dtype = np.dtype([('eid', np.int), ('feature', fdtype)])
@@ -164,8 +163,7 @@ def load_movielens100k(infile=None):
     data.set_features(0, x['eid'], x['feature'])
 
     # load item's feature file
-    infile = os.path.join(os.path.dirname(__file__),
-                          'samples', 'movielens100k.item')
+    infile = os.path.join(SAMPLE_PATH, 'movielens100k.item')
     fdtype = np.dtype([('name', 'U81'),
                        ('day', np.int),
                        ('month', np.int),
@@ -201,8 +199,7 @@ def load_movielens_mini():
     * 30 events in total
     * 8 users rate 10 items (=movies)
     """
-    infile = os.path.join(os.path.dirname(__file__),
-                          'samples', 'movielens_mini.event')
+    infile = os.path.join(SAMPLE_PATH, 'movielens_mini.event')
     return load_movielens100k(infile=infile)
 
 def load_movielens1m(infile=None):
@@ -279,8 +276,7 @@ def load_movielens1m(infile=None):
 
     # load event file
     if infile is None:
-        infile = os.path.join(os.path.dirname(__file__),
-                              'samples', 'movielens1m.event')
+        infile = os.path.join(SAMPLE_PATH, 'movielens1m.event')
     dtype = np.dtype([('event', np.int, 2),
                       ('score', np.float),
                       ('event_feature', np.dtype([('timestamp', np.int)]))])
@@ -291,8 +287,7 @@ def load_movielens1m(infile=None):
                     event_feature=x['event_feature'])
 
     # load user's feature file
-    infile = os.path.join(os.path.dirname(__file__),
-                          'samples', 'movielens1m.user')
+    infile = os.path.join(SAMPLE_PATH, 'movielens1m.user')
     fdtype = np.dtype([('gender', np.int), ('age', np.int),
                        ('occupation', np.int), ('zip', 'S5')])
     dtype = np.dtype([('eid', np.int), ('feature', fdtype)])
@@ -300,8 +295,7 @@ def load_movielens1m(infile=None):
     data.set_features(0, x['eid'], x['feature'])
 
     # load item's feature file
-    infile = os.path.join(os.path.dirname(__file__),
-                          'samples', 'movielens1m.item')
+    infile = os.path.join(SAMPLE_PATH, 'movielens1m.item')
     infile = codecs.open(infile, 'r', 'utf_8')
     fdtype = np.dtype([('name', 'U82'),
                        ('year', np.int),
