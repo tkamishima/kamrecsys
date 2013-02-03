@@ -1,6 +1,6 @@
-*********
+#########
 KamRecSys
-*********
+#########
 
 ``KamRecSys`` is a python package of algorithms for recommender systems.
 
@@ -16,6 +16,12 @@ We tested this module under the following packages:
 * NumPy 1.6.x or later
 * SciPy 0.11.x or later
 * Scikit-learn 0.11 or later
+
+Install
+=======
+
+First, generate sample data sets that you need. Read a `readme.rst` file in a `data` directory.
+You then build and install by using a `setup.py` script.
 
 Algorithms
 ==========
