@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Algorithms: matrix decomposition
+Algorithms: matrix factorization
 """
 
 #==============================================================================
@@ -12,4 +12,4 @@ Algorithms: matrix decomposition
 # Public symbols
 #==============================================================================
 
-__all__ = ['latent_factor']
+__all__ = ['pmf']

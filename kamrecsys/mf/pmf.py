@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Matrix Decomposition: latent factor model
+Matrix Factorization: probabilistic matrix factorization model
 """
 
 #==============================================================================
@@ -39,7 +39,8 @@ __all__ = ['EventScorePredictor']
 
 class EventScorePredictor(BaseEventScorePredictor):
     """
-    Latent factor model defined by equation (5) in [1]_.
+    A probabilistic matrix factorization model proposed in [1]_.
+    A method of handling bias terms is defined by equation (5) in [2]_.
 
     Parameters
     ----------
@@ -85,8 +86,10 @@ class EventScorePredictor(BaseEventScorePredictor):
 
     References
     ----------
-    .. [1] Y. Koren, "Factorization Meets the Neighborhood: A Multifaceted
-       Collaborative Filtering Model", KDD2008
+    .. [1] R. Salakhutdinov and A. Mnih. "Probabilistic matrix factorization"
+        NIPS 20
+    .. [2] Y. Koren, "Factorization Meets the Neighborhood: A Multifaceted
+        Collaborative Filtering Model", KDD2008
     """
 
     def __init__(self, C=1.0, k=1):

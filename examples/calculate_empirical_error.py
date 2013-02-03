@@ -8,7 +8,7 @@ import sys
 import numpy as np
 
 from kamrecsys.datasets import *
-from kamrecsys.md.latent_factor import EventScorePredictor
+from kamrecsys.mf.pmf import EventScorePredictor
 
 # To get the same result in any execution
 np.random.seed(1234)
@@ -18,7 +18,7 @@ data = load_movielens100k()
 
 # generate empty model
 # `C` : regularization parameter
-# `k` : the dimension of latent factors
+# `k` : the number of latent factors
 recommender = EventScorePredictor(C=0.1, k=5)
 
 # fit model

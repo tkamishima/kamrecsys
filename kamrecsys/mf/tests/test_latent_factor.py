@@ -14,7 +14,7 @@ class TestEventScorePredictor(unittest.TestCase):
     def runTest(self):
         import numpy as np
         from kamrecsys.datasets import load_movielens_mini
-        from kamrecsys.md.latent_factor import EventScorePredictor
+        from kamrecsys.mf.pmf import EventScorePredictor
 
         np.random.seed(1234)
         data = load_movielens_mini()

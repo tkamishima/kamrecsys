@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Learning latent factor models from event-score data
+Learning probabilistic matrix factorization factor models from event-score
+data
 
 SYNOPSIS::
 
@@ -16,7 +17,7 @@ Options
 -C <C>, --lambda <C>
     regularization parameter, default=0.01.
 -k <K>, --dim <K>
-    the number of dimensions of latent, default=1.
+    the number of latent factors, default=1.
 -t <GTOL>, --gtol <GTOL>
     optimization parameter. the size of norm of gradient. default=1e-05.
 -m <MAXITER>, --maxiter <MAXITER>
@@ -67,7 +68,7 @@ import cPickle
 import numpy as np
 
 from kamrecsys.data import EventWithScoreData
-from kamrecsys.md.latent_factor import EventScorePredictor
+from kamrecsys.mf.pmf import EventScorePredictor
 
 #==============================================================================
 # Public symbols

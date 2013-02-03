@@ -8,7 +8,7 @@ setup = """
 import sys
 import numpy as np
 from kamrecsys.datasets import load_movielens100k
-from kamrecsys.md.latent_factor import EventScorePredictor
+from kamrecsys.mf.pmf import EventScorePredictor
 
 np.random.seed(1234)
 

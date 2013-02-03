@@ -26,9 +26,9 @@ You then build and install by using a `setup.py` script.
 Algorithms
 ==========
 
-* Matrix Decomposition
+* Matrix Factorization
 
-  * Latent Factor Model
+  * Probabilistic Matrix Factorization
 
 DataSets
 ========

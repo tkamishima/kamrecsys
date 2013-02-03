@@ -10,7 +10,7 @@ KamRecSys: Algorithms for recommender systems in Python
 
 __author__ = "Toshihiro Kamishima ( http://www.kamishima.net/ )"
 __date__ = "2012/03/25"
-__version__ = "3.0.0"
+__version__ = "3.0.1"
 __copyright__ = "Copyright (c) 2012 Toshihiro Kamishima all rights reserved."
 __license__ = "MIT License: http://www.opensource.org/licenses/mit-license.php"
 __docformat__ = "restructuredtext en"
@@ -25,7 +25,7 @@ import logging
 # Public symbols
 #==============================================================================
 
-__all__ = ['data', 'datasets', 'eval', 'md', 'recommenders']
+__all__ = ['data', 'datasets', 'eval', 'mf', 'recommenders']
 
 #==============================================================================
 # Constants
