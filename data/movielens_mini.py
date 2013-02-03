@@ -23,7 +23,7 @@ pwd = os.path.dirname(__file__)
 if len(sys.argv) >= 2:
     target = sys.argv[1]
 else:
-    target = os.path.join(pwd, '..', "pyrecsys", 'datasets', 'samples')
+    target = os.path.join(pwd, '..', "kamrecsys", 'datasets', 'samples')
 
 # convert event files ---------------------------------------------------------
 

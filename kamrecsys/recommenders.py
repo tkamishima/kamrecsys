@@ -74,7 +74,7 @@ class BaseRecommender(object):
 
         Parameters
         ----------
-        data : :class:`pyrecsys.data.BaseData`
+        data : :class:`kamrecsys.data.BaseData`
             data to fit
         """
 
@@ -155,13 +155,13 @@ class BaseRecommender(object):
 
         Parameters
         ----------
-        data : :class:`pyrecsys.data.BaseData`
+        data : :class:`kamrecsys.data.BaseData`
             input data
         
         Raises
         ------
         TypeError
-            if input data is not :class:`pyrecsys.data.BaseData` class
+            if input data is not :class:`kamrecsys.data.BaseData` class
         """
         if not isinstance(data, BaseData):
             raise TypeError("input data must data.BaseData class")
@@ -197,13 +197,13 @@ class BaseEventRecommender(BaseRecommender, EventUtilMixin):
 
         Parameters
         ----------
-        data : :class:`pyrecsys.data.EventData`
+        data : :class:`kamrecsys.data.EventData`
             input data
 
         Raises
         ------
         TypeError
-            if input data is not :class:`pyrecsys.data.EventData` class
+            if input data is not :class:`kamrecsys.data.EventData` class
         """
         if not isinstance(data, EventData):
             raise TypeError("input data must data.EventData class")
@@ -254,7 +254,7 @@ class BaseEventScorePredictor(BaseEventRecommender):
         """
         Parameters
         ----------
-        data : :class:`pyrecsys.data.EventWithScoreData`
+        data : :class:`kamrecsys.data.EventWithScoreData`
             data to fit
         event_index : array_like, shape=(variable,)
             a set of indexes to specify the elements in events that are used in
@@ -277,7 +277,7 @@ class BaseEventScorePredictor(BaseEventRecommender):
         Raises
         ------
         TypeError
-            if input data is not :class:`pyrecsys.data.EventWithScoreData`
+            if input data is not :class:`kamrecsys.data.EventWithScoreData`
             class
         """
         if not isinstance(data, EventWithScoreData):
@@ -329,7 +329,7 @@ class BaseEventScorePredictor(BaseEventRecommender):
 
 # init logging system ---------------------------------------------------------
 
-logger = logging.getLogger('pyrecsys')
+logger = logging.getLogger('kamrecsys')
 if not logger.handlers:
     logger.addHandler(logging.NullHandler)
 

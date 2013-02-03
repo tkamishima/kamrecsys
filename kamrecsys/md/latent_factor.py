@@ -295,7 +295,7 @@ class EventScorePredictor(BaseEventScorePredictor):
 
         Parameters
         ----------
-        data : :class:`pyrecsys.data.EventWithScoreData`
+        data : :class:`kamrecsys.data.EventWithScoreData`
             data to fit
         user_index : optional, int
             Index to specify the position of a user in an event vector.
@@ -382,7 +382,7 @@ class EventScorePredictor(BaseEventScorePredictor):
 
 # init logging system ---------------------------------------------------------
 
-logger = logging.getLogger('pyrecsys')
+logger = logging.getLogger('kamrecsys')
 if not logger.handlers:
     logger.addHandler(logging.NullHandler)
 

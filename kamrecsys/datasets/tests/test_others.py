@@ -12,7 +12,7 @@ import unittest
 class TestLoadPCISample(unittest.TestCase):
 
     def test_load_pci_sample(self):
-        from pyrecsys.datasets import load_pci_sample
+        from kamrecsys.datasets import load_pci_sample
         data = load_pci_sample()
         self.assertEqual(str(data.event_otypes), '[0 1]')
         self.assertEqual(data.n_otypes, 2)

@@ -14,8 +14,8 @@ class EventUtilMixin(unittest.TestCase):
     def test_to_eid_event(self):
         import os
         import numpy as np
-        from pyrecsys.data import EventWithScoreData
-        from pyrecsys.datasets import SAMPLE_PATH
+        from kamrecsys.data import EventWithScoreData
+        from kamrecsys.datasets import SAMPLE_PATH
 
         infile = os.path.join(SAMPLE_PATH, 'pci.event')
         dtype = np.dtype([('event', 'S18', 2), ('score', np.float)])
@@ -38,8 +38,8 @@ class EventUtilMixin(unittest.TestCase):
     def test_to_iid_event(self):
         import os
         import numpy as np
-        from pyrecsys.data import EventWithScoreData
-        from pyrecsys.datasets import SAMPLE_PATH
+        from kamrecsys.data import EventWithScoreData
+        from kamrecsys.datasets import SAMPLE_PATH
 
         infile = os.path.join(SAMPLE_PATH, 'pci.event')
         dtype = np.dtype([('event', 'S18', 2), ('score', np.float)])

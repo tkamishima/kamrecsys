@@ -46,7 +46,7 @@ SAMPLE_PATH = os.path.join(os.path.dirname(__file__), 'samples')
 
 # init logging system
 
-logger = logging.getLogger('pyrecsys')
+logger = logging.getLogger('kamrecsys')
 if not logger.handlers:
     logger.addHandler(logging.NullHandler)
 

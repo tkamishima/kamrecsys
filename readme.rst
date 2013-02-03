@@ -1,8 +1,8 @@
-********
-PyRecSys
-********
+*********
+KamRecSys
+*********
 
-``PyRecSys`` is a python package of algorithms for recommender systems.
+``KamRecSys`` is a python package of algorithms for recommender systems.
 
 This package targets experimental algorithm used for research purpose.
 We concentrate on the flexibility of data structure or easiness for implementing new algorithm rather than scalablity or efficiency of algorithms.
@@ -10,12 +10,12 @@ We concentrate on the flexibility of data structure or easiness for implementing
 Requirements
 ============
 
-We tested this module under the following softwares:
+We tested this module under the following packages:
 
 * Python 2.7.x (Python 3.x's are not supported)
 * NumPy 1.6.x or later
-* SciPy 0.10.x or later
-* Scikit-learn 0.10 or later
+* SciPy 0.11.x or later
+* Scikit-learn 0.11 or later
 
 Algorithms
 ==========

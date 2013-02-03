@@ -13,7 +13,7 @@ import unittest
 class TestBaseData(unittest.TestCase):
 
     def test_BaseData(self):
-        from pyrecsys.datasets import load_pci_sample
+        from kamrecsys.datasets import load_pci_sample
 
         data = load_pci_sample()
 

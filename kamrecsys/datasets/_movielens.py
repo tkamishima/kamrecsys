@@ -87,7 +87,7 @@ def load_movielens100k(infile=None):
 
     Returns
     -------
-    data : :class:`pyrecsys.data.EventWithScoreData`
+    data : :class:`kamrecsys.data.EventWithScoreData`
         sample data
 
     Notes
@@ -190,7 +190,7 @@ def load_movielens_mini():
 
     Returns
     -------
-    data : :class:`pyrecsys.data.EventWithScoreData`
+    data : :class:`kamrecsys.data.EventWithScoreData`
         sample data
 
     Notes
@@ -216,7 +216,7 @@ def load_movielens1m(infile=None):
 
     Returns
     -------
-    data : :class:`pyrecsys.data.EventWithScoreData`
+    data : :class:`kamrecsys.data.EventWithScoreData`
         sample data
 
     Notes
@@ -314,7 +314,7 @@ def load_movielens1m(infile=None):
 
 # init logging system ---------------------------------------------------------
 
-logger = logging.getLogger('pyrecsys')
+logger = logging.getLogger('kamrecsys')
 if not logger.handlers:
     logger.addHandler(logging.NullHandler)
 

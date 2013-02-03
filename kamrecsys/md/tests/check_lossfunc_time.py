@@ -7,8 +7,8 @@ import timeit
 setup = """
 import sys
 import numpy as np
-from pyrecsys.datasets import load_movielens100k
-from pyrecsys.md.latent_factor import EventScorePredictor
+from kamrecsys.datasets import load_movielens100k
+from kamrecsys.md.latent_factor import EventScorePredictor
 
 np.random.seed(1234)
 

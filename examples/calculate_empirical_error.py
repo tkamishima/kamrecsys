@@ -7,8 +7,8 @@ Calculate errors of predicted scores
 import sys
 import numpy as np
 
-from pyrecsys.datasets import *
-from pyrecsys.md.latent_factor import EventScorePredictor
+from kamrecsys.datasets import *
+from kamrecsys.md.latent_factor import EventScorePredictor
 
 # To get the same result in any execution
 np.random.seed(1234)

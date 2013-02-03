@@ -1,31 +1,26 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-PyRecSys: Algorithms for recommender systems in Python
+Evaluation: simple metrics for evaluating scores, relevance, etc.
 """
 
 #==============================================================================
-# Module metadata variables
+# Evaluation: metrics
 #==============================================================================
-
-__author__ = "Toshihiro Kamishima ( http://www.kamishima.net/ )"
-__date__ = "2012/03/25"
-__version__ = "0.2.4"
-__copyright__ = "Copyright (c) 2012 Toshihiro Kamishima all rights reserved."
-__license__ = "MIT License: http://www.opensource.org/licenses/mit-license.php"
-__docformat__ = "restructuredtext en"
 
 #==============================================================================
 # Imports
 #==============================================================================
 
 import logging
+import sys
+import numpy as np
 
 #==============================================================================
 # Public symbols
 #==============================================================================
 
-__all__ = ['data', 'datasets', 'eval', 'md', 'recommenders']
+__all__ = []
 
 #==============================================================================
 # Constants
@@ -40,7 +35,7 @@ __all__ = ['data', 'datasets', 'eval', 'md', 'recommenders']
 #==============================================================================
 
 #==============================================================================
-# Functions 
+# Functions
 #==============================================================================
 
 #==============================================================================
@@ -49,7 +44,7 @@ __all__ = ['data', 'datasets', 'eval', 'md', 'recommenders']
 
 # init logging system ---------------------------------------------------------
 
-logger = logging.getLogger('pyrecsys')
+logger = logging.getLogger('kamrecsys')
 if not logger.handlers:
     logger.addHandler(logging.NullHandler)
 

@@ -6,7 +6,7 @@
 # This data set consists of
 #     n ratings with (1-5) from n users to n movies.
 #
-# imported from scikits.crab to PyRecSys
+# imported from scikits.crab to KamRecSys
 Jack Matthews	Lady in the Water	3.0
 Jack Matthews	Snakes on a Planet	4.0
 Jack Matthews	You, Me and Dupree	3.5

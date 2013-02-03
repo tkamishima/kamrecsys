@@ -66,8 +66,8 @@ import datetime
 import cPickle
 import numpy as np
 
-from pyrecsys.data import EventWithScoreData
-from pyrecsys.md.latent_factor import EventScorePredictor
+from kamrecsys.data import EventWithScoreData
+from kamrecsys.md.latent_factor import EventScorePredictor
 
 #==============================================================================
 # Public symbols
