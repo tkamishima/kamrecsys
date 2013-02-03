@@ -20,8 +20,8 @@ We tested this module under the following packages:
 Install
 =======
 
-First, generate sample data sets that you need. Read a `readme.rst` file in a `data` directory.
-You then build and install by using a `setup.py` script.
+First, generate sample data sets that you need. Read a ``readme.rst`` file in a ``data`` directory.
+You then build and install by using a ``setup.py`` script.
 
 Algorithms
 ==========
