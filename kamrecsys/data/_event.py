@@ -126,7 +126,9 @@ class EventData(BaseData, EventUtilMixin):
     s_event : int
         the size of event, which is the number of objects to reprent a rating
         event
-    event : array_like, shape=(, s_event), dtype=int
+    n_events : int
+        the number of events
+    event : array_like, shape=(n_events, s_event), dtype=int
         each row is a vector of internal ids that indicates the tareget of
         rating event
     event_feature : array_like, shape=(n_events, variable), dtype=variable
