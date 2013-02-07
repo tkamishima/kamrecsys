@@ -73,7 +73,8 @@ MOVIELENS1M_INFO = {
 # Functions 
 #==============================================================================
 
-def load_movielens100k(infile=None):
+def load_movielens100k(infile=None,
+                       event_dtype=np.dtype([('timestamp', np.int)])):
     """ load the MovieLens 100k data set
 
     Original file ``ml-100k.zip`` is distributed by the Grouplens Research
@@ -84,6 +85,9 @@ def load_movielens100k(infile=None):
     ----------
     infile : optional, file or str
         input file if specified; otherwise, read from default sample directory.
+    event_dtype : np.dtype
+        dtype of extra event features. as default, it consists of only a
+        ``timestamp`` feature.
 
     Returns
     -------
@@ -105,7 +109,7 @@ def load_movielens100k(infile=None):
     * domain of score is [1.0, 2.0, 3.0, 4.0, 5.0]
     * dtype=np.float
 
-    Format of event_features ( `data.event_feature` ):
+    Default format of event_features ( `data.event_feature` ):
     
     timestamp : int
         UNIX seconds since 1/1/1970 UTC
@@ -147,7 +151,7 @@ def load_movielens100k(infile=None):
         infile = os.path.join(SAMPLE_PATH, 'movielens100k.event')
     dtype = np.dtype([('event', np.int, 2),
                       ('score', np.float),
-                      ('event_feature', np.dtype([('timestamp', np.int)]))])
+                      ('event_feature', event_dtype)])
     x = np.genfromtxt(fname=infile, delimiter='\t', dtype=dtype)
     data = EventWithScoreData(n_otypes=2, n_stypes=1,
                               event_otypes=np.array([0, 1]))
@@ -202,7 +206,8 @@ def load_movielens_mini():
     infile = os.path.join(SAMPLE_PATH, 'movielens_mini.event')
     return load_movielens100k(infile=infile)
 
-def load_movielens1m(infile=None):
+def load_movielens1m(infile=None,
+                     event_dtype=np.dtype([('timestamp', np.int)])):
     """ load the MovieLens 1m data set
 
     Original file ``ml-1m.zip`` is distributed by the Grouplens Research
@@ -213,6 +218,9 @@ def load_movielens1m(infile=None):
     ----------
     infile : optional, file or str
         input file if specified; otherwise, read from default sample directory.
+    event_dtype : np.dtype
+        dtype of extra event features. as default, it consists of only a
+        ``timestamp`` feature.
 
     Returns
     -------
@@ -234,7 +242,7 @@ def load_movielens1m(infile=None):
     * domain of score is [1.0, 2.0, 3.0, 4.0, 5.0]
     * dtype=np.float
 
-    Format of event_features ( `data.event_feature` ):
+    Default format of event_features ( `data.event_feature` ):
     
     timestamp : int
         represented in seconds since the epoch as returned by time(2)
@@ -279,7 +287,7 @@ def load_movielens1m(infile=None):
         infile = os.path.join(SAMPLE_PATH, 'movielens1m.event')
     dtype = np.dtype([('event', np.int, 2),
                       ('score', np.float),
-                      ('event_feature', np.dtype([('timestamp', np.int)]))])
+                      ('event_feature', event_dtype)])
     x = np.genfromtxt(fname=infile, delimiter='\t', dtype=dtype)
     data = EventWithScoreData(n_otypes=2, n_stypes=1,
                               event_otypes=np.array([0, 1]))
