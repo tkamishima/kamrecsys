@@ -33,4 +33,11 @@ Algorithms
 DataSets
 ========
 
+* Programming the Collective Intelligence by Toby Segaran
+
+  * sample_movies
+
 * `Movielens Data Sets <http://www.grouplens.org/node/73>`_
+
+  * Movielens 100k Data Sets
+  * Movielens 1m Data Sets
