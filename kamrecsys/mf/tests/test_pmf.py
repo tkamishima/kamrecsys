@@ -6,12 +6,13 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from numpy.testing import assert_array_equal, assert_array_almost_equal
-import unittest
+from unittest import TestCase
 
 ##### Test Classes #####
 
-class TestEventScorePredictor(unittest.TestCase):
-    def runTest(self):
+class TestEventScorePredictor(TestCase):
+
+    def test_class(self):
         import numpy as np
         from kamrecsys.datasets import load_movielens_mini
         from kamrecsys.mf.pmf import EventScorePredictor

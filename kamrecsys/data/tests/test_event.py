@@ -9,7 +9,7 @@ import unittest
 
 ##### Test Classes #####
 
-class EventUtilMixin(unittest.TestCase):
+class TestEventUtilMixin(unittest.TestCase):
 
     def test_to_eid_event(self):
         import os

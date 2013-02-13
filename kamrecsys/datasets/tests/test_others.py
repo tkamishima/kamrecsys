@@ -5,11 +5,11 @@ from __future__ import print_function
 from __future__ import division
 from __future__ import unicode_literals
 
-import unittest
+from unittest import TestCase
 
 ##### Test Classes #####
 
-class TestLoadPCISample(unittest.TestCase):
+class TestLoadPCISample(TestCase):
 
     def test_load_pci_sample(self):
         from kamrecsys.datasets import load_pci_sample

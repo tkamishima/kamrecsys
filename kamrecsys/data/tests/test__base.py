@@ -6,13 +6,13 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from numpy.testing import assert_array_equal, assert_array_almost_equal
-import unittest
+from unittest import TestCase
 
 ##### Test Classes #####
 
-class TestBaseData(unittest.TestCase):
+class TestBaseData(TestCase):
 
-    def test_BaseData(self):
+    def test_class(self):
         from kamrecsys.datasets import load_pci_sample
 
         data = load_pci_sample()
