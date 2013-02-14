@@ -5,11 +5,11 @@ from __future__ import print_function
 from __future__ import division
 from __future__ import unicode_literals
 
-from unittest import TestCase
+import unittest
 
 ##### Test Classes #####
 
-class TestLoadMovielens100k(TestCase):
+class TestLoadMovielens100k(unittest.TestCase):
     def test_load_movielens100k(self):
         from kamrecsys.datasets import load_movielens100k
 
@@ -99,7 +99,7 @@ class TestLoadMovielens100k(TestCase):
             " 'Romance' 'Sci-Fi' 'Thriller' 'War' 'Western']")
 
 
-class TestLoadMovielens1m(TestCase):
+class TestLoadMovielens1m(unittest.TestCase):
     def test_load_movielens1m(self):
         from kamrecsys.datasets import load_movielens1m
 

@@ -6,11 +6,11 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from numpy.testing import assert_array_equal, assert_array_almost_equal
-from unittest import TestCase
+import unittest
 
 ##### Test Classes #####
 
-class TestEventScorePredictor(TestCase):
+class TestEventScorePredictor(unittest.TestCase):
 
     def test_class(self):
         import numpy as np
