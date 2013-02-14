@@ -6,11 +6,11 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from numpy.testing import assert_array_equal, assert_array_almost_equal
-from unittest import TestCase
+import unittest
 
 ##### Test Classes #####
 
-class TestEventScorePredictor(TestCase):
+class TestEventScorePredictor(unittest.TestCase):
 
     def test_class(self):
         import numpy as np
@@ -32,15 +32,24 @@ class TestEventScorePredictor(TestCase):
                  'n_objects': None, '_dt': None, 'mu_': None})
 
         recommender.fit(data, disp=False, gtol=1e-03)
-        self.assertAlmostEqual(recommender.predict((1, 7)), 4.00074631485)
-        self.assertAlmostEqual(recommender.predict((1, 9)), 4.98286035672)
-        self.assertAlmostEqual(recommender.predict((1, 11)), 3.44741578214)
-        self.assertAlmostEqual(recommender.predict((3, 7)), 3.89716397809)
-        self.assertAlmostEqual(recommender.predict((3, 9)), 4.20400627475)
-        self.assertAlmostEqual(recommender.predict((3, 11)), 3.66306486366)
-        self.assertAlmostEqual(recommender.predict((5, 7)), 3.7468479513)
-        self.assertAlmostEqual(recommender.predict((5, 9)), 3.96853184458)
-        self.assertAlmostEqual(recommender.predict((5, 11)), 3.60148694779)
+        self.assertAlmostEqual(recommender.predict((1, 7)),
+                               4.00074631485, places=5)
+        self.assertAlmostEqual(recommender.predict((1, 9)),
+                               4.98286035672, places=5)
+        self.assertAlmostEqual(recommender.predict((1, 11)),
+                               3.44741578214, places=5)
+        self.assertAlmostEqual(recommender.predict((3, 7)),
+                               3.89716397809, places=5)
+        self.assertAlmostEqual(recommender.predict((3, 9)),
+                               4.20400627475, places=5)
+        self.assertAlmostEqual(recommender.predict((3, 11)),
+                               3.66306486366, places=5)
+        self.assertAlmostEqual(recommender.predict((5, 7)),
+                               3.7468479513, places=5)
+        self.assertAlmostEqual(recommender.predict((5, 9)),
+                               3.96853184458, places=5)
+        self.assertAlmostEqual(recommender.predict((5, 11)),
+                               3.60148694779, places=5)
         x = np.array([[1, 7], [1, 9], [1, 11],
             [3, 7], [3, 9], [3, 11],
             [5, 7], [5, 9], [5, 11]])
