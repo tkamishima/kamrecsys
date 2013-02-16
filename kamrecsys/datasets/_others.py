@@ -4,6 +4,10 @@
 Load other sample data sets
 """
 
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+
 #==============================================================================
 # Imports
 #==============================================================================
