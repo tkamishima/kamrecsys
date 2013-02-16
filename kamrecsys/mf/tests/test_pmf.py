@@ -3,6 +3,7 @@
 
 from __future__ import print_function
 from __future__ import division
+from __future__ import absolute_import
 from __future__ import unicode_literals
 
 from numpy.testing import assert_array_equal, assert_array_almost_equal
@@ -14,8 +15,8 @@ class TestEventScorePredictor(unittest.TestCase):
 
     def test_class(self):
         import numpy as np
-        from kamrecsys.datasets import load_movielens_mini
-        from kamrecsys.mf.pmf import EventScorePredictor
+        from ...datasets import load_movielens_mini
+        from ..pmf import EventScorePredictor
 
         np.random.seed(1234)
         data = load_movielens_mini()

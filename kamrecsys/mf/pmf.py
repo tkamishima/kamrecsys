@@ -4,6 +4,10 @@
 Matrix Factorization: probabilistic matrix factorization model
 """
 
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+
 #==============================================================================
 # Module metadata variables
 #==============================================================================

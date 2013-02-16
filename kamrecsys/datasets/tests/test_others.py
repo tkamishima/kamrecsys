@@ -3,6 +3,7 @@
 
 from __future__ import print_function
 from __future__ import division
+from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import unittest
@@ -12,7 +13,7 @@ import unittest
 class TestLoadPCISample(unittest.TestCase):
 
     def test_load_pci_sample(self):
-        from kamrecsys.datasets import load_pci_sample
+        from .. import load_pci_sample
         data = load_pci_sample()
         self.assertEqual(str(data.event_otypes), '[0 1]')
         self.assertEqual(data.n_otypes, 2)
