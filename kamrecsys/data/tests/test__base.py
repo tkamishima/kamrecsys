@@ -14,7 +14,7 @@ import unittest
 class TestBaseData(unittest.TestCase):
 
     def test_class(self):
-        from kamrecsys.datasets import load_pci_sample
+        from ...datasets import load_pci_sample
 
         data = load_pci_sample()
 

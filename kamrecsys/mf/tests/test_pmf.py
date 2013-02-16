@@ -15,8 +15,8 @@ class TestEventScorePredictor(unittest.TestCase):
 
     def test_class(self):
         import numpy as np
-        from kamrecsys.datasets import load_movielens_mini
-        from kamrecsys.mf.pmf import EventScorePredictor
+        from ...datasets import load_movielens_mini
+        from ..pmf import EventScorePredictor
 
         np.random.seed(1234)
         data = load_movielens_mini()

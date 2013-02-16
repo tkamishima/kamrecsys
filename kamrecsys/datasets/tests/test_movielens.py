@@ -12,7 +12,7 @@ import unittest
 
 class TestLoadMovielens100k(unittest.TestCase):
     def test_load_movielens100k(self):
-        from kamrecsys.datasets import load_movielens100k
+        from .. import load_movielens100k
 
         data = load_movielens100k()
         self.assertListEqual(data.__dict__.keys(),
@@ -85,7 +85,7 @@ class TestLoadMovielens100k(unittest.TestCase):
         self.assertEqual(len(data.feature[1]), 1682)
 
     def test_MOVIELENS100K_INFO(self):
-        from kamrecsys.datasets import MOVIELENS100K_INFO
+        from .. import MOVIELENS100K_INFO
 
         self.assertEqual(
             str(MOVIELENS100K_INFO['user_occupation']),
@@ -102,7 +102,7 @@ class TestLoadMovielens100k(unittest.TestCase):
 
 class TestLoadMovielens1m(unittest.TestCase):
     def test_load_movielens1m(self):
-        from kamrecsys.datasets import load_movielens1m
+        from .. import load_movielens1m
 
         data = load_movielens1m()
         self.assertListEqual(
@@ -179,7 +179,7 @@ class TestLoadMovielens1m(unittest.TestCase):
         self.assertEqual(len(data.feature[1]), 3706)
 
     def test_MOVIELENS1M_INFO(self):
-        from kamrecsys.datasets import MOVIELENS1M_INFO
+        from .. import MOVIELENS1M_INFO
         self.assertEqual(
             str(MOVIELENS1M_INFO['user_age']),
             "['Under 18' '18-24' '25-34' '35-44' '45-49' '50-55' '56+']")
