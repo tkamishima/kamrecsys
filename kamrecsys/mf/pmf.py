@@ -286,7 +286,9 @@ class EventScorePredictor(BaseEventScorePredictor):
         for i in xrange(self.k):
             grad_q[:, i] = np.bincount(ev[:, 1], weights=weights[:, i],
                                        minlength=n_items + 1)
-        grad = grad / np.float(n_events)
+
+        # re-scale gradients
+        grad[:] = grad[:] / np.float(n_events)
 
         # gradient of regularization term
         grad_bu[:] += self._reg * bu
