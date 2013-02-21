@@ -158,7 +158,7 @@ class EventScorePredictor(BaseEventScorePredictor):
         self.q_ = self._coef.view(self._dt)['q'][0]
 
         # set bias term
-        self.mu_[0] = np.sum(sc) / np.float(n_events)
+        self.mu_[0] = np.sum(sc) / n_events
         for i in xrange(n_users):
             j = np.nonzero(ev[:, 0] == i)[0]
             if len(j) > 0:
@@ -176,14 +176,14 @@ class EventScorePredictor(BaseEventScorePredictor):
             var += (sc[i] -
                     (self.mu_[0] + self.bu_[ev[i, 0]] + self.bi_[ev[i, 1]]))\
             ** 2
-        var = var / np.float(n_events)
+        var = var / n_events
         self.p_[0:n_users, :] =\
         np.random.normal(0.0, np.sqrt(var), (n_users, k))
         self.q_[0:n_items, :] =\
         np.random.normal(0.0, np.sqrt(var), (n_items, k))
 
         # scale a regularization term by the number of parameters
-        self._reg = self.C / np.float(1 + (k + 1) * (n_users + n_items))
+        self._reg = self.C / (1 + (k + 1) * (n_users + n_items))
 
     def loss(self, coef, ev, sc, n_objects):
         """
@@ -227,7 +227,7 @@ class EventScorePredictor(BaseEventScorePredictor):
         reg = np.sum(bu ** 2) + np.sum(bi ** 2) +\
               np.sum(p ** 2) + np.sum(q ** 2)
 
-        return loss / np.float(n_events) + self._reg * reg
+        return loss / n_events + self._reg * reg
 
     def grad_loss(self, coef, ev, sc, n_objects):
         """
@@ -288,7 +288,7 @@ class EventScorePredictor(BaseEventScorePredictor):
                                        minlength=n_items + 1)
 
         # re-scale gradients
-        grad[:] = grad[:] / np.float(n_events)
+        grad[:] = grad[:] / n_events
 
         # gradient of regularization term
         grad_bu[:] += self._reg * bu
