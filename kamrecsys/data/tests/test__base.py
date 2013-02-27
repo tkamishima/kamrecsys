@@ -6,7 +6,9 @@ from __future__ import division
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-from numpy.testing import assert_array_equal, assert_array_almost_equal
+from numpy.testing import (assert_array_equal, assert_array_less,
+                           assert_allclose, assert_array_max_ulp,
+                           assert_array_almost_equal_nulp)
 import unittest
 
 ##### Test Classes #####

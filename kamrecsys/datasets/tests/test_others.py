@@ -6,6 +6,9 @@ from __future__ import division
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from numpy.testing import (assert_array_equal, assert_array_less,
+                           assert_allclose, assert_array_max_ulp,
+                           assert_array_almost_equal_nulp)
 import unittest
 
 ##### Test Classes #####
@@ -14,18 +17,19 @@ class TestLoadPCISample(unittest.TestCase):
 
     def test_load_pci_sample(self):
         from .. import load_pci_sample
+
         data = load_pci_sample()
-        self.assertEqual(str(data.event_otypes), '[0 1]')
+        assert_array_equal(data.event_otypes, [0, 1])
         self.assertEqual(data.n_otypes, 2)
         self.assertEqual(data.n_events, 35)
-        self.assertEqual(str(data.feature), '[None None]')
-        self.assertEqual(
-            str(data.event),
-            "[[2 1]\n [2 2]\n [2 5]\n [2 3]\n [2 4]\n [5 1]\n [5 2]\n"
-            " [5 0]\n [5 3]\n [5 5]\n [5 4]\n [0 2]\n [0 0]\n [0 5]\n"
-            " [0 3]\n [0 4]\n [3 1]\n [3 2]\n [3 0]\n [3 3]\n [3 4]\n"
-            " [3 5]\n [6 2]\n [6 3]\n [6 5]\n [1 1]\n [1 2]\n [1 0]\n"
-            " [1 3]\n [1 5]\n [1 4]\n [4 1]\n [4 2]\n [4 3]\n [4 4]]")
+        assert_array_equal(data.feature, [None, None])
+        assert_array_equal(
+            data.event,
+            [[2, 1], [2, 2], [2, 5], [2, 3], [2, 4], [5, 1], [5, 2],
+             [5, 0], [5, 3], [5, 5], [5, 4], [0, 2], [0, 0], [0, 5],
+             [0, 3], [0, 4], [3, 1], [3, 2], [3, 0], [3, 3], [3, 4],
+             [3, 5], [6, 2], [6, 3], [6, 5], [1, 1], [1, 2], [1, 0],
+             [1, 3], [1, 5], [1, 4], [4, 1], [4, 2], [4, 3], [4, 4]])
         self.assertDictEqual(data.iid[0],
                 {'Jack Matthews': 2, 'Mick LaSalle': 5, 'Claudia Puig': 0,
                  'Lisa Rose': 3, 'Toby': 6, 'Gene Seymour': 1,
@@ -35,24 +39,23 @@ class TestLoadPCISample(unittest.TestCase):
                  'Superman Returns': 3, 'You, Me and Dupree': 5,
                  'Snakes on a Planet': 2, 'The Night Listener': 4})
         self.assertIsNone(data.event_feature)
-        self.assertEqual(
-            str(data.score),
-            "[ 3.   4.   3.5  5.   3.   3.   4.   2.   3.   2.   3.   3.5"
-            "  3.   2.5  4.\n  4.5  2.5  3.5  3.   3.5  3.   2.5  4.5  4."
-            "   1.   3.   3.5  1.5  5.   3.5\n  3.   2.5  3.   3.5  4. ]")
-        self.assertEqual(
-            str(data.eid[0]),
-            "['Claudia Puig' 'Gene Seymour' 'Jack Matthews' 'Lisa Rose'\n"
-            " 'Michael Phillips' 'Mick LaSalle' 'Toby']")
-        self.assertEqual(
-            str(data.eid[1]),
-            "['Just My Luck' 'Lady in the Water' 'Snakes on a Planet'"
-            " 'Superman Returns'\n 'The Night Listener' 'You, "
-            "Me and Dupree']")
-        self.assertEqual(str(data.n_objects), '[7 6]')
+        assert_array_equal(
+            data.score,
+            [3., 4., 3.5, 5., 3., 3., 4., 2., 3., 2., 3., 3.5, 3., 2.5, 4.,
+             4.5, 2.5, 3.5, 3., 3.5, 3., 2.5, 4.5, 4., 1., 3., 3.5, 1.5, 5.,
+             3.5, 3., 2.5, 3., 3.5, 4.])
+        assert_array_equal(
+            data.eid[0],
+            ['Claudia Puig', 'Gene Seymour', 'Jack Matthews', 'Lisa Rose',
+             'Michael Phillips', 'Mick LaSalle', 'Toby'])
+        assert_array_equal(
+            data.eid[1],
+            ['Just My Luck', 'Lady in the Water', 'Snakes on a Planet',
+             'Superman Returns', 'The Night Listener', 'You, Me and Dupree'])
+        assert_array_equal(data.n_objects, [7, 6])
         self.assertEqual(data.n_stypes, 1)
         self.assertEqual(data.s_event, 2)
-        self.assertEqual(str(data.score_domain), '[ 1.  5.]')
+        assert_array_equal(data.score_domain, [1., 5.])
 
 ##### Do Test #####
 if __name__ == '__main__':
