@@ -53,6 +53,8 @@ class EventScorePredictor(BaseEventScorePredictor):
     k : int, optional
         the number of latent factors (= sizes of :math:`\mathbf{p}_u` or
         :math:`\mathbf{q}_i`), default=1
+    tol : optional, float
+        tolerance parameter for optimizer
 
     Attributes
     ----------
@@ -96,11 +98,12 @@ class EventScorePredictor(BaseEventScorePredictor):
         Collaborative Filtering Model", KDD2008
     """
 
-    def __init__(self, C=1.0, k=1):
+    def __init__(self, C=1.0, k=1, tol=None):
         super(EventScorePredictor, self).__init__()
 
         self.C = np.float(C)
         self.k = np.int(k)
+        self.tol = tol
         self.mu_ = None
         self.bu_ = None
         self.bi_ = None
@@ -298,7 +301,8 @@ class EventScorePredictor(BaseEventScorePredictor):
 
         return grad
 
-    def fit(self, data, user_index=0, item_index=1, score_index=0, **kwargs):
+    def fit(self, data, user_index=0, item_index=1, score_index=0, tol=None,
+            **kwargs):
         """
         fitting model
 
@@ -331,6 +335,10 @@ class EventScorePredictor(BaseEventScorePredictor):
         # check optimization parameters
         if not 'disp' in kwargs:
             kwargs['disp'] = False
+        if 'gtol' in kwargs:
+            del kwargs['gtol']
+        if self.tol is not None:
+            kwargs['gtol'] = self.tol
 
         # get final loss
         self.i_loss_ = self.loss(self._coef, ev, sc, n_objects)

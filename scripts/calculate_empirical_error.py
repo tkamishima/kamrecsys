@@ -19,12 +19,12 @@ data = load_movielens100k()
 # generate empty model
 # `C` : regularization parameter
 # `k` : the number of latent factors
-recommender = EventScorePredictor(C=0.1, k=5)
+# You can tune optimization parameters, such as tol
+recommender = EventScorePredictor(C=0.1, k=5, tol=1e-05)
 
 # fit model
-# You can tune optimization parameters, such as gtol or maxiter
 # See also: scipy.optimize.fmin_cg
-recommender.fit(data, gtol=1e-05)
+recommender.fit(data)
 
 # predict scores for event data that is used for training model
 sc = recommender.raw_predict(data.event)
