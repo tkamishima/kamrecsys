@@ -18,11 +18,8 @@ Options
     regularization parameter, default=0.01.
 -k <K>, --dim <K>
     the number of latent factors, default=1.
--t <GTOL>, --gtol <GTOL>
+-t <TOL>, --tol <TOL>
     optimization parameter. the size of norm of gradient. default=1e-05.
--m <MAXITER>, --maxiter <MAXITER>
-    optimization parameter. The maximum number of iteration.
-    default=Unlimited.
 -n, --notimestamp
     timestamps are not included in input file
 -q, --quiet
@@ -48,7 +45,7 @@ timestamp fields can be omitted.
 
 __author__ = "Toshihiro Kamishima ( http://www.kamishima.net/ )"
 __date__ = "2012/04/09"
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 __copyright__ = "Copyright (c) 2012 Toshihiro Kamishima all rights reserved."
 __license__ = "MIT License: http://www.opensource.org/licenses/mit-license.php"
 __docformat__ = "restructuredtext en"
@@ -126,8 +123,8 @@ def main(opt):
     logger.info("start time = " + start_time.isoformat())
 
     # create and learing model
-    recommender = EventScorePredictor(C=opt.C, k=opt.k)
-    recommender.fit(data, gtol=opt.gtol, maxiter=opt.maxiter)
+    recommender = EventScorePredictor(C=opt.C, k=opt.k, tol=opt.tol)
+    recommender.fit(data)
 
     # set end and elapsed time
     end_time = datetime.datetime.now()
@@ -200,8 +197,7 @@ if __name__ == '__main__':
     # script specific options
     ap.add_argument('-C', '--lambda', dest='C', type=float, default=0.01)
     ap.add_argument('-k', '--dim', dest='k', type=int, default=1)
-    ap.add_argument('-t', '--gtol', type=float, default=1e-06)
-    ap.add_argument('-m', '--maxiter', type=int, default=None)
+    ap.add_argument('-t', '--tol', type=float, default=1e-06)
     ap.add_argument('-n', '--notimestamp', dest='timastamp',
                     action='store_false')
     ap.set_defaults(timestamp=True)
