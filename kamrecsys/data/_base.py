@@ -49,8 +49,9 @@ class BaseData(object):
     Attributes
     ----------
     n_objects : array_like, shape=(n_otypes), dtype=int
-        the number of different objects in each type.  the first and the second
-        types of objects are referred by the keywords, 'user' or 'item'.
+        the number of different objects in each type.  the first and the
+        second types of objects are referred by the keywords, ``user`` or
+        ``item``.
     eid : array_like, shape=(n_otypes,), dtype=(array_like)
         id[i] is a vector of external ids. the j-th element of the array is the
         external id that corresponds to the object with internal id j.

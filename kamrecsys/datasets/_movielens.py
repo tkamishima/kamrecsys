@@ -193,7 +193,7 @@ def load_movielens_mini():
     This data set is the subset of the data in the `movielens100k` data set.
     Users and items whose external ids are less or equal than 10 are collected.
 
-    You can find the format of this data set in :function:`load_movielens100k`.
+    You can find the format of this data set in :func:`load_movielens100k`.
     Original item database contains 3,883 movies, but 3,706 movies were rated.
 
     Returns
