@@ -23,9 +23,6 @@ class TestEventScorePredictor(unittest.TestCase):
         np.random.seed(1234)
         data = load_movielens_mini()
 
-        with self.assertRaises(ValueError):
-            EventScorePredictor(C=0.1, k=0)
-
         recommender = EventScorePredictor(C=0.1, k=2, tol=1e-03)
         self.assertDictEqual(
             vars(recommender),
