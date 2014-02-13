@@ -121,48 +121,52 @@ for line in infile.readlines():
 infile.close()
 outfile.close()
 
-# convert item files ----------------------------------------------------------
+# convert item file -----------------------------------------------------------
+infile = io.open(os.path.join(pwd, 'sushi3.idata'), 'r', encoding='utf-8')
+outfile = io.open(os.path.join(target, stem + '.item'), 'w', encoding='utf-8')
 
-infile = io.open(os.path.join(pwd, 'u.item'), 'r', encoding='cp1252')
-outfile = io.open(os.path.join(target, stem + '.item'), 'w', encoding='utf_8')
-
-outfile.write(
-"""# Item feature file for ``movielens100k.event``.
+print(
+"""# Item feature file for sushi3 data sets.
 #
-# The number of movies is 1682.
+# The number of movies is 100.
 #
 # Format
 # ------
 # item : int
 #     item id of the movie which is compatible with the event file.
-# name : str, length=[7, 81]
+# name : str, encoding=utf-8
 #     title of the movie with release year
-# date : int * 3, (day, month, year)
-#     released date
-# genre : binary_int * 18
-#     18 binary numbers represents a genre of the movie. 1 if the movie belongs
-#     to the genre; 0 other wise. All 0 implies unknown. Each column
-#     corresponds to the following genres:
-#     Action, Adventure, Animation, Children's, Comedy, Crime, Documentary,
-#     Drama, Fantasy, Film-Noir, Horror, Musical, Mystery, Romance, Sci-Fi,
-#     Thriller, War, Western
-# imdb : str, length=[0, 134]
-#      URL for the movie at IMDb http://www.imdb.com
-""")
-
-month = {'Jan':1, 'Feb':2, 'Mar':3, 'Apr':4, 'May':5, 'Jun':6,
-         'Jul':7, 'Aug':8, 'Sep':9, 'Oct':10, 'Nov':11, 'Dec':12}
+# is_maki : int {0:otherwise, 1:maki}
+#     whether a style of the sushi is *maki* or not
+# is_seafood : int {0:otherwise, 1:seafood}
+#     whether seafood or not
+# group : int {0, ..., 8}
+#     the group of the sushi *neta*
+#     0:aomono (blue-skinned fish)
+#     1:akami (red meat fish)
+#     2:shiromi (white-meat fish)
+#     3:tare (something like baste; for eel or sea eel)
+#     4:clam or shell
+#     5:squid or octopus
+#     6:shrimp or crab
+#     7:roe
+#     8:other seafood
+#     9:egg
+#    10:meat other than fish
+#    11:vegetables
+# heaviness : float, range=[0-4], 0:heavy/oily
+#     mean of the heaviness/oiliness/*kotteri* in taste,
+# frequency : float, range=[0-3], 3:frequently eat
+#     how frequently the user eats the SUSHI,
+# price : float, range=[1-5], 5:expensive
+#     maki and other style sushis are normalized separatly
+# supply : float, range=[0-1]
+#    the ratio of shops that supplies the sushi
+""", file=outfile, end="")
 
 for line in infile.readlines():
-    f = line.rstrip('\r\n').split("|")
-    outfile.write(f[0] + "\t" + f[1] + "\t")
-    d = f[2].split('-')
-    if len(d) == 3:
-        outfile.write("%d\t%d\t%d\t" % (int(d[0]), month[d[1]], int(d[2])))
-    else:
-        outfile.write("0\t0\t0\t")
-    outfile.write("\t".join(f[6:24]))
-    outfile.write("\t" + f[4] + "\n")
+    item_feature = line.rstrip('\r\n').split("\t")
+    print("\t".join(item_feature), sep="\t", file=outfile)
 
 infile.close()
 outfile.close()
