@@ -77,50 +77,46 @@ outfile.close()
 
 # convert user file -----------------------------------------------------------
 
-exit()
-
-infile = open(os.path.join(pwd, 'u.user'), 'r')
+infile = open(os.path.join(pwd, 'sushi3.udata'), 'r')
 outfile = open(os.path.join(target, stem + '.user'), 'w')
 
-outfile.write(
-"""# User feature file for ``movielens100k.event``.
+print(
+"""# User feature file for sushi3 data sets
 # 
-# The number of users is 943.
+# The number of users is 5000.
 #
 # Format
 # ------
 # user : int
 #     user id of the users which is compatible with the event file.
-# age : int
+# gender : int {0:male, 1:female}
+#     gender of the user
+# age : int {0:15-19, 1:20-29, 2:30-39, 3:40-49, 4:50-59, 5:60-}
 #     age of the user
-# gender : int
-#     gender of the user, {0:male, 1:female}
-# occupation : int {0,1,...,20}
-#     the number indicates the occupation of the user.
-#     none:0, other:1, administrator:2, artist:3, doctor:4, educator:5,
-#     engineer:6, entertainment:7, executive:8, healthcare:9, homemaker:10,
-#     lawyer:11, librarian:12, marketing:13, programmer:14, retired:15,
-#     salesman:16,  scientist:17, student:18, technician:19, writer:20
-# zip : str, length=5
-#     zip code of 5 digits, which represents the residential area of the user
-""")
-occupation = {'none':0, 'other':1, 'administrator':2, 'artist':3, 'doctor':4,
-              'educator':5, 'engineer':6, 'entertainment':7, 'executive':8,
-              'healthcare':9, 'homemaker':10, 'lawyer':11, 'librarian':12,
-              'marketing':13, 'programmer':14, 'retired':15, 'salesman':16,
-              'scientist':17, 'student':18, 'technician':19, 'writer':20}
+# answer_time : int
+#     the total time need to fill questionnaire form
+# child_prefecture : int {0, 1, ..., 47}
+#     prefecture ID at which you have been the most longly lived
+#     until 15 years old
+# child_region : int {0, 1, ..., 11}
+#     region ID at which you have been the most longly lived
+#     until 15 years old
+# child_ew : int {0: Eastern, 1: Western}
+#     east/west ID at which you have been the most longly lived
+#     until 15 years old
+# current_prefecture : int {0, 1, ..., 47}
+#     prefecture ID at which you currently live
+# current_region : int {0, 1, ..., 11}
+#     regional ID at which you currently live
+# current_ew : int {0: Eastern, 1: Western}
+#     east/west ID at which you currently live
+# is_moved : int {0: don't move, 1: move}
+#     whether child_prefecture and current_prefecture are equal or not
+""", file=outfile, end="")
 
 for line in infile.readlines():
-    f = line.rstrip('\r\n').split("|")
-    outfile.write(f[0] + '\t' + f[1] + '\t')
-    if f[2] == 'M':
-        outfile.write('0\t')
-    elif f[2] == 'F':
-        outfile.write('1\t')
-    else:
-        raise ValueError
-    outfile.write(str(occupation[f[3]]) + '\t')
-    outfile.write(f[4] + '\n')
+    user_feature = line.rstrip('\r\n').split("\t")
+    print("\t".join(user_feature), sep="\t", file=outfile)
 
 infile.close()
 outfile.close()
