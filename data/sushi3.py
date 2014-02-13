@@ -136,9 +136,9 @@ print(
 #     item id of the movie which is compatible with the event file.
 # name : str, encoding=utf-8
 #     title of the movie with release year
-# is_maki : int {0:otherwise, 1:maki}
+# style : int {0:maki, 1:otherwise}
 #     whether a style of the sushi is *maki* or not
-# is_seafood : int {0:otherwise, 1:seafood}
+# seafood : int {0:seafood, 1:otherwise}
 #     whether seafood or not
 # genre : int {0, ..., 8}
 #     the genre of the sushi *neta*
