@@ -140,8 +140,8 @@ print(
 #     whether a style of the sushi is *maki* or not
 # is_seafood : int {0:otherwise, 1:seafood}
 #     whether seafood or not
-# group : int {0, ..., 8}
-#     the group of the sushi *neta*
+# genre : int {0, ..., 8}
+#     the genre of the sushi *neta*
 #     0:aomono (blue-skinned fish)
 #     1:akami (red meat fish)
 #     2:shiromi (white-meat fish)
