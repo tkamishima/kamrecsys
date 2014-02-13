@@ -62,7 +62,7 @@ print(
 #     item id of the sushi rated by the user
 # score : int
 #     rating score whose range is {1, 2, 3, 4, 5}
-""", file=outfile)
+""", file=outfile, end="")
 
 uid = 0
 for line in infile.readlines():
