@@ -184,8 +184,7 @@ def load_sushi3b_score(infile=None):
         ('current_prefecture', np.int),
         ('current_region', np.int),
         ('current_ew', np.int),
-        ('is_moved', np.int)
-    ])
+        ('is_moved', np.int)])
     dtype = np.dtype([('eid', np.int), ('feature', fdtype)])
     x = np.genfromtxt(fname=infile, delimiter='\t', dtype=dtype)
     data.set_features(0, x['eid'], x['feature'])
@@ -201,8 +200,7 @@ def load_sushi3b_score(infile=None):
         ('heaviness', np.float),
         ('frequency', np.float),
         ('price', np.float),
-        ('supply', np.float)
-    ])
+        ('supply', np.float)])
     dtype = np.dtype([('eid', np.int), ('feature', fdtype)])
     x = np.genfromtxt(fname=infile, delimiter='\t', dtype=dtype)
     data.set_features(1, x['eid'], x['feature'])
