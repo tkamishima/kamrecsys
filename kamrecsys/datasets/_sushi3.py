@@ -15,7 +15,7 @@ from __future__ import (
 
 import sys
 import os
-import codecs
+import io
 import logging
 import numpy as np
 
@@ -84,21 +84,16 @@ SUSHI3_INFO = {
 # Functions 
 #==============================================================================
 
-def load_sushi3b_score(infile=None,
-                       event_dtype=np.dtype([('timestamp', np.int)])):
-    """ load the MovieLens 100k data set
+def load_sushi3b_score(infile=None):
+    """ load the sushi3b score data set
 
-    Original file ``ml-100k.zip`` is distributed by the Grouplens Research
-    Project at the site:
-    `MovieLens Data Sets <http://www.grouplens.org/node/73>`_.
+    An original data set is distributed at:
+    `SUSHI Preference Data Sets <http://www.kamishima.net/sushi/>`_.
 
     Parameters
     ----------
     infile : optional, file or str
         input file if specified; otherwise, read from default sample directory.
-    event_dtype : np.dtype
-        dtype of extra event features. as default, it consists of only a
-        ``timestamp`` feature.
 
     Returns
     -------
@@ -110,87 +105,107 @@ def load_sushi3b_score(infile=None,
     Format of events:
 
     * each event consists of a vector whose format is [user, item].
-    * 100,000 events in total
-    * 943 users rate 1682 items (=movies)
+    * 50,000 events in total
+    * 5,000 users rate 100 items (=sushis)
     * dtype=np.int
 
     Format of scores:
 
     * one score is given to each event
-    * domain of score is [1.0, 2.0, 3.0, 4.0, 5.0]
+    * domain of score is [0.0, 1.0, 2.0, 3.0, 4.0]
     * dtype=np.float
 
     Default format of event_features ( `data.event_feature` ):
-    
-    timestamp : int
-        UNIX seconds since 1/1/1970 UTC
 
     Format of user's feature ( `data.feature[0]` ):
 
-    age : int
+    gender : int {0:male, 1:female}
+        gender of the user
+    age : int, SUSHI3_INFO['user_age']
         age of the user
-    gender : int
-        gender of the user, {0:male, 1:female}
-    occupation : int
-        the number indicates the occupation of the user as follows:
-        0:None, 1:Other, 2:Administrator, 3:Artist, 4:Doctor, 5:Educator,
-        6:Engineer, 7:Entertainment, 8:Executive, 9:Healthcare, 10:Homemaker,
-        11:Lawyer, 12:Librarian, 13:Marketing, 14:Programmer, 15:Retired,
-        16:Salesman, 17:Scientist, 18:Student, 19:Technician, 20:Writer
-    zip : str, length=5
-        zip code of 5 digits, which represents the residential area of the user
+    answer_time : int
+    #     the total time need to fill questionnaire form
+    child_prefecture : int, SUSHI3_INFO['user_prefecture']
+        prefecture ID at which you have been the most longly lived
+        until 15 years old
+    child_region : int, SUSHI3_INFO['user_region']
+        region ID at which you have been the most longly lived
+        until 15 years old
+    child_ew : int {0: Eastern, 1: Western}
+        east/west ID at which you have been the most longly lived
+        until 15 years old
+    current_prefecture : int, SUSHI3_INFO['user_prefecture']
+        prefecture ID at which you currently live
+    current_region : int, SUSHI3_INFO['user_region']
+        regional ID at which you currently live
+    current_ew : int {0: Eastern, 1: Western}
+        east/west ID at which you currently live
+    is_moved : int {0: don't move, 1: move}
+        whether child_prefecture and current_prefecture are equal or not
 
     Format of item's feature ( `data.feature[1]` ):
 
-    name : str, length=[7, 81], dtype=np.dtype('S81')
+    name : str, encoding=utf-8
         title of the movie with release year
-    date : int * 3
-        released date represented by a tuple (year, month, day)
-    genre : np.dtype(i1) * 18
-        18 binary nunbers represents a genre of the movie. 1 if the movie
-        belongs to the genre; 0 other wise. All 0 implies unknown. Each column
-        corresponds to the following genres:
-        Action, Adventure, Animation, Children's, Comedy, Crime, Documentary,
-        Drama, Fantasy, Film-Noir, Horror, Musical, Mystery, Romance, Sci-Fi,
-        Thriller, War, Western
-    imdb : str, length=[0, 134], dtype=np.dtype('S134')
-         URL for the movie at IMDb http://www.imdb.com
+    is_maki : int {0:otherwise, 1:maki}
+        whether a style of the sushi is *maki* or not
+    is_seafood : int {0:otherwise, 1:seafood}
+        whether seafood or not
+    genre : int, int, SUSHI3_INFO['item_genre']
+        the genre of the sushi *neta*
+    heaviness : float, range=[0-4], 0:heavy/oily
+        mean of the heaviness/oiliness/*kotteri* in taste,
+    frequency : float, range=[0-3], 3:frequently eat
+        how frequently the user eats the SUSHI,
+    price : float, range=[1-5], 5:expensive
+        maki and other style sushis are normalized separatly
+    supply : float, range=[0-1]
+       the ratio of shops that supplies the sushi
     """
 
     # load event file
     if infile is None:
-        infile = os.path.join(SAMPLE_PATH, 'movielens100k.event')
-    dtype = np.dtype([('event', np.int, 2),
-                      ('score', np.float),
-                      ('event_feature', event_dtype)])
+        infile = os.path.join(SAMPLE_PATH, 'sushi3b_score.event')
+    dtype = np.dtype([('event', np.int, 2), ('score', np.float)])
     x = np.genfromtxt(fname=infile, delimiter='\t', dtype=dtype)
-    data = EventWithScoreData(n_otypes=2, n_stypes=1,
-                              event_otypes=np.array([0, 1]))
+    data = EventWithScoreData(n_otypes=2, n_stypes=1)
     data.set_events(x['event'], x['score'], score_domain=(1.0, 5.0),
                     event_feature=x['event_feature'])
 
     # load user's feature file
-    infile = os.path.join(SAMPLE_PATH, 'movielens100k.user')
-    fdtype = np.dtype([('age', np.int), ('gender', np.int),
-                       ('occupation', np.int), ('zip', 'S5')])
+    infile = os.path.join(SAMPLE_PATH, 'sushi3.user')
+    fdtype = np.dtype([
+        ('gender', np.int),
+        ('age', np.int),
+        ('answer_time', np.int),
+        ('child_prefecture', np.int),
+        ('child_region', np.int),
+        ('child_ew', np.int),
+        ('current_prefecture', np.int),
+        ('current_region', np.int),
+        ('current_ew', np.int),
+        ('is_moved', np.int)
+    ])
     dtype = np.dtype([('eid', np.int), ('feature', fdtype)])
     x = np.genfromtxt(fname=infile, delimiter='\t', dtype=dtype)
     data.set_features(0, x['eid'], x['feature'])
 
     # load item's feature file
-    infile = os.path.join(SAMPLE_PATH, 'movielens100k.item')
-    fdtype = np.dtype([('name', 'U81'),
-                       ('day', np.int),
-                       ('month', np.int),
-                       ('year', np.int),
-                       ('genre', 'i1', 18),
-                       ('imdb', 'S134')])
+    infile = io.open(os.path.join(SAMPLE_PATH, 'sushi3.item'), 'r',
+                     encoding='utf-8')
+    fdtype = np.dtype([
+        ('name', 'U20'),
+        ('is_maki', np.int),
+        ('is_seafood', np.int),
+        ('genre', np.int),
+        ('heaviness', np.float),
+        ('frequency', np.float),
+        ('price', np.float),
+        ('supply', np.float)
+    ])
     dtype = np.dtype([('eid', np.int), ('feature', fdtype)])
-    infile = codecs.open(infile, 'r', 'utf_8')
     x = np.genfromtxt(fname=infile, delimiter='\t', dtype=dtype)
     data.set_features(1, x['eid'], x['feature'])
-
-    del x
 
     return data
 
