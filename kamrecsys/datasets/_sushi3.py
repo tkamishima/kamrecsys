@@ -115,8 +115,6 @@ def load_sushi3b_score(infile=None):
     * domain of score is [0.0, 1.0, 2.0, 3.0, 4.0]
     * dtype=np.float
 
-    Default format of event_features ( `data.event_feature` ):
-
     Format of user's feature ( `data.feature[0]` ):
 
     original_uid : int
