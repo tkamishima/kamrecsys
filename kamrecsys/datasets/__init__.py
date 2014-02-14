@@ -15,6 +15,7 @@ from __future__ import (
 #==============================================================================
 
 from ._base import *
+from ._flixster import *
 from ._movielens import *
-from ._sushi3 import *
 from ._others import *
+from ._sushi3 import *
