@@ -41,3 +41,7 @@ DataSets
 
   * Movielens 100k Data Sets
   * Movielens 1m Data Sets
+
+* `SUSHI Data Sets <http://www.kamishima.net/sushi/>`_
+
+  * Sushi3b Score Data Sets
