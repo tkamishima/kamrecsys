@@ -119,6 +119,8 @@ def load_sushi3b_score(infile=None):
 
     Format of user's feature ( `data.feature[0]` ):
 
+    original_uid : int
+        uid in the original data
     gender : int {0:male, 1:female}
         gender of the user
     age : int, SUSHI3_INFO['user_age']
@@ -169,12 +171,12 @@ def load_sushi3b_score(infile=None):
     dtype = np.dtype([('event', np.int, 2), ('score', np.float)])
     x = np.genfromtxt(fname=infile, delimiter='\t', dtype=dtype)
     data = EventWithScoreData(n_otypes=2, n_stypes=1)
-    data.set_events(x['event'], x['score'], score_domain=(1.0, 5.0),
-                    event_feature=x['event_feature'])
+    data.set_events(x['event'], x['score'], score_domain=(0.0, 4.0))
 
     # load user's feature file
     infile = os.path.join(SAMPLE_PATH, 'sushi3.user')
     fdtype = np.dtype([
+        ('original_uid', np.int),
         ('gender', np.int),
         ('age', np.int),
         ('answer_time', np.int),
