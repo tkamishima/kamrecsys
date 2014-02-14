@@ -32,18 +32,44 @@ __all__ = ['SUSHI3_INFO', 'load_sushi3b_score']
 # Constants
 #==============================================================================
 
-# Conversion tables for mapping the numbers to names for the ``movielens100k``
-# data set. available tables are ``user_occupation`` and ``item_genre``.
+# Conversion tables for mapping the numbers to names for the ``sushi3``
+# data set. available tables are ``user_age``, ``user_prefecture``,
+# ``user_region``, and ``item_genre``.
 SUSHI3_INFO = {
-    'user_occupation': np.array([
-        'None', 'Other', 'Administrator', 'Artist', 'Doctor', 'Educator',
-        'Engineer', 'Entertainment', 'Executive', 'Healthcare', 'Homemaker',
-        'Lawyer', 'Librarian', 'Marketing', 'Programmer', 'Retired',
-        'Salesman', 'Scientist', 'Student', 'Technician', 'Writer']),
+    'user_age': np.array([
+        '15-19', '20-29', '30-39', '40-49', '50-59', '60-'
+    ]),
+    'user_prefecture': np.array([
+        'Hokkaido', 'Aomori', 'Iwate', 'Akita', 'Miyagi',
+        'Yamagata', 'Fukushima', 'Niigata', 'Ibaraki', 'Tochigi',
+        'Gunma', 'Saitama', 'Chiba', 'Tokyo', 'Kanagawa',
+        'Yamanashi', 'Shizuoka', 'Nagano', 'Aichi', 'Gifu',
+        'Toyama', 'Ishikawa', 'Fukui', 'Shiga', 'Mie',
+        'Kyoto', 'Osaka', 'Nara', 'Wakayama', 'Hyogo',
+        'Okayama', 'Hiroshima', 'Tottori', 'Shimane', 'Yamaguchi',
+        'Ehime', 'Kagawa', 'Tokushima', 'Kochi', 'Fukuoka',
+        'Nagasaki', 'Saga', 'Kumamoto', 'Kagoshima', 'Miyazaki',
+        'Oita', 'Okinawa', 'non-Japan'
+    ]),
+    'user_region': np.array([
+        'Hokkaido', 'Tohoku', 'Hokuriku', 'Kanto+Shizuoka', 'Nagano+Yamanashi',
+        'Chukyo', 'Kinki', 'Chugoku', 'Shikoku', 'Kyushu',
+        'Okinawa', 'non-Japan'
+    ]),
     'item_genre': np.array([
-        "Action", "Adventure", "Animation", "Children's", "Comedy", "Crime",
-        "Documentary", "Drama", "Fantasy", "Film-Noir", "Horror", "Musical",
-        "Mystery", "Romance", "Sci-Fi", "Thriller", "War", "Western"])
+        'aomono (blue-skinned fish)',
+        'akami (red meat fish)',
+        'shiromi (white-meat fish)',
+        'tare (something like baste; for eel or sea eel)',
+        'clam or shell',
+        'squid or octopus',
+        'shrimp or crab',
+        'roe',
+        'other seafood',
+        'egg',
+        'non-fish meat',
+        'vegetable'
+    ])
 }
 
 #==============================================================================
