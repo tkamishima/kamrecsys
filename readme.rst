@@ -39,9 +39,13 @@ DataSets
 
 * `Movielens Data Sets <http://www.grouplens.org/node/73>`_
 
-  * Movielens 100k Data Sets
-  * Movielens 1m Data Sets
+  * Movielens 100k Data Set
+  * Movielens 1m Data Set
 
 * `SUSHI Data Sets <http://www.kamishima.net/sushi/>`_
 
-  * Sushi3b Score Data Sets
+  * Sushi3b Score Data Set
+
+* `Flixster Data Sets <http://www.sfu.ca/~sja25/datasets/>`_
+
+  * Flixster Rating Data Set
