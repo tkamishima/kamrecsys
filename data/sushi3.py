@@ -61,7 +61,7 @@ print(
 # item : int
 #     item id of the sushi rated by the user
 # score : int
-#     rating score whose range is {1, 2, 3, 4, 5}
+#     rating score whose range is {0, 1, 2, 3, 4}
 """, file=outfile, end="")
 
 uid = 0
@@ -89,6 +89,8 @@ print(
 # ------
 # user : int
 #     user id of the users which is compatible with the event file.
+# original_uid : int
+#     uid in the original data
 # gender : int {0:male, 1:female}
 #     gender of the user
 # age : int {0:15-19, 1:20-29, 2:30-39, 3:40-49, 4:50-59, 5:60-}
@@ -114,9 +116,11 @@ print(
 #     whether child_prefecture and current_prefecture are equal or not
 """, file=outfile, end="")
 
+uid = 0
 for line in infile.readlines():
     user_feature = line.rstrip('\r\n').split("\t")
-    print("\t".join(user_feature), sep="\t", file=outfile)
+    print(uid, "\t".join(user_feature), sep="\t", file=outfile)
+    uid += 1
 
 infile.close()
 outfile.close()
