@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Learning probabilistic matrix factorization factor models from event-score
+Learning model: probabilistic matrix factorization
 data
 
 SYNOPSIS::
@@ -45,7 +45,7 @@ timestamp fields can be omitted.
 
 __author__ = "Toshihiro Kamishima ( http://www.kamishima.net/ )"
 __date__ = "2012/04/09"
-__version__ = "1.0.1"
+__version__ = "1.1.0"
 __copyright__ = "Copyright (c) 2012 Toshihiro Kamishima all rights reserved."
 __license__ = "MIT License: http://www.opensource.org/licenses/mit-license.php"
 __docformat__ = "restructuredtext en"
