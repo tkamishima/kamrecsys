@@ -198,7 +198,7 @@ if __name__ == '__main__':
                     type=argparse.FileType('r'), required=True)
 
     # script specific options
-    ap.add_argument('-n', '--notimestamp', dest='timastamp',
+    ap.add_argument('-n', '--notimestamp', dest='timestamp',
                     action='store_false')
     ap.set_defaults(timestamp=True)
 

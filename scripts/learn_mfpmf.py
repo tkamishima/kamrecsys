@@ -198,7 +198,7 @@ if __name__ == '__main__':
     ap.add_argument('-C', '--lambda', dest='C', type=float, default=0.01)
     ap.add_argument('-k', '--dim', dest='k', type=int, default=1)
     ap.add_argument('-t', '--tol', type=float, default=1e-06)
-    ap.add_argument('-n', '--notimestamp', dest='timastamp',
+    ap.add_argument('-n', '--notimestamp', dest='timestamp',
                     action='store_false')
     ap.set_defaults(timestamp=True)
 
