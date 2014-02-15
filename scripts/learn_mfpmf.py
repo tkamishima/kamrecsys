@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Learning probabilistic matrix factorization factor models from event-score
+Learning model: probabilistic matrix factorization
 data
 
 SYNOPSIS::
@@ -45,7 +45,7 @@ timestamp fields can be omitted.
 
 __author__ = "Toshihiro Kamishima ( http://www.kamishima.net/ )"
 __date__ = "2012/04/09"
-__version__ = "1.0.1"
+__version__ = "1.1.0"
 __copyright__ = "Copyright (c) 2012 Toshihiro Kamishima all rights reserved."
 __license__ = "MIT License: http://www.opensource.org/licenses/mit-license.php"
 __docformat__ = "restructuredtext en"
@@ -198,7 +198,7 @@ if __name__ == '__main__':
     ap.add_argument('-C', '--lambda', dest='C', type=float, default=0.01)
     ap.add_argument('-k', '--dim', dest='k', type=int, default=1)
     ap.add_argument('-t', '--tol', type=float, default=1e-06)
-    ap.add_argument('-n', '--notimestamp', dest='timastamp',
+    ap.add_argument('-n', '--notimestamp', dest='timestamp',
                     action='store_false')
     ap.set_defaults(timestamp=True)
 
