@@ -44,7 +44,7 @@ __all__ = ['load_flixster_rating']
 # Functions 
 #==============================================================================
 
-def load_flixster_rating(infile=None):
+def load_flixster_rating(infile=None, event_dtype=None):
     """ load the sushi3b score data set
 
     An original data set is distributed at:
@@ -54,6 +54,8 @@ def load_flixster_rating(infile=None):
     ----------
     infile : optional, file or str
         input file if specified; otherwise, read from default sample directory.
+    event_dtype : np.dtype, default=None
+        dtype of extra event features
 
     Returns
     -------
@@ -79,10 +81,18 @@ def load_flixster_rating(infile=None):
     # load event file
     if infile is None:
         infile = os.path.join(SAMPLE_PATH, 'flixster.event')
-    dtype = np.dtype([('event', np.int, 2), ('score', np.float)])
+    if event_dtype is None:
+        dtype = np.dtype([('event', np.int, 2), ('score', np.float)])
+    else:
+        dtype = np.dtype([('event', np.int, 2), ('score', np.float),
+                          ('event_feature', event_dtype)])
     x = np.genfromtxt(fname=infile, delimiter='\t', dtype=dtype)
     data = EventWithScoreData(n_otypes=2, n_stypes=1)
-    data.set_events(x['event'], x['score'], score_domain=(0.5, 5.0))
+    if event_dtype is None:
+        data.set_events(x['event'], x['score'], score_domain=(0.5, 5.0))
+    else:
+        data.set_events(x['event'], x['score'], score_domain=(0.5, 5.0),
+                        event_feature=x['event_feature'])
 
     return data
 
