@@ -84,7 +84,7 @@ SUSHI3_INFO = {
 # Functions 
 #==============================================================================
 
-def load_sushi3b_score(infile=None):
+def load_sushi3b_score(infile=None, event_dtype=None):
     """ load the sushi3b score data set
 
     An original data set is distributed at:
@@ -94,6 +94,8 @@ def load_sushi3b_score(infile=None):
     ----------
     infile : optional, file or str
         input file if specified; otherwise, read from default sample directory.
+    event_dtype : np.dtype, default=None
+        dtype of extra event features
 
     Returns
     -------
@@ -166,10 +168,18 @@ def load_sushi3b_score(infile=None):
     # load event file
     if infile is None:
         infile = os.path.join(SAMPLE_PATH, 'sushi3b_score.event')
-    dtype = np.dtype([('event', np.int, 2), ('score', np.float)])
+    if event_dtype is None:
+        dtype = np.dtype([('event', np.int, 2), ('score', np.float)])
+    else:
+        dtype = np.dtype([('event', np.int, 2), ('score', np.float),
+                          ('event_feature', event_dtype)])
     x = np.genfromtxt(fname=infile, delimiter='\t', dtype=dtype)
     data = EventWithScoreData(n_otypes=2, n_stypes=1)
-    data.set_events(x['event'], x['score'], score_domain=(0.0, 4.0))
+    if event_dtype is None:
+        data.set_events(x['event'], x['score'], score_domain=(0.0, 4.0))
+    else:
+        data.set_events(x['event'], x['score'], score_domain=(0.0, 4.0),
+                        event_feature=x['event_feature'])
 
     # load user's feature file
     infile = os.path.join(SAMPLE_PATH, 'sushi3.user')
