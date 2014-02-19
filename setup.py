@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 from kamrecsys import __version__
 
-with open('README.rst') as file:
+with open('readme.md') as file:
     long_description = file.read()
 
 setup(
