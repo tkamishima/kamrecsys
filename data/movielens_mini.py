@@ -23,6 +23,10 @@ from __future__ import (
 import os
 import sys
 
+# help message
+if ('-h' in sys.argv) or ('--help' in sys.argv):
+    print(__doc__, file=sys.stderr)
+    sys.exit(0)
 
 # set directories
 pwd = os.path.dirname(__file__)

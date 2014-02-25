@@ -27,6 +27,10 @@ import sys
 import io
 import re
 
+# help message
+if ('-h' in sys.argv) or ('--help' in sys.argv):
+    print(__doc__, file=sys.stderr)
+    sys.exit(0)
 
 # set directories
 stem = 'movielens1m'
