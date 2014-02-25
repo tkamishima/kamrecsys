@@ -116,7 +116,7 @@ print(
 #     regional ID at which you currently live
 # current_ew : int {0: Eastern, 1: Western}
 #     east/west ID at which you currently live
-# is_moved : int {0: don't move, 1: move}
+# moved : int {0: don't move, 1: move}
 #     whether child_prefecture and current_prefecture are equal or not
 """, end='', file=outfile)
 
@@ -144,7 +144,7 @@ print(
 #     item id of the movie which is compatible with the event file.
 # name : str, encoding=utf-8
 #     title of the movie with release year
-# style : int {0:maki, 1:otherwise}
+# maki : int {0:maki, 1:otherwise}
 #     whether a style of the sushi is *maki* or not
 # seafood : int {0:seafood, 1:otherwise}
 #     whether seafood or not

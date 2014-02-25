@@ -142,16 +142,16 @@ def load_sushi3b_score(infile=None, event_dtype=None):
         regional ID at which you currently live
     current_ew : int {0: Eastern, 1: Western}
         east/west ID at which you currently live
-    is_moved : int {0: don't move, 1: move}
+    moved : int {0: don't move, 1: move}
         whether child_prefecture and current_prefecture are equal or not
 
     Format of item's feature ( `data.feature[1]` ):
 
     name : str, encoding=utf-8
         title of the movie with release year
-    is_maki : int {0:otherwise, 1:maki}
+    maki : int {0:otherwise, 1:maki}
         whether a style of the sushi is *maki* or not
-    is_seafood : int {0:otherwise, 1:seafood}
+    seafood : int {0:otherwise, 1:seafood}
         whether seafood or not
     genre : int, int, SUSHI3_INFO['item_genre']
         the genre of the sushi *neta*
@@ -194,7 +194,7 @@ def load_sushi3b_score(infile=None, event_dtype=None):
         ('current_prefecture', np.int),
         ('current_region', np.int),
         ('current_ew', np.int),
-        ('is_moved', np.int)])
+        ('moved', np.int)])
     dtype = np.dtype([('eid', np.int), ('feature', fdtype)])
     x = np.genfromtxt(fname=infile, delimiter='\t', dtype=dtype)
     data.set_features(0, x['eid'], x['feature'])
@@ -204,8 +204,8 @@ def load_sushi3b_score(infile=None, event_dtype=None):
                      encoding='utf-8')
     fdtype = np.dtype([
         ('name', 'U20'),
-        ('is_maki', np.int),
-        ('is_seafood', np.int),
+        ('maki', np.int),
+        ('seafood', np.int),
         ('genre', np.int),
         ('heaviness', np.float),
         ('frequency', np.float),
