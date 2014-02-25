@@ -16,15 +16,23 @@ Instruction
 4. Remove original files, if you do not need them.
 """
 
-from __future__ import unicode_literals
+from __future__ import (
+    print_function,
+    division,
+    absolute_import,
+    unicode_literals)
 
 import os
 import sys
 import io
 import re
 
-# set directories
+# help message
+if ('-h' in sys.argv) or ('--help' in sys.argv):
+    print(__doc__, file=sys.stderr)
+    sys.exit(0)
 
+# set directories
 stem = 'movielens1m'
 pwd = os.path.dirname(__file__)
 if len(sys.argv) >= 2:
@@ -37,7 +45,7 @@ else:
 infile = open(os.path.join(pwd, 'ratings.dat'), 'r')
 outfile = open(os.path.join(target, stem + '.event'), 'w')
 
-outfile.write(
+print(
 """# Movielens 1M data set
 #
 # Original files are distributed by the Grouplens Research Project at the site:
@@ -63,11 +71,11 @@ outfile.write(
 #     rating score whose range is {1, 2, 3, 4, 5}
 # timestamp : int
 #     represented in seconds since the epoch as returned by time(2)
-""")
+""", end='', file=outfile)
 
 for line in infile.readlines():
     f = line.rstrip('\r\n').split("::")
-    outfile.write("\t".join(f) + "\n")
+    print('\t'.join(f), file=outfile)
 
 infile.close()
 outfile.close()
@@ -77,7 +85,7 @@ outfile.close()
 infile = open(os.path.join(pwd, 'users.dat'), 'r')
 outfile = open(os.path.join(target, stem + '.user'), 'w')
 
-outfile.write(
+print(
 """# User feature file for ``movielens1m.event``.
 # 
 # The number of users is 6040.
@@ -103,20 +111,20 @@ outfile.write(
 #     19:"unemployed", 20:"writer"
 # zip : str, length=5
 #     zip code of 5 digits, which represents the residential area of the user
-""")
+""", end='', file=outfile)
 
 age = {'1':0, '18':1, '25':2, '35':3, '45':4, '50':5, '56':6}
 
 for line in infile.readlines():
     f = line.rstrip('\r\n').split("::")
-    outfile.write(f[0] + '\t')
+    print(f[0], end='\t', file=outfile)
     if f[1] == 'M':
-        outfile.write('0\t')
+        print('0', end='\t', file=outfile)
     elif f[1] == 'F':
-        outfile.write('1\t')
+        print('1', end='\t', file=outfile)
     else:
         raise ValueError
-    outfile.write(str(age[f[2]]) + '\t' + f[3] + '\t' + f[4][0:5] + '\n')
+    print(age[f[2]], f[3], f[4][0:5], sep='\t', file=outfile)
 
 infile.close()
 outfile.close()
@@ -126,7 +134,7 @@ outfile.close()
 infile = io.open(os.path.join(pwd, 'movies.dat'), 'r', encoding='cp1252')
 outfile = io.open(os.path.join(target, stem + '.item'), 'w', encoding='utf_8')
 
-outfile.write(
+print(
 """# Item feature file for ``movielens1m.event``.
 #
 # The number of movies is 3883.
@@ -146,7 +154,7 @@ outfile.write(
 #     0:Action, 1:Adventure, 2:Animation, 3:Children's, 4:Comedy, 5:Crime,
 #     6:Documentary, 7:Drama, 8:Fantasy, 9:Film-Noir, 10:Horror, 11:Musical,
 #     12:Mystery, 13:Romance, 14:Sci-Fi, 15:Thriller, 16:War, 17:Western 
-""")
+""", end='', file=outfile)
 
 genre = {"Action":0, "Adventure":1, "Animation":2, "Children's":3, "Comedy":4,
          "Crime":5, "Documentary":6, "Drama":7, "Fantasy":8, "Film-Noir":9,
@@ -158,14 +166,14 @@ for line in infile.readlines():
     f = line.rstrip('\r\n').split("::")
     if f[0] == '3845': # for buggy character in original file
         f[1] = re.sub('&#8230;', '\u2026', f[1])
-    outfile.write(f[0] + "\t" + f[1] + "\t")
+    print(f[0], f[1], sep='\t', end='\t', file=outfile)
     year = year_p.search(f[1]).group(1)
-    outfile.write(year + '\t')
+    print(year, end='\t', file=outfile)
     d = f[2].split('|')
     o = ['0'] * 18
     for i in d:
         o[genre[i]] = '1'
-    outfile.write('\t'.join(o) + '\n')
+    print('\t'.join(o), file=outfile)
 
 infile.close()
 outfile.close()

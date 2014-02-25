@@ -27,8 +27,12 @@ import os
 import sys
 import io
 
-# set directories
+# help message
+if ('-h' in sys.argv) or ('--help' in sys.argv):
+    print(__doc__, file=sys.stderr)
+    sys.exit(0)
 
+# set directories
 stem = 'sushi3'
 pwd = os.path.dirname(__file__)
 if len(sys.argv) >= 2:
@@ -62,7 +66,7 @@ print(
 #     item id of the sushi rated by the user
 # score : int
 #     rating score whose range is {0, 1, 2, 3, 4}
-""", file=outfile, end="")
+""", end='', file=outfile)
 
 uid = 0
 for line in infile.readlines():
@@ -112,9 +116,9 @@ print(
 #     regional ID at which you currently live
 # current_ew : int {0: Eastern, 1: Western}
 #     east/west ID at which you currently live
-# is_moved : int {0: don't move, 1: move}
+# moved : int {0: don't move, 1: move}
 #     whether child_prefecture and current_prefecture are equal or not
-""", file=outfile, end="")
+""", end='', file=outfile)
 
 uid = 0
 for line in infile.readlines():
@@ -140,7 +144,7 @@ print(
 #     item id of the movie which is compatible with the event file.
 # name : str, encoding=utf-8
 #     title of the movie with release year
-# style : int {0:maki, 1:otherwise}
+# maki : int {0:maki, 1:otherwise}
 #     whether a style of the sushi is *maki* or not
 # seafood : int {0:seafood, 1:otherwise}
 #     whether seafood or not
@@ -166,7 +170,7 @@ print(
 #     maki and other style sushis are normalized separatly
 # supply : float, range=[0-1]
 #    the ratio of shops that supplies the sushi
-""", file=outfile, end="")
+""", end='', file=outfile)
 
 for line in infile.readlines():
     item_feature = line.rstrip('\r\n').split("\t")

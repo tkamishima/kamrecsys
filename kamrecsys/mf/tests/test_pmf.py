@@ -39,23 +39,23 @@ class TestEventScorePredictor(unittest.TestCase):
                                0.025638738121075231, delta=0.00001)
 
         self.assertAlmostEqual(recommender.predict((1, 7)),
-                               3.9873641434545979, delta=1e-7)
+                               3.9873641434545979, delta=1e-5)
         self.assertAlmostEqual(recommender.predict((1, 9)),
-                               4.9892118821609106, delta=1e-7)
+                               4.9892118821609106, delta=1e-5)
         self.assertAlmostEqual(recommender.predict((1, 11)),
-                               3.6480799850368273, delta=1e-7)
+                               3.6480799850368273, delta=1e-5)
         self.assertAlmostEqual(recommender.predict((3, 7)),
-                               3.6336318795279228, delta=1e-7)
+                               3.6336318795279228, delta=1e-5)
         self.assertAlmostEqual(recommender.predict((3, 9)),
-                               4.2482001235634943, delta=1e-7)
+                               4.2482001235634943, delta=1e-5)
         self.assertAlmostEqual(recommender.predict((3, 11)),
-                               3.7236984083417841, delta=1e-7)
+                               3.7236984083417841, delta=1e-5)
         self.assertAlmostEqual(recommender.predict((5, 7)),
-                               3.4141968145802597, delta=1e-7)
+                               3.4141968145802597, delta=1e-5)
         self.assertAlmostEqual(recommender.predict((5, 9)),
-                               3.9818882049478654, delta=1e-7)
+                               3.9818882049478654, delta=1e-5)
         self.assertAlmostEqual(recommender.predict((5, 11)),
-                               3.4710520150321895, delta=1e-7)
+                               3.4710520150321895, delta=1e-5)
         x = np.array([[1, 7], [1, 9], [1, 11],
             [3, 7], [3, 9], [3, 11],
             [5, 7], [5, 9], [5, 11]])

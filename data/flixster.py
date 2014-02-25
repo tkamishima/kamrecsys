@@ -27,8 +27,12 @@ import os
 import sys
 import io
 
-# set directories
+# help message
+if ('-h' in sys.argv) or ('--help' in sys.argv):
+    print(__doc__, file=sys.stderr)
+    sys.exit(0)
 
+# set directories
 stem = 'flixster'
 pwd = os.path.dirname(__file__)
 if len(sys.argv) >= 2:
@@ -62,11 +66,11 @@ print(
 # score : int
 #     rating score whose range is:
 #     {0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0}
-""", file=outfile, end="")
+""", end='', file=outfile)
 
 for line in infile.readlines():
-    f = line.rstrip('\r\n').split("\t")
-    print(f[0], f[1], f[2], sep="\t", file=outfile)
+    f = line.rstrip('\r\n').split('\t')
+    print(f[0], f[1], f[2], sep='\t', file=outfile)
 
 infile.close()
 outfile.close()

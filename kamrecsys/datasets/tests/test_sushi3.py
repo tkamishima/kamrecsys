@@ -67,13 +67,13 @@ class TestSushi3Class(unittest.TestCase):
         self.assertEqual(data.feature[0][322]['current_prefecture'], 8)
         self.assertEqual(data.feature[0][322]['current_region'], 3)
         self.assertEqual(data.feature[0][322]['current_ew'], 0)
-        self.assertEqual(data.feature[0][322]['is_moved'], 1)
+        self.assertEqual(data.feature[0][322]['moved'], 1)
 
         # items
 # todo: sushi name in unicode
         #self.assertEqual(data.feature[1][8]['name'], u'とろ')
-        self.assertEqual(data.feature[1][8]['is_maki'], 1)
-        self.assertEqual(data.feature[1][8]['is_seafood'], 0)
+        self.assertEqual(data.feature[1][8]['maki'], 1)
+        self.assertEqual(data.feature[1][8]['seafood'], 0)
         self.assertEqual(data.feature[1][8]['genre'], 1)
         self.assertAlmostEqual(data.feature[1][8]['heaviness'],
                                0.551854655563967)

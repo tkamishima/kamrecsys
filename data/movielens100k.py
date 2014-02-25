@@ -16,14 +16,22 @@ Instruction
 4. Remove original files, if you do not need them.
 """
 
-from __future__ import unicode_literals
+from __future__ import (
+    print_function,
+    division,
+    absolute_import,
+    unicode_literals)
 
 import os
 import sys
 import io
 
-# set directories
+# help message
+if ('-h' in sys.argv) or ('--help' in sys.argv):
+    print(__doc__, file=sys.stderr)
+    sys.exit(0)
 
+# set directories
 stem = 'movielens100k'
 pwd = os.path.dirname(__file__)
 if len(sys.argv) >= 2:
@@ -36,7 +44,7 @@ else:
 infile = open(os.path.join(pwd, 'u.data'), 'r')
 outfile = open(os.path.join(target, stem + '.event'), 'w')
 
-outfile.write(
+print(
 """# Movielens 100k data set
 #
 # Original files are distributed by the Grouplens Research Project at the site:
@@ -57,11 +65,11 @@ outfile.write(
 #     rating score whose range is {1, 2, 3, 4, 5}
 # timestamp : int
 #     UNIX seconds since 1/1/1970 UTC
-""")
+""", end='', file=outfile)
 
 for line in infile.readlines():
     f = line.rstrip('\r\n').split("\t")
-    outfile.write("\t".join(f) + "\n")
+    print("\t".join(f), file=outfile)
 
 infile.close()
 outfile.close()
@@ -71,7 +79,7 @@ outfile.close()
 infile = open(os.path.join(pwd, 'u.user'), 'r')
 outfile = open(os.path.join(target, stem + '.user'), 'w')
 
-outfile.write(
+print(
 """# User feature file for ``movielens100k.event``.
 # 
 # The number of users is 943.
@@ -92,7 +100,8 @@ outfile.write(
 #     salesman:16,  scientist:17, student:18, technician:19, writer:20
 # zip : str, length=5
 #     zip code of 5 digits, which represents the residential area of the user
-""")
+""", end='', file=outfile)
+
 occupation = {'none':0, 'other':1, 'administrator':2, 'artist':3, 'doctor':4,
               'educator':5, 'engineer':6, 'entertainment':7, 'executive':8,
               'healthcare':9, 'homemaker':10, 'lawyer':11, 'librarian':12,
@@ -101,15 +110,15 @@ occupation = {'none':0, 'other':1, 'administrator':2, 'artist':3, 'doctor':4,
 
 for line in infile.readlines():
     f = line.rstrip('\r\n').split("|")
-    outfile.write(f[0] + '\t' + f[1] + '\t')
+    print(f[0], f[1], sep='\t', end='\t', file=outfile)
     if f[2] == 'M':
-        outfile.write('0\t')
+        print('0', end='\t', file=outfile)
     elif f[2] == 'F':
-        outfile.write('1\t')
+        print('1', end='\t', file=outfile)
     else:
         raise ValueError
-    outfile.write(str(occupation[f[3]]) + '\t')
-    outfile.write(f[4] + '\n')
+    print(occupation[f[3]], end='\t', file=outfile)
+    print(f[4], file=outfile)
 
 infile.close()
 outfile.close()
@@ -117,9 +126,9 @@ outfile.close()
 # convert item files ----------------------------------------------------------
 
 infile = io.open(os.path.join(pwd, 'u.item'), 'r', encoding='cp1252')
-outfile = io.open(os.path.join(target, stem + '.item'), 'w', encoding='utf_8')
+outfile = io.open(os.path.join(target, stem + '.item'), 'w', encoding='utf-8')
 
-outfile.write(
+print(
 """# Item feature file for ``movielens100k.event``.
 #
 # The number of movies is 1682.
@@ -141,21 +150,21 @@ outfile.write(
 #     Thriller, War, Western
 # imdb : str, length=[0, 134]
 #      URL for the movie at IMDb http://www.imdb.com
-""")
+""", end='', file=outfile)
 
 month = {'Jan':1, 'Feb':2, 'Mar':3, 'Apr':4, 'May':5, 'Jun':6,
          'Jul':7, 'Aug':8, 'Sep':9, 'Oct':10, 'Nov':11, 'Dec':12}
 
 for line in infile.readlines():
     f = line.rstrip('\r\n').split("|")
-    outfile.write(f[0] + "\t" + f[1] + "\t")
+    print(f[0], f[1], sep='\t', end='\t', file=outfile)
     d = f[2].split('-')
     if len(d) == 3:
-        outfile.write("%d\t%d\t%d\t" % (int(d[0]), month[d[1]], int(d[2])))
+        print('{0:d}\t{1:d}\t{2:d}'.format(int(d[0]), month[d[1]], int(d[2])),
+              end='\t', file=outfile)
     else:
-        outfile.write("0\t0\t0\t")
-    outfile.write("\t".join(f[6:24]))
-    outfile.write("\t" + f[4] + "\n")
+        print('0', '0', '0', sep='\t', end='\t', file=outfile)
+    print('\t'.join(f[6:24]), f[4], sep='\t', file=outfile)
 
 infile.close()
 outfile.close()
