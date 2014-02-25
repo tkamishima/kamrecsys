@@ -27,8 +27,8 @@ import os
 import sys
 import io
 
-# set directories
 
+# set directories
 stem = 'sushi3'
 pwd = os.path.dirname(__file__)
 if len(sys.argv) >= 2:
@@ -62,7 +62,7 @@ print(
 #     item id of the sushi rated by the user
 # score : int
 #     rating score whose range is {0, 1, 2, 3, 4}
-""", file=outfile, end="")
+""", end='', file=outfile)
 
 uid = 0
 for line in infile.readlines():
@@ -114,7 +114,7 @@ print(
 #     east/west ID at which you currently live
 # is_moved : int {0: don't move, 1: move}
 #     whether child_prefecture and current_prefecture are equal or not
-""", file=outfile, end="")
+""", end='', file=outfile)
 
 uid = 0
 for line in infile.readlines():
@@ -166,7 +166,7 @@ print(
 #     maki and other style sushis are normalized separatly
 # supply : float, range=[0-1]
 #    the ratio of shops that supplies the sushi
-""", file=outfile, end="")
+""", end='', file=outfile)
 
 for line in infile.readlines():
     item_feature = line.rstrip('\r\n').split("\t")
