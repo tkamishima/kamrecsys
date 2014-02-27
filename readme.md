@@ -1,7 +1,7 @@
 KamRecSys
 =========
 
-``KamRecSys`` is a python package of algorithms for recommender systems.
+`KamRecSys` is a python package of algorithms for recommender systems.
 
 This package targets experimental algorithm used for research purpose.
 We concentrate on the flexibility of data structure or easiness for implementing new algorithm rather than scalablity or efficiency of algorithms.
@@ -19,8 +19,8 @@ We tested this module under the following packages:
 Install
 -------
 
-First, generate sample data sets that you need. Read a ``readme.rst`` file in a ``data`` directory.
-You then build and install by using a ``setup.py`` script.
+First, generate sample data sets that you need. Read a `readme.md` file in a `data` directory.
+You then build and install by using a `setup.py` script.
 
 Algorithms
 ----------
@@ -36,15 +36,15 @@ DataSets
 
     * sample_movies
 
-* `Movielens Data Sets <http://www.grouplens.org/node/73>`_
+* [Movielens Data Sets](http://www.grouplens.org/node/73)
 
     * Movielens 100k Data Set
     * Movielens 1m Data Set
 
-* `SUSHI Data Sets <http://www.kamishima.net/sushi/>`_
+* [SUSHI Data Sets](http://www.kamishima.net/sushi/)
 
     * Sushi3b Score Data Set
 
-* `Flixster Data Sets <http://www.sfu.ca/~sja25/datasets/>`_
+* [Flixster Data Sets](http://www.sfu.ca/~sja25/datasets/)
 
     * Flixster Rating Data Set
