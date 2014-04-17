@@ -1,5 +1,5 @@
-include readme.rst
+include readme.md
 include data/*.py
-include data/readme.rst
-include kamrecsys/datasets/samples/readme.rst
+include data/readme.md
+include kamrecsys/datasets/samples/readme.md
 
