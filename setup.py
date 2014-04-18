@@ -17,6 +17,10 @@ setup(
     keywords='recommender systems',
     packages=find_packages(),
     package_data={
-        'kamrecsys.datasets': ['samples/movielens*']
+        'kamrecsys.datasets':
+            ['samples/flixster*',
+             'samples/movielens*',
+             'samples/pci.*',
+             'samples/sushi*']
     },
 )
