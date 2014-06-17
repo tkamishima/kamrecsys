@@ -117,35 +117,37 @@ def main(opt):
 
     ### output statistics
     stats = []
+    stats_name = []
 
     # mean scores
+
+
+
+    stats_name.append('nos_smaples')
     stats.append(x['t_score'].shape[0])
+    stats_name.append('mean_true_score')
     stats.append(np.mean(x['t_score']))
+    stats_name.append('mean_predicted_score')
     stats.append(np.mean(x['p_score']))
 
     # absolute error
     errs = np.abs(x['t_score'] - x['p_score'])
+    stats_name.append('mean_absolute_error')
     stats.append(np.mean(errs))
+    stats_name.append('mean_absolute_error_stdev')
     stats.append(np.std(errs))
 
     # squared error
     errs = (x['t_score'] - x['p_score']) ** 2
+    stats_name.append('mean_squared_error')
     stats.append(np.mean(errs))
+    stats_name.append('mean_squared_error_stdev')
     stats.append(np.std(errs))
+    stats_name.append('root_mean_squared_error')
     stats.append(np.sqrt(np.mean(errs)))
 
     # output errors
     if opt.json:
-        stats_name = [
-            'nos_smaples',
-            'mean_true_score',
-            'mean_predicted_score',
-            'mean_absolute_error',
-            'mean_absolute_error_stdev',
-            'mean_squared_error',
-            'mean_squared_error_stdev',
-            'root_mean_squared_error',
-        ]
         json.dump(dict(zip(stats_name, stats)), opt.outfile)
     else:
         print(*stats, sep='\t', end='\n', file=opt.outfile)
