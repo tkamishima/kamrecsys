@@ -10,7 +10,7 @@ SYNOPSIS::
 Description
 ===========
 
-errors between original and predicted scores
+errors between original and predicted scores in a tsv or json format
 
 Output
 ------
