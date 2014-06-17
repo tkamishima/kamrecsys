@@ -34,8 +34,13 @@ Options
 -n, --no-timestamp or --timestamp
     specify whether .event files has 'timestamp' information,
     default=true
--j, --json
-    output in a json format (default false)
+-f <FORMAT>, --format <FORMT>
+    output format (default=tsv)
+
+        * tsv: tab separated values
+        * htsv: tsv with a header line
+        * json: json
+
 -h, --help
     show this help message and exit
 --version
@@ -120,9 +125,6 @@ def main(opt):
     stats_name = []
 
     # mean scores
-
-
-
     stats_name.append('nos_smaples')
     stats.append(x['t_score'].shape[0])
     stats_name.append('mean_true_score')
@@ -147,8 +149,11 @@ def main(opt):
     stats.append(np.sqrt(np.mean(errs)))
 
     # output errors
-    if opt.json:
+    if opt.format == 'json':
         json.dump(dict(zip(stats_name, stats)), opt.outfile)
+    elif opt.format == 'htsv':
+        print(*stats_name, sep='\t', end='\n', file=opt.outfile)
+        print(*stats, sep='\t', end='\n', file=opt.outfile)
     else:
         print(*stats, sep='\t', end='\n', file=opt.outfile)
 
@@ -190,8 +195,8 @@ if __name__ == '__main__':
                      action='store_false')
     apg.add_argument('--timestamp', dest='timestamp',
                      action='store_true')
-    ap.set_defaults(json=False)
-    ap.add_argument('-j', '--json', dest='json', action='store_true')
+    ap.add_argument('-f', '--format', type=str,
+                    default='tsv', choices=['tsv', 'htsv', 'json'])
 
     # parsing
     opt = ap.parse_args()
