@@ -252,7 +252,7 @@ if __name__ == '__main__':
     ap.add_argument('outfilep', nargs='?', metavar='OUTFILE',
                     default=sys.stdout, type=argparse.FileType('w'))
     ap.add_argument('-t', '--test', dest='testfile', default=None,
-                    type=argparse.FileType('r'))
+                    required=True, type=argparse.FileType('r'))
 
     # script specific options
     apg = ap.add_mutually_exclusive_group()
