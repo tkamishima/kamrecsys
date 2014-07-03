@@ -23,9 +23,6 @@ from sklearn.utils import check_random_state
 from sklearn.externals.six import with_metaclass
 
 
-__all__ = ['KFold']
-
-
 class _PartitionIterator(with_metaclass(ABCMeta)):
     """Base class for CV iterators where train_mask = ~test_mask
 

@@ -14,7 +14,7 @@ from __future__ import (
 # Imports
 #==============================================================================
 
-from ._sklearn_cross_validation import *
+from ._sklearn_cross_validation import KFold
 
 #==============================================================================
 # Public symbols
