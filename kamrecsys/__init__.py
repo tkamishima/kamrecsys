@@ -30,7 +30,11 @@ import logging
 # Public symbols
 #==============================================================================
 
-__all__ = ['data', 'datasets', 'mf', 'recommenders']
+__all__ = ['cross_validation',
+           'data',
+           'datasets',
+           'mf',
+           'recommenders']
 
 #==============================================================================
 # Constants
