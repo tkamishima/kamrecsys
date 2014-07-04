@@ -23,7 +23,9 @@ from ._base import BaseData
 # Public symbols
 #==============================================================================
 
-__all__ = ['EventUtilMixin', 'EventData', 'EventWithScoreData']
+__all__ = ['EventUtilMixin',
+           'EventData',
+           'EventWithScoreData']
 
 #==============================================================================
 # Constants

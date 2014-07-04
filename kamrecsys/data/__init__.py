@@ -4,14 +4,26 @@
 Data container
 """
 
-from __future__ import print_function
-from __future__ import division
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import (
+    print_function,
+    division,
+    absolute_import,
+    unicode_literals)
 
 #==============================================================================
 # Imports
 #==============================================================================
 
-from ._base import *
-from ._event import *
+from ._base import (BaseData)
+from ._event import (EventUtilMixin,
+                     EventData,
+                     EventWithScoreData)
+
+#==============================================================================
+# Public symbols
+#==============================================================================
+
+__all__ = ['EventUtilMixin',
+           'EventData',
+           'EventWithScoreData',
+           'BaseData']

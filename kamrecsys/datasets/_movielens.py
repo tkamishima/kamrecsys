@@ -25,8 +25,11 @@ from ._base import SAMPLE_PATH
 # Public symbols
 #==============================================================================
 
-__all__ = ['MOVIELENS100K_INFO', 'load_movielens100k', 'load_movielens_mini',
-           'MOVIELENS1M_INFO', 'load_movielens1m']
+__all__ = ['MOVIELENS100K_INFO',
+           'load_movielens100k',
+           'load_movielens_mini',
+           'MOVIELENS1M_INFO',
+           'load_movielens1m']
 
 #==============================================================================
 # Constants

@@ -26,7 +26,8 @@ from ._base import SAMPLE_PATH
 # Public symbols
 #==============================================================================
 
-__all__ = ['SUSHI3_INFO', 'load_sushi3b_score']
+__all__ = ['SUSHI3_INFO',
+           'load_sushi3b_score']
 
 #==============================================================================
 # Constants
