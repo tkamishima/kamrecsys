@@ -180,8 +180,10 @@ def main(opt):
             print(ev[i, 0], ev[i, 1], tsc[i], esc[i], ts[i],
                   file=opt.outfile, sep='\t')
     else:
-        print('User ID', 'Item ID', 'Original Score', 'Predicted Score',
-              file=opt.outfile, sep='\t')
+        if opt.header:
+            print('User ID', 'Item ID', 'Original Score', 'Predicted Score',
+                  'Time Stamp',
+                  file=opt.outfile, sep='\t')
         for i in xrange(ev.shape[0]):
             print(ev[i, 0], ev[i, 1], tsc[i], esc[i],
                   file=opt.outfile, sep='\t')
