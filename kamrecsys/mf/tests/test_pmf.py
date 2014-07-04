@@ -34,9 +34,9 @@ class TestEventScorePredictor(unittest.TestCase):
         recommender.fit(data, disp=False)
 
         self.assertAlmostEqual(recommender.i_loss_,
-                               0.74652578358324106, delta=0.00001)
+                               0.74652578358324106, delta=1e-5)
         self.assertAlmostEqual(recommender.f_loss_,
-                               0.025638738121075231, delta=0.00001)
+                               0.025638738121075231, delta=1e-5)
 
         self.assertAlmostEqual(recommender.predict((1, 7)),
                                3.9873641434545979, delta=1e-5)
@@ -63,7 +63,7 @@ class TestEventScorePredictor(unittest.TestCase):
             recommender.predict(x),
             [3.98736414, 4.98921188, 3.64807999, 3.63363188, 4.24820012,
              3.72369841, 3.41419681, 3.9818882, 3.47105202],
-            rtol=1e-7)
+            rtol=1e-5)
 
 ##### Main routine #####
 if __name__ == '__main__':
