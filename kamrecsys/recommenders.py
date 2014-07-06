@@ -4,10 +4,11 @@
 Recommenders: abstract classes
 """
 
-from __future__ import print_function
-from __future__ import division
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import (
+    print_function,
+    division,
+    absolute_import,
+    unicode_literals)
 
 #==============================================================================
 # Module metadata variables
@@ -27,8 +28,10 @@ from .data import BaseData, EventData, EventWithScoreData, EventUtilMixin
 # Public symbols
 #==============================================================================
 
-__all__ = ['BaseRecommender', 'BaseEventRecommender',
-           'BaseEventItemFinder', 'BaseEventScorePredictor']
+__all__ = ['BaseRecommender',
+           'BaseEventRecommender',
+           'BaseEventItemFinder',
+           'BaseEventScorePredictor']
 
 #==============================================================================
 # Constants
@@ -57,6 +60,8 @@ class BaseRecommender(object):
         conversion table to external ids, succeed from training data sets
     iid : dictionary
         conversion table to internal ids, succeed from training data sets
+    random_state: RandomState or an int seed (None by default)
+        A random number generator instance
 
     Raises
     ------
@@ -66,11 +71,12 @@ class BaseRecommender(object):
 
     __metaclass__ = ABCMeta
 
-    def __init__(self):
+    def __init__(self, random_state=None):
         self.n_otypes = 0
         self.n_objects = None
         self.eid = None
         self.iid = None
+        self.random_state = random_state
 
     @abstractmethod
     def fit(self, data, **kwargs):
@@ -193,8 +199,8 @@ class BaseEventRecommender(BaseRecommender, EventUtilMixin):
 
     __metaclass__ = ABCMeta
 
-    def __init__(self):
-        super(BaseEventRecommender, self).__init__()
+    def __init__(self, random_state=None):
+        super(BaseEventRecommender, self).__init__(random_state=random_state)
 
     def _set_event_info(self, data):
         """
@@ -224,8 +230,9 @@ class BaseEventItemFinder(BaseEventRecommender):
 
     __metaclass__ = ABCMeta
 
-    def __init__(self):
-        super(BaseEventItemFinder, self).__init__()
+    def __init__(self, random_state=None):
+        super(BaseEventItemFinder, self).\
+            __init__(random_state=random_state)
 
 
 class BaseEventScorePredictor(BaseEventRecommender):
@@ -235,8 +242,9 @@ class BaseEventScorePredictor(BaseEventRecommender):
 
     __metaclass__ = ABCMeta
 
-    def __init__(self):
-        super(BaseEventScorePredictor, self).__init__()
+    def __init__(self, random_state=None):
+        super(BaseEventScorePredictor, self).\
+            __init__(random_state=random_state)
 
     @abstractmethod
     def raw_predict(self, ev, **kwargs):
