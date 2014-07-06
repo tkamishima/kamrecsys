@@ -98,8 +98,8 @@ class EventScorePredictor(BaseEventScorePredictor):
         Collaborative Filtering Model", KDD2008
     """
 
-    def __init__(self, C=1.0, k=1, tol=None):
-        super(EventScorePredictor, self).__init__()
+    def __init__(self, C=1.0, k=1, tol=None, random_state=None):
+        super(EventScorePredictor, self).__init__(random_state=random_state)
 
         self.C = np.float(C)
         self.k = np.int(k)
@@ -177,9 +177,9 @@ class EventScorePredictor(BaseEventScorePredictor):
             ** 2
         var = var / n_events
         self.p_[0:n_users, :] =\
-        np.random.normal(0.0, np.sqrt(var), (n_users, k))
+        self._rng.normal(0.0, np.sqrt(var), (n_users, k))
         self.q_[0:n_items, :] =\
-        np.random.normal(0.0, np.sqrt(var), (n_items, k))
+        self._rng.normal(0.0, np.sqrt(var), (n_items, k))
 
         # scale a regularization term by the number of parameters
         self._reg = self.C / (1 + (k + 1) * (n_users + n_items))
@@ -298,7 +298,7 @@ class EventScorePredictor(BaseEventScorePredictor):
         return grad
 
     def fit(self, data, user_index=0, item_index=1, score_index=0, tol=None,
-            **kwargs):
+            random_state=None, **kwargs):
         """
         fitting model
 
@@ -316,9 +316,17 @@ class EventScorePredictor(BaseEventScorePredictor):
             Ignored if score of data is a single criterion type. In a multi-
             criteria case, specify the position of the target score in a score
             vector. (default=0)
+        random_state: RandomState or an int seed (None by default)
+            A random number generator instance. If None is given, the
+            object's random_state is used
         kwargs : keyowrd arguments
             keyword arguments passed to optimizers
         """
+
+        # set random state
+        if random_state is None:
+            random_state = self.random_state
+        self._rng = check_random_state(random_state)
 
         # get input data
         ev, sc, n_objects =\

@@ -23,13 +23,15 @@ class TestEventScorePredictor(unittest.TestCase):
         np.random.seed(1234)
         data = load_movielens_mini()
 
-        recommender = EventScorePredictor(C=0.1, k=2, tol=1e-03)
+        recommender = EventScorePredictor(C=0.1, k=2, tol=1e-03,
+                                          random_state=1234)
         self.assertDictEqual(
             vars(recommender),
                 {'C': 0.1, 'n_otypes': 0, 'bu_': None, 'bi_': None, 'k': 2,
                  'p_': None, 'q_': None, '_coef': None, 'f_loss_': np.inf,
                  'iid': None, 'i_loss_': np.inf, 'eid': None, 'tol': 1e-03,
-                 'n_objects': None, '_dt': None, 'mu_': None})
+                 'n_objects': None, '_dt': None, 'mu_': None,
+                 'random_state': 1234})
 
         recommender.fit(data, disp=False)
 
