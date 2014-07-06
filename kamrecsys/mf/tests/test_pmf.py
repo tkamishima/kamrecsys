@@ -20,7 +20,6 @@ class TestEventScorePredictor(unittest.TestCase):
         from ...datasets import load_movielens_mini
         from ..pmf import EventScorePredictor
 
-        np.random.seed(1234)
         data = load_movielens_mini()
 
         recommender = EventScorePredictor(C=0.1, k=2, tol=1e-03,

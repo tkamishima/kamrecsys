@@ -20,6 +20,7 @@ import logging
 import sys
 import numpy as np
 from scipy.optimize import fmin_cg
+from sklearn.utils import check_random_state
 
 from ..recommenders import BaseEventScorePredictor
 
