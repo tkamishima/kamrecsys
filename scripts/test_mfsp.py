@@ -1,5 +1,5 @@
 """
-Testing "matrix factorization score predictors" on a hold-out set
+test "matrix factorization score predictors" on a hold-out set
 
 SYNOPSIS::
 
@@ -23,7 +23,7 @@ Options
 -i <INPUT>, --in <INPUT>
     specify training file name
 -t <TEST>, --test <TEST>
-    specify testing file name
+    specify test file name
 -o <OUTPUT>, --out <OUTPUT>
     specify output file name
 -m <METHOD>, --method <METHOD>
@@ -90,6 +90,7 @@ import datetime
 import numpy as np
 
 from kamrecsys.data import EventWithScoreData
+from kamrecsys.cross_validation import KFold
 
 #==============================================================================
 # Public symbols
@@ -149,7 +150,7 @@ def load_data(fp, ts):
     return x
 
 
-def training(opt, ev, tsc, event_feature=None):
+def training(opt, ev, tsc, event_feature=None, fold=0):
     """
     training model
 
@@ -163,6 +164,8 @@ def training(opt, ev, tsc, event_feature=None):
         true scores
     event_feature : optional, structured array
         structured array of event features
+    fold : int, default=0
+        fold No., ignored if negarive
 
     Returns
     -------
@@ -179,8 +182,10 @@ def training(opt, ev, tsc, event_feature=None):
     # set starting time
     start_time = datetime.datetime.now()
     start_utime = os.times()[0]
-    opt.training_start_time = start_time.isoformat()
-    logger.info("training_start time = " + start_time.isoformat())
+    if 'training_start_time' not in opt:
+        opt.training_start_time = [0] * opt.fold
+    opt.training_start_time[fold] = start_time.isoformat()
+    logger.info("training_start_time = " + start_time.isoformat())
 
     # create and learing model
     rcmdr = EventScorePredictor(C=opt.C, k=opt.k, tol=opt.tol,
@@ -193,17 +198,27 @@ def training(opt, ev, tsc, event_feature=None):
     # set end and elapsed time
     end_time = datetime.datetime.now()
     end_utime = os.times()[0]
-    logger.info("training_end time = " + end_time.isoformat())
-    opt.training_end_time = end_time.isoformat()
-    logger.info("training_elapsed_time = " + str((end_time - start_time)))
-    opt.training_elapsed_time = str((end_time - start_time))
-    logger.info("training_elapsed_utime = " + str((end_utime - start_utime)))
-    opt.training_elapsed_utime = str((end_utime - start_utime))
+    elapsed_time = end_time - start_time
+    elapsed_utime = end_utime - start_utime
+    if 'training_end_time' not in opt:
+        opt.training_end_time = [0] * opt.fold
+    opt.training_end_time[fold] = end_time.isoformat()
+    logger.info("training_end_time = " + end_time.isoformat())
+    if 'training_elapsed_time' not in opt:
+        opt.training_elapsed_time = elapsed_time
+    else:
+        opt.training_elapsed_time += elapsed_time
+    logger.info("training_elapsed_time = " + str(opt.training_elapsed_time))
+    if 'training_elapsed_utime' not in opt:
+        opt.training_elapsed_utime = elapsed_utime
+    else:
+        opt.training_elapsed_utime += elapsed_utime
+    logger.info("training_elapsed_utime = " + str(opt.training_elapsed_utime))
 
     return rcmdr
 
 
-def testing(rcmdr, fp, opt, ev, tsc, ts=None):
+def testing(rcmdr, fp, opt, ev, tsc, ts=None, fold=0):
     """
     test and output results
 
@@ -221,13 +236,17 @@ def testing(rcmdr, fp, opt, ev, tsc, ts=None):
         true scores
     ts : optional, array, size=(n_events,), dtype=np.int
         timestamps if available
+    fold : int, default=0
+        fold No., ignored if negarive
     """
 
     # set starting time
     start_time = datetime.datetime.now()
     start_utime = os.times()[0]
-    opt.testing_start_time = start_time.isoformat()
-    logger.info("testing_start time = " + start_time.isoformat())
+    if 'test_start_time' not in opt:
+        opt.test_start_time = [0] * opt.fold
+    opt.test_start_time[fold] = start_time.isoformat()
+    logger.info("test_start_time = " + start_time.isoformat())
 
     # prediction
     esc = rcmdr.predict(ev)
@@ -252,12 +271,22 @@ def testing(rcmdr, fp, opt, ev, tsc, ts=None):
     # set end and elapsed time
     end_time = datetime.datetime.now()
     end_utime = os.times()[0]
-    logger.info("testing_end time = " + end_time.isoformat())
-    opt.testing_end_time = end_time.isoformat()
-    logger.info("testing_elapsed_time = " + str((end_time - start_time)))
-    opt.testing_elapsed_time = str((end_time - start_time))
-    logger.info("testing_elapsed_utime = " + str((end_utime - start_utime)))
-    opt.testing_elapsed_utime = str((end_utime - start_utime))
+    elapsed_time = end_time - start_time
+    elapsed_utime = end_utime - start_utime
+    if 'test_end_time' not in opt:
+        opt.test_end_time = [0] * opt.fold
+    opt.test_end_time[fold] = end_time.isoformat()
+    logger.info("test_end_time = " + end_time.isoformat())
+    if 'test_elapsed_time' not in opt:
+        opt.test_elapsed_time = elapsed_time
+    else:
+        opt.test_elapsed_time += elapsed_time
+    logger.info("test_elapsed_time = " + str(opt.test_elapsed_time))
+    if 'test_elapsed_utime' not in opt:
+        opt.test_elapsed_utime = elapsed_utime
+    else:
+        opt.test_elapsed_utime += elapsed_utime
+    logger.info("test_elapsed_utime = " + str(opt.test_elapsed_utime))
 
 
 def finalize(fp, opt):
@@ -294,28 +323,71 @@ def holdout_test(opt):
     """
 
     # load training data
-    train_x = load_data(opt.infile, opt)
+    train_x = load_data(opt.infile, opt.timestamp)
 
-    # load testing data
+    # load test data
     if opt.testfile is None:
         raise IOError('hold-out test data is required')
     test_x = load_data(opt.testfile, opt)
+    if opt.timestamp:
+        ef = train_x['event_feature']
+    else:
+        ef = None
 
     # training
-    if opt.timestamp:
-        rcmdr = training(opt, train_x['event'], train_x['score'],
-                         event_feature=train_x['event_feature'])
-    else:
-        rcmdr = training(opt, train_x['event'], train_x['score'])
+    rcmdr = training(opt, train_x['event'], train_x['score'], event_feature=ef)
 
-    # testing
+    # test
     if opt.timestamp:
-        testing(rcmdr, opt.outfile, opt,
-                test_x['event'], test_x['score'],
-                test_x['event_feature']['timestamp'])
+        ef = test_x['event_feature']
     else:
-        testing(rcmdr, opt.outfile, opt,
-                test_x['event'], test_x['score'])
+        ef = None
+
+    testing(rcmdr, opt.outfile, opt,
+            test_x['event'], test_x['score'], ef['timestamp'])
+
+    # output tailing information
+    finalize(opt.outfile, opt)
+
+
+def cv_test(opt):
+    """
+    tested on specified hold-out test data
+
+    Parameters
+    ----------
+    opt : Optionn
+        parsed command line options
+    """
+
+    # load training data
+    x = load_data(opt.infile, opt.timestamp)
+    n_events = x.shape[0]
+    ev = x['event']
+    tsc = x['score']
+    if opt.timestamp:
+        ef = x['event_feature']
+
+    fold = 0
+    for train_i, test_i in KFold(n_events, n_folds=opt.fold, interlace=True):
+
+        # training
+        if opt.timestamp:
+            rcmdr = training(opt, ev[train_i], tsc[train_i],
+                             event_feature=ef[train_i], fold=fold)
+        else:
+            rcmdr = training(opt, ev[train_i], tsc[train_i], fold=fold)
+
+        # test
+        if opt.timestamp:
+            testing(rcmdr, opt.outfile, opt,
+                    ev[test_i], tsc[test_i],
+                    ef[test_i]['timestamp'], fold=fold)
+        else:
+            testing(rcmdr, opt.outfile, opt,
+                    ev[test_i], tsc[test_i], fold=fold)
+
+        fold += 1
 
     # output tailing information
     finalize(opt.outfile, opt)
@@ -336,9 +408,11 @@ def main(opt):
 
     ### select validation scheme
     if opt.validation == 'holdout':
+        opt.fold = 1
+        logger.info("the nos of folds is set to 1")
         holdout_test(opt)
     elif opt.validation == 'cv':
-        pass
+        cv_test(opt)
     else:
         raise argparse.ArgumentTypeError(
             "Invalid validation scheme: {0:s}".format(opt.method))
