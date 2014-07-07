@@ -16,6 +16,10 @@ setup(
     long_description=long_description,
     keywords='recommender systems',
     packages=find_packages(),
+    install_requires=[
+        'numpy',
+        'scipy',
+        'scikit-learn'],
     package_data={
         'kamrecsys.datasets':
             ['samples/flixster*',
