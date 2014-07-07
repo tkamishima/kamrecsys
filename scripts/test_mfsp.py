@@ -31,6 +31,14 @@ Options
 
     * pmf : probabilitistic matrix factorization
 
+-v <VALIDATION>, --validation <VALIDATION>
+    validation scheme: default=holdout
+
+    * holdout : tested on the specified hold-out data
+    * cv : cross validation
+
+-f <FOLD>, --fold <FOLD>
+    the number of folds in cross validation, default=5
 -n, --no-timestamp or --timestamp
     specify whether .event files has 'timestamp' information,
     default=timestamp
@@ -326,7 +334,14 @@ def main(opt):
     """ Main routine that exits with status code 0
     """
 
-    holdout_test(opt)
+    ### select validation scheme
+    if opt.validation == 'holdout':
+        holdout_test(opt)
+    elif opt.validation == 'cv':
+        pass
+    else:
+        raise argparse.ArgumentTypeError(
+            "Invalid validation scheme: {0:s}".format(opt.method))
 
     sys.exit(0)
 
@@ -373,6 +388,9 @@ if __name__ == '__main__':
     # script specific options
     ap.add_argument('-m', '--method', type=str, default='pmf',
                     choices=['pmf'])
+    ap.add_argument('-v', '--validation', type=str, default='holdout',
+                    choices=['holdout', 'cv'])
+    ap.add_argument('-f', '--fold', type=int, default=5)
     apg = ap.add_mutually_exclusive_group()
     apg.set_defaults(timestamp=True)
     apg.add_argument('-n', '--no-timestamp', dest='timestamp',
