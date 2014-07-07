@@ -26,6 +26,11 @@ Options
     specify testing file name
 -o <OUTPUT>, --out <OUTPUT>
     specify output file name
+-m <METHOD>, --method <METHOD>
+    epecify algorithm: pmf
+
+    * pmf : probabilitistic matrix factorization
+
 -n, --no-timestamp or --timestamp
     specify whether .event files has 'timestamp' information,
     default=timestamp
@@ -77,7 +82,6 @@ import datetime
 import numpy as np
 
 from kamrecsys.data import EventWithScoreData
-from kamrecsys.mf.pmf import EventScorePredictor
 
 #==============================================================================
 # Public symbols
@@ -367,6 +371,8 @@ if __name__ == '__main__':
                     type=argparse.FileType('r'))
 
     # script specific options
+    ap.add_argument('-m', '--method', type=str, default='pmf',
+                    choices=['pmf'])
     apg = ap.add_mutually_exclusive_group()
     apg.set_defaults(timestamp=True)
     apg.add_argument('-n', '--no-timestamp', dest='timestamp',
@@ -420,6 +426,13 @@ if __name__ == '__main__':
 
     ### suppress warnings in numerical computation
     np.seterr(all='ignore')
+
+    ### select algorithm
+    if opt.method == 'pmf':
+        from kamrecsys.mf.pmf import EventScorePredictor
+    else:
+        raise argparse.ArgumentTypeError(
+            "Invalid method name: {0:s}".format(opt.method))
 
     ### output option information
     logger.info("list of options:")
