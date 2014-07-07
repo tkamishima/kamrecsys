@@ -398,16 +398,15 @@ if __name__ == '__main__':
     if opt.infile is None:
         opt.infile = opt.infilep
     del vars(opt)['infilep']
-    logger.info("input_file = " + opt.infile.name)
     if opt.outfile is None:
         opt.outfile = opt.outfilep
     del vars(opt)['outfilep']
-    logger.info("output_file = " + opt.outfile.name)
 
     ### set meta-data of script and machine
     opt.script_name = script_name
     opt.script_version = __version__
     opt.python_version = platform.python_version()
+    opt.numpy_version = np.__version__
     opt.sys_uname = platform.uname()
     if platform.system() == 'Darwin':
         opt.sys_info = commands.getoutput(
