@@ -29,7 +29,7 @@ Options
 -m <METHOD>, --method <METHOD>
     epecify algorithm: pmf
 
-    * pmf : probabilitistic matrix factorization
+    * pmf : probabilistic matrix factorization
 
 -v <VALIDATION>, --validation <VALIDATION>
     validation scheme: default=holdout
@@ -110,6 +110,7 @@ __all__ = []
 # Functions
 #==============================================================================
 
+
 def load_data(fp, ts):
     """
     load event with scores data
@@ -165,7 +166,7 @@ def training(opt, ev, tsc, event_feature=None, fold=0):
     event_feature : optional, structured array
         structured array of event features
     fold : int, default=0
-        fold No., ignored if negarive
+        fold No.
 
     Returns
     -------
@@ -187,7 +188,7 @@ def training(opt, ev, tsc, event_feature=None, fold=0):
     opt.training_start_time[fold] = start_time.isoformat()
     logger.info("training_start_time = " + start_time.isoformat())
 
-    # create and learing model
+    # create and learning model
     rcmdr = EventScorePredictor(C=opt.C, k=opt.k, tol=opt.tol,
                                 random_state=opt.rseed)
     rcmdr.fit(data)
@@ -237,7 +238,7 @@ def testing(rcmdr, fp, opt, ev, tsc, ts=None, fold=0):
     ts : optional, array, size=(n_events,), dtype=np.int
         timestamps if available
     fold : int, default=0
-        fold No., ignored if negarive
+        fold No.
     """
 
     # set starting time

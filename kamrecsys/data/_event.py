@@ -4,10 +4,11 @@
 Data model: rating events
 """
 
-from __future__ import print_function
-from __future__ import division
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import (
+    print_function,
+    division,
+    absolute_import,
+    unicode_literals)
 
 #==============================================================================
 # Imports
@@ -39,6 +40,7 @@ __all__ = ['EventUtilMixin',
 # Classes
 #==============================================================================
 
+
 class EventUtilMixin(object):
     """
     Methods that are commonly used in data containers and recommenders for
@@ -63,10 +65,10 @@ class EventUtilMixin(object):
             array whose elements are represented by external ids
         """
         if data.ndim == 1 and data.shape[0] == self.s_event:
-            new_data = np.array([self.eid[self.event_otypes[e]][data[e]]
-                                 for e in xrange(self.s_event)],
-                                                               dtype=self.eid[
-                                                                     0].dtype)
+            new_data = \
+                np.array([self.eid[self.event_otypes[e]][data[e]]
+                          for e in xrange(self.s_event)],
+                         dtype=self.eid[0].dtype)
         elif data.ndim == 2 and data.shape[1] == self.s_event:
             new_data = np.empty_like(data, dtype=self.eid[0].dtype)
             for e in xrange(self.s_event):
@@ -86,8 +88,8 @@ class EventUtilMixin(object):
         ev : array_like
             array whose elements are represented by external ids
         missing_values : optional, int or array_like, shape=(s_event,)
-            if unknown external ids are detected, these will be converted to -1.
-            as default, numbers of possible objects are used.
+            if unknown external ids are detected, these will be converted to
+            -1. as default, numbers of possible objects are used.
 
         Returns
         -------
@@ -102,9 +104,11 @@ class EventUtilMixin(object):
         if missing_values is None:
             missing_values = self.n_objects[self.event_otypes]
         if ev.ndim == 1 and ev.shape[0] == self.s_event:
-            new_ev = np.array([self.iid[self.event_otypes[e]].\
-                               get(ev[e], missing_values[e])
-                               for e in xrange(self.s_event)], dtype=np.int)
+            new_ev = \
+                np.array(
+                    [self.iid[self.event_otypes[e]].get(ev[e],
+                                                        missing_values[e])
+                     for e in xrange(self.s_event)], dtype=np.int)
         elif ev.ndim == 2 and ev.shape[1] == self.s_event:
             new_ev = np.empty_like(ev, dtype=np.int)
             for e in xrange(self.s_event):
@@ -131,12 +135,12 @@ class EventData(BaseData, EventUtilMixin):
     Attributes
     ----------
     s_event : int
-        the size of event, which is the number of objects to reprent a rating
+        the size of event, which is the number of objects to represent a rating
         event
     n_events : int
         the number of events
     event : array_like, shape=(n_events, s_event), dtype=int
-        each row is a vector of internal ids that indicates the tareget of
+        each row is a vector of internal ids that indicates the target of
         rating event
     event_feature : array_like, shape=(n_events, variable), dtype=variable
         i-the row contains the feature assigned to the i-th event
@@ -180,7 +184,7 @@ class EventData(BaseData, EventUtilMixin):
         """
         for otype in xrange(self.n_otypes):
             self.n_objects[otype], self.eid[otype], self.iid[otype] =\
-            self._gen_id(event[:, self.event_otypes == otype])
+                self._gen_id(event[:, self.event_otypes == otype])
 
         self.event = np.empty_like(event, dtype=np.int)
         for e in xrange(self.s_event):
@@ -211,7 +215,7 @@ class EventWithScoreData(EventData):
 
     Attributes
     ----------
-    score_domain : tuple or 1d-ndarray of tuple
+    score_domain : tuple or 1d-array of tuple
         i-th tuple is a pair of the minimum and the maximum score of i-th score
     score : array_like, shape=(n_events) or (n_events, n_stypes)
         rating scores of each events. this array takes a vector shape if
@@ -237,7 +241,8 @@ class EventWithScoreData(EventData):
         self.score = None
 
     def set_events(self, event, score, score_domain=None, event_feature=None):
-        """Set event data from structured array.
+        """
+        Set event data from structured array.
 
         Parameters
         ----------
@@ -246,7 +251,7 @@ class EventWithScoreData(EventData):
             with external ids
         score : array_like, shape=(n_events) or (n_stypes, 
             i-th ele
-        score_domain : optional, tuple or 1d-ndarray of tuple
+        score_domain : optional, tuple or 1d-array of tuple
             min and max of scores. as 
         event_feature : optional, array_like, shape=(n_events, variable)
             feature of events
@@ -266,7 +271,6 @@ class EventWithScoreData(EventData):
 #==============================================================================
 
 # init logging system ---------------------------------------------------------
-
 logger = logging.getLogger('kamrecsys')
 if not logger.handlers:
     logger.addHandler(logging.NullHandler)
@@ -274,6 +278,7 @@ if not logger.handlers:
 #==============================================================================
 # Test routine
 #==============================================================================
+
 
 def _test():
     """ test function for this module

@@ -4,9 +4,10 @@
 Load sample Movielens data sets 
 """
 
-from __future__ import print_function
-from __future__ import division
-from __future__ import absolute_import
+from __future__ import (
+    print_function,
+    division,
+    absolute_import)
 
 #==============================================================================
 # Imports
@@ -143,7 +144,7 @@ def load_movielens100k(infile=None,
     date : int * 3
         released date represented by a tuple (year, month, day)
     genre : np.dtype(i1) * 18
-        18 binary nunbers represents a genre of the movie. 1 if the movie
+        18 binary numbers represents a genre of the movie. 1 if the movie
         belongs to the genre; 0 other wise. All 0 implies unknown. Each column
         corresponds to the following genres:
         Action, Adventure, Animation, Children's, Comedy, Crime, Documentary,
@@ -190,6 +191,7 @@ def load_movielens100k(infile=None,
 
     return data
 
+
 def load_movielens_mini():
     """ load the MovieLens mini data set
 
@@ -212,6 +214,7 @@ def load_movielens_mini():
     """
     infile = os.path.join(SAMPLE_PATH, 'movielens_mini.event')
     return load_movielens100k(infile=infile)
+
 
 def load_movielens1m(infile=None,
                      event_dtype=np.dtype([('timestamp', np.int)])):
@@ -328,7 +331,6 @@ def load_movielens1m(infile=None,
 #==============================================================================
 
 # init logging system ---------------------------------------------------------
-
 logger = logging.getLogger('kamrecsys')
 if not logger.handlers:
     logger.addHandler(logging.NullHandler)
@@ -336,6 +338,7 @@ if not logger.handlers:
 #==============================================================================
 # Test routine
 #==============================================================================
+
 
 def _test():
     """ test function for this module

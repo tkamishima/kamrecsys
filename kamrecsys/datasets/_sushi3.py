@@ -85,6 +85,7 @@ SUSHI3_INFO = {
 # Functions 
 #==============================================================================
 
+
 def load_sushi3b_score(infile=None, event_dtype=None):
     """ load the sushi3b score data set
 
@@ -129,13 +130,13 @@ def load_sushi3b_score(infile=None, event_dtype=None):
     answer_time : int
     #     the total time need to fill questionnaire form
     child_prefecture : int, SUSHI3_INFO['user_prefecture']
-        prefecture ID at which you have been the most longly lived
+        prefecture ID at which you have been the most long lived
         until 15 years old
     child_region : int, SUSHI3_INFO['user_region']
-        region ID at which you have been the most longly lived
+        region ID at which you have been the most long lived
         until 15 years old
     child_ew : int {0: Eastern, 1: Western}
-        east/west ID at which you have been the most longly lived
+        east/west ID at which you have been the most long lived
         until 15 years old
     current_prefecture : int, SUSHI3_INFO['user_prefecture']
         prefecture ID at which you currently live
@@ -161,7 +162,7 @@ def load_sushi3b_score(infile=None, event_dtype=None):
     frequency : float, range=[0-3], 3:frequently eat
         how frequently the user eats the SUSHI,
     price : float, range=[1-5], 5:expensive
-        maki and other style sushis are normalized separatly
+        maki and other style sushi are normalized separately
     supply : float, range=[0-1]
        the ratio of shops that supplies the sushi
     """
@@ -223,7 +224,6 @@ def load_sushi3b_score(infile=None, event_dtype=None):
 #==============================================================================
 
 # init logging system ---------------------------------------------------------
-
 logger = logging.getLogger('kamrecsys')
 if not logger.handlers:
     logger.addHandler(logging.NullHandler)
@@ -231,6 +231,7 @@ if not logger.handlers:
 #==============================================================================
 # Test routine
 #==============================================================================
+
 
 def _test():
     """ test function for this module

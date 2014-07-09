@@ -102,13 +102,13 @@ print(
 # answer_time : int
 #     the total time need to fill questionnaire form
 # child_prefecture : int {0, 1, ..., 47}
-#     prefecture ID at which you have been the most longly lived
+#     prefecture ID at which you have been the most long lived
 #     until 15 years old
 # child_region : int {0, 1, ..., 11}
-#     region ID at which you have been the most longly lived
+#     region ID at which you have been the most long lived
 #     until 15 years old
 # child_ew : int {0: Eastern, 1: Western}
-#     east/west ID at which you have been the most longly lived
+#     east/west ID at which you have been the most long lived
 #     until 15 years old
 # current_prefecture : int {0, 1, ..., 47}
 #     prefecture ID at which you currently live
@@ -167,7 +167,7 @@ print(
 # frequency : float, range=[0-3], 3:frequently eat
 #     how frequently the user eats the SUSHI,
 # price : float, range=[1-5], 5:expensive
-#     maki and other style sushis are normalized separatly
+#     maki and other style sushis are normalized separately
 # supply : float, range=[0-1]
 #    the ratio of shops that supplies the sushi
 """, end='', file=outfile)

@@ -57,7 +57,6 @@ __all__ = ['cross_validation',
 #==============================================================================
 
 # init logging system ---------------------------------------------------------
-
 logger = logging.getLogger('kamrecsys')
 if not logger.handlers:
     logger.addHandler(logging.NullHandler)
@@ -65,6 +64,7 @@ if not logger.handlers:
 #==============================================================================
 # Test routine
 #==============================================================================
+
 
 def _test():
     """ test function for this module

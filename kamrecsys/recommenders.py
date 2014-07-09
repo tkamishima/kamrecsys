@@ -77,6 +77,7 @@ class BaseRecommender(object):
         self.eid = None
         self.iid = None
         self.random_state = random_state
+        self._rng = None
 
     @abstractmethod
     def fit(self, data, **kwargs):
@@ -341,7 +342,6 @@ class BaseEventScorePredictor(BaseEventRecommender):
 #==============================================================================
 
 # init logging system ---------------------------------------------------------
-
 logger = logging.getLogger('kamrecsys')
 if not logger.handlers:
     logger.addHandler(logging.NullHandler)
@@ -349,6 +349,7 @@ if not logger.handlers:
 #==============================================================================
 # Test routine
 #==============================================================================
+
 
 def _test():
     """ test function for this module

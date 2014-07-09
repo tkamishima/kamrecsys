@@ -4,9 +4,10 @@
 Matrix Factorization: probabilistic matrix factorization model
 """
 
-from __future__ import print_function
-from __future__ import division
-from __future__ import absolute_import
+from __future__ import (
+    print_function,
+    division,
+    absolute_import)
 
 #==============================================================================
 # Module metadata variables
@@ -41,6 +42,7 @@ __all__ = ['EventScorePredictor']
 #==============================================================================
 # Classes
 #==============================================================================
+
 
 class EventScorePredictor(BaseEventScorePredictor):
     """
@@ -166,21 +168,20 @@ class EventScorePredictor(BaseEventScorePredictor):
         for i in xrange(n_items):
             j = np.nonzero(ev[:, 1] == i)[0]
             if len(j) > 0:
-                self.bi_[i] = np.sum(sc[j] -
-                                     (self.mu_[0] + self.bu_[ev[j, 0]]))\
-                / len(j)
+                self.bi_[i] = \
+                    np.sum(sc[j] - (self.mu_[0] + self.bu_[ev[j, 0]])) / len(j)
 
         # fill cross terms by normal randoms whose s.d.'s are mean residuals
         var = 0.0
         for i in xrange(n_events):
-            var += (sc[i] -
-                    (self.mu_[0] + self.bu_[ev[i, 0]] + self.bi_[ev[i, 1]]))\
-            ** 2
+            var += \
+                (sc[i] -
+                 (self.mu_[0] + self.bu_[ev[i, 0]] + self.bi_[ev[i, 1]])) ** 2
         var = var / n_events
-        self.p_[0:n_users, :] =\
-        self._rng.normal(0.0, np.sqrt(var), (n_users, k))
-        self.q_[0:n_items, :] =\
-        self._rng.normal(0.0, np.sqrt(var), (n_items, k))
+        self.p_[0:n_users, :] = \
+            self._rng.normal(0.0, np.sqrt(var), (n_users, k))
+        self.q_[0:n_items, :] = \
+            self._rng.normal(0.0, np.sqrt(var), (n_items, k))
 
         # scale a regularization term by the number of parameters
         self._reg = self.C / (1 + (k + 1) * (n_users + n_items))
@@ -207,9 +208,6 @@ class EventScorePredictor(BaseEventScorePredictor):
         """
         # constants
         n_events = ev.shape[0]
-        n_users = n_objects[0]
-        n_items = n_objects[1]
-        k = self.k
 
         # set array's view
         mu = coef.view(self._dt)['mu'][0]
@@ -219,13 +217,13 @@ class EventScorePredictor(BaseEventScorePredictor):
         q = coef.view(self._dt)['q'][0]
 
         # loss term
-        esc = mu[0] + bu[ev[:, 0]] + bi[ev[:, 1]] +\
-              np.sum(p[ev[:, 0], :] * q[ev[:, 1], :], axis=1)
+        esc = (mu[0] + bu[ev[:, 0]] + bi[ev[:, 1]] +
+               np.sum(p[ev[:, 0], :] * q[ev[:, 1], :], axis=1))
         loss = np.sum((sc - esc) ** 2)
 
         # regularization term
-        reg = np.sum(bu ** 2) + np.sum(bi ** 2) +\
-              np.sum(p ** 2) + np.sum(q ** 2)
+        reg = (np.sum(bu ** 2) + np.sum(bi ** 2) +
+               np.sum(p ** 2) + np.sum(q ** 2))
 
         return loss / n_events + self._reg * reg
 
@@ -253,7 +251,6 @@ class EventScorePredictor(BaseEventScorePredictor):
         n_events = ev.shape[0]
         n_users = n_objects[0]
         n_items = n_objects[1]
-        k = self.k
 
         # set input array's view
         mu = coef.view(self._dt)['mu'][0]
@@ -310,7 +307,7 @@ class EventScorePredictor(BaseEventScorePredictor):
         user_index : optional, int
             Index to specify the position of a user in an event vector.
             (default=0)
-        item_index : optioanl, int
+        item_index : optional, int
             Index to specify the position of a item in an event vector.
             (default=1)
         score_index : optional, int
@@ -320,7 +317,7 @@ class EventScorePredictor(BaseEventScorePredictor):
         random_state: RandomState or an int seed (None by default)
             A random number generator instance. If None is given, the
             object's random_state is used
-        kwargs : keyowrd arguments
+        kwargs : keyword arguments
             keyword arguments passed to optimizers
         """
 
@@ -330,9 +327,10 @@ class EventScorePredictor(BaseEventScorePredictor):
         self._rng = check_random_state(random_state)
 
         # get input data
-        ev, sc, n_objects =\
-        self._get_event_and_score(data,
-            (user_index, item_index), score_index)
+        ev, sc, n_objects = \
+            self._get_event_and_score(data,
+                                      (user_index, item_index),
+                                      score_index)
 
         # initialize coefficients
         self._init_coef(ev, sc, n_objects)
@@ -385,12 +383,12 @@ class EventScorePredictor(BaseEventScorePredictor):
         """
 
         if ev.ndim == 1:
-            return self.mu_[0] + self.bu_[ev[0]] + self.bi_[ev[1]] +\
-                   np.dot(self.p_[ev[0]], self.q_[ev[1]])
+            return (self.mu_[0] + self.bu_[ev[0]] + self.bi_[ev[1]] +
+                    np.dot(self.p_[ev[0]], self.q_[ev[1]]))
         elif ev.ndim == 2:
-            return self.mu_[0] + self.bu_[ev[:, 0]] + self.bi_[ev[:, 1]] +\
-                   np.sum(self.p_[ev[:, 0], :] * self.q_[ev[:, 1], :],
-                          axis=1)
+            return (self.mu_[0] + self.bu_[ev[:, 0]] + self.bi_[ev[:, 1]] +
+                    np.sum(self.p_[ev[:, 0], :] * self.q_[ev[:, 1], :],
+                           axis=1))
         else:
             raise TypeError('argument has illegal shape')
 
@@ -403,7 +401,6 @@ class EventScorePredictor(BaseEventScorePredictor):
 #==============================================================================
 
 # init logging system ---------------------------------------------------------
-
 logger = logging.getLogger('kamrecsys')
 if not logger.handlers:
     logger.addHandler(logging.NullHandler)
@@ -411,6 +408,7 @@ if not logger.handlers:
 #==============================================================================
 # Test routine
 #==============================================================================
+
 
 def _test():
     """ test function for this module

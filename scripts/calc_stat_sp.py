@@ -34,7 +34,7 @@ Options
 -n, --no-timestamp or --timestamp
     specify whether .event files has 'timestamp' information,
     default=true
--f <FORMAT>, --format <FORMT>
+-f <FORMAT>, --format <FORMAT>
     output format (default=tsv)
 
         * tsv: tab separated values
@@ -125,7 +125,7 @@ def main(opt):
     stats_name = []
 
     # mean scores
-    stats_name.append('nos_smaples')
+    stats_name.append('nos_samples')
     stats.append(x['t_score'].shape[0])
     stats_name.append('mean_true_score')
     stats.append(np.mean(x['t_score']))

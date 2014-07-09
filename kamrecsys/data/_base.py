@@ -4,10 +4,11 @@
 Data Container: abstract classes
 """
 
-from __future__ import print_function
-from __future__ import division
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import (
+    print_function,
+    division,
+    absolute_import,
+    unicode_literals)
 
 #==============================================================================
 # Imports
@@ -34,6 +35,7 @@ __all__ = ['BaseData']
 #==============================================================================
 # Classes
 #==============================================================================
+
 
 class BaseData(object):
     """ 
@@ -81,9 +83,9 @@ class BaseData(object):
             raise ValueError("n_otypes must be >= 1")
         self.n_otypes = n_otypes
         self.n_objects = np.zeros(self.n_otypes, dtype=int)
-        self.eid = np.repeat(None, self.n_otypes)
-        self.iid = np.repeat(None, self.n_otypes)
-        self.feature = np.repeat(None, self.n_otypes)
+        self.eid = np.empty(self.n_otypes, dtype=np.object)
+        self.iid = np.empty(self.n_otypes, dtype=np.object)
+        self.feature = np.empty(self.n_otypes, dtype=np.object)
 
     def set_features(self, otype, eid, feature):
         """
@@ -173,7 +175,7 @@ class BaseData(object):
             the numbeer of unique objects
         eid : array, shape=(variable,)
             map from internal id to external id
-        iid : dictioanry
+        iid : dict
             map from external id to internal id
         """
         eid = np.sort(np.unique(event))
@@ -191,7 +193,6 @@ class BaseData(object):
 #==============================================================================
 
 # init logging system ---------------------------------------------------------
-
 logger = logging.getLogger('kamrecsys')
 if not logger.handlers:
     logger.addHandler(logging.NullHandler)
@@ -199,6 +200,7 @@ if not logger.handlers:
 #==============================================================================
 # Test routine
 #==============================================================================
+
 
 def _test():
     """ test function for this module

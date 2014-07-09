@@ -4,9 +4,10 @@
 Load other sample data sets
 """
 
-from __future__ import print_function
-from __future__ import division
-from __future__ import absolute_import
+from __future__ import (
+    print_function,
+    division,
+    absolute_import)
 
 #==============================================================================
 # Imports
@@ -88,7 +89,6 @@ def load_pci_sample(infile=None):
 #==============================================================================
 
 # init logging system ---------------------------------------------------------
-
 logger = logging.getLogger('kamrecsys')
 if not logger.handlers:
     logger.addHandler(logging.NullHandler)
@@ -96,6 +96,7 @@ if not logger.handlers:
 #==============================================================================
 # Test routine
 #==============================================================================
+
 
 def _test():
     """ test function for this module

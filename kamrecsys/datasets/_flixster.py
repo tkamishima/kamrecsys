@@ -44,6 +44,7 @@ __all__ = ['load_flixster_rating']
 # Functions 
 #==============================================================================
 
+
 def load_flixster_rating(infile=None, event_dtype=None):
     """ load the sushi3b score data set
 
@@ -101,7 +102,6 @@ def load_flixster_rating(infile=None, event_dtype=None):
 #==============================================================================
 
 # init logging system ---------------------------------------------------------
-
 logger = logging.getLogger('kamrecsys')
 if not logger.handlers:
     logger.addHandler(logging.NullHandler)
@@ -109,6 +109,7 @@ if not logger.handlers:
 #==============================================================================
 # Test routine
 #==============================================================================
+
 
 def _test():
     """ test function for this module
