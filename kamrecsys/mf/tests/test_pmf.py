@@ -30,7 +30,7 @@ class TestEventScorePredictor(unittest.TestCase):
                  'p_': None, 'q_': None, '_coef': None, 'f_loss_': np.inf,
                  'iid': None, 'i_loss_': np.inf, 'eid': None, 'tol': 1e-03,
                  'n_objects': None, '_dt': None, 'mu_': None,
-                 'random_state': 1234})
+                 'random_state': 1234, '_rng': None})
 
         recommender.fit(data, disp=False)
 

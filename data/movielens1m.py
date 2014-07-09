@@ -113,7 +113,7 @@ print(
 #     zip code of 5 digits, which represents the residential area of the user
 """, end='', file=outfile)
 
-age = {'1':0, '18':1, '25':2, '35':3, '45':4, '50':5, '56':6}
+age = {'1': 0, '18': 1, '25': 2, '35': 3, '45': 4, '50': 5, '56': 6}
 
 for line in infile.readlines():
     f = line.rstrip('\r\n').split("::")
@@ -156,15 +156,18 @@ print(
 #     12:Mystery, 13:Romance, 14:Sci-Fi, 15:Thriller, 16:War, 17:Western 
 """, end='', file=outfile)
 
-genre = {"Action":0, "Adventure":1, "Animation":2, "Children's":3, "Comedy":4,
-         "Crime":5, "Documentary":6, "Drama":7, "Fantasy":8, "Film-Noir":9,
-         "Horror":10, "Musical":11, "Mystery":12, "Romance":13, "Sci-Fi":14,
-         "Thriller":15, "War":16, "Western":17}
+genre = {"Action": 0, "Adventure": 1, "Animation": 2, "Children's": 3,
+         "Comedy": 4, "Crime": 5, "Documentary": 6, "Drama": 7,
+         "Fantasy": 8, "Film-Noir": 9, "Horror": 10, "Musical": 11,
+         "Mystery": 12, "Romance": 13, "Sci-Fi": 14, "Thriller": 15,
+         "War": 16, "Western": 17}
+
 year_p = re.compile(r'\((\d\d\d\d)\)$')
 
 for line in infile.readlines():
     f = line.rstrip('\r\n').split("::")
-    if f[0] == '3845': # for buggy character in original file
+    # for buggy character in original file
+    if f[0] == '3845':
         f[1] = re.sub('&#8230;', '\u2026', f[1])
     print(f[0], f[1], sep='\t', end='\t', file=outfile)
     year = year_p.search(f[1]).group(1)

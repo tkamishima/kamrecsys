@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """ 
-Shrnked movielens100k.event data set
+Shrunk movielens100k.event data set
 
 This data set is the subset of the data in the `movielens100k` data set.
 Users and items whose external ids are less or equal than 10 are collected.

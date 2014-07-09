@@ -102,11 +102,12 @@ print(
 #     zip code of 5 digits, which represents the residential area of the user
 """, end='', file=outfile)
 
-occupation = {'none':0, 'other':1, 'administrator':2, 'artist':3, 'doctor':4,
-              'educator':5, 'engineer':6, 'entertainment':7, 'executive':8,
-              'healthcare':9, 'homemaker':10, 'lawyer':11, 'librarian':12,
-              'marketing':13, 'programmer':14, 'retired':15, 'salesman':16,
-              'scientist':17, 'student':18, 'technician':19, 'writer':20}
+occupation = {'none': 0, 'other': 1, 'administrator': 2, 'artist': 3,
+              'doctor': 4, 'educator': 5, 'engineer': 6, 'entertainment': 7,
+              'executive': 8, 'healthcare': 9, 'homemaker': 10, 'lawyer': 11,
+              'librarian': 12, 'marketing': 13, 'programmer': 14,
+              'retired': 15, 'salesman': 16, 'scientist': 17, 'student': 18,
+              'technician': 19, 'writer': 20}
 
 for line in infile.readlines():
     f = line.rstrip('\r\n').split("|")
@@ -152,8 +153,8 @@ print(
 #      URL for the movie at IMDb http://www.imdb.com
 """, end='', file=outfile)
 
-month = {'Jan':1, 'Feb':2, 'Mar':3, 'Apr':4, 'May':5, 'Jun':6,
-         'Jul':7, 'Aug':8, 'Sep':9, 'Oct':10, 'Nov':11, 'Dec':12}
+month = {'Jan': 1, 'Feb': 2, 'Mar': 3, 'Apr': 4, 'May': 5, 'Jun': 6, 'Jul': 7,
+         'Aug': 8, 'Sep': 9, 'Oct': 10, 'Nov': 11, 'Dec': 12}
 
 for line in infile.readlines():
     f = line.rstrip('\r\n').split("|")
