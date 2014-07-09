@@ -1,24 +1,18 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-KamRecSys: Algorithms for recommender systems in Python
+Metrics for General Purpose
 """
 
-from __future__ import print_function
-from __future__ import division
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import (
+    print_function,
+    division,
+    absolute_import,
+    unicode_literals)
 
 #==============================================================================
 # Module metadata variables
 #==============================================================================
-
-__author__ = "Toshihiro Kamishima ( http://www.kamishima.net/ )"
-__date__ = "2012/03/25"
-__version__ = "3.3.0"
-__copyright__ = "Copyright (c) 2012 Toshihiro Kamishima all rights reserved."
-__license__ = "MIT License: http://www.opensource.org/licenses/mit-license.php"
-__docformat__ = "restructuredtext en"
 
 #==============================================================================
 # Imports
@@ -30,12 +24,7 @@ import logging
 # Public symbols
 #==============================================================================
 
-__all__ = ['cross_validation',
-           'data',
-           'datasets',
-           'metrics',
-           'mf',
-           'recommenders']
+__all__ = []
 
 #==============================================================================
 # Constants
@@ -46,18 +35,18 @@ __all__ = ['cross_validation',
 #==============================================================================
 
 #==============================================================================
+# Functions
+#==============================================================================
+
+#==============================================================================
 # Classes
 #==============================================================================
 
 #==============================================================================
-# Functions 
+# Module initialization
 #==============================================================================
 
-#==============================================================================
-# Module initialization 
-#==============================================================================
-
-# init logging system ---------------------------------------------------------
+# init logging system
 logger = logging.getLogger('kamrecsys')
 if not logger.handlers:
     logger.addHandler(logging.NullHandler)
@@ -79,7 +68,7 @@ def _test():
 
     sys.exit(0)
 
-# Check if this is call as command script -------------------------------------
+# Check if this is call as command script
 
 if __name__ == '__main__':
     _test()
