@@ -21,12 +21,16 @@ from __future__ import (
 import logging
 from abc import ABCMeta, abstractmethod
 import numpy as np
+from sklearn.utils import (
+    assert_all_finite,
+    safe_asarray)
 
 #==============================================================================
 # Public symbols
 #==============================================================================
 
-__all__ = ['BaseMetrics']
+__all__ = ['BaseMetrics',
+           'DescriptiveStatistics']
 
 #==============================================================================
 # Constants
@@ -100,6 +104,36 @@ class BaseMetrics(object):
             list of metric values
         """
         return [self.metrics[subname] for subname in self.subnames()]
+
+
+class DescriptiveStatistics(BaseMetrics):
+    """
+    descriptive statistics
+
+    * nos_samples : the number of samples
+    * mean : mean
+    * stdev : standard deviation
+
+    Parameters
+    ----------
+    x : array, shpae=(n_samples), dtype=float or int
+        data
+
+    """
+
+    def __init__(self, x, name="descriptive_statistics"):
+        super(DescriptiveStatistics, self).__init__(name=name)
+
+        # check inputs
+        x = safe_asarray(x)
+        assert_all_finite(x)
+
+        # the number of samples
+        self.metrics['nos_samples'] = x.shape[0]
+
+        # mean and standard deviation of true values
+        self.metrics['mean'] = np.mean(x)
+        self.metrics['stdev'] = np.std(x)
 
 #==============================================================================
 # Module initialization

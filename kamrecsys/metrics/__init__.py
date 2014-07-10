@@ -14,11 +14,14 @@ from __future__ import (
 # Imports
 #==============================================================================
 
-from ._base import (BaseMetrics)
+from ._base import (
+    BaseMetrics,
+    DescriptiveStatistics)
 from ._score import *
 
 #==============================================================================
 # Public symbols
 #==============================================================================
 
-__all__ = ['BaseMetrics']
+__all__ = ['BaseMetrics',
+           'DescriptiveStatistics']
