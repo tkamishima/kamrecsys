@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Calculate evaluation statistics for predicted scores
+Calculate evaluation metrics for predicted scores
 
 SYNOPSIS::
 
@@ -10,19 +10,15 @@ SYNOPSIS::
 Description
 ===========
 
-errors between original and predicted scores in a tsv or json format
+errors between true and predicted scores in a tsv or json format
 
 Output
 ------
 
-1. The number of Samples
-2. Mean True Score
-3. Mean Predicted Score
-4. Mean Absolute Error',
-5. Mean Absolute Error (stdev)
-6. Mean Squared Error
-7. Mean Squared Error (stdev)
-8. Root Mean Squared Error
+1. Descriptive Statistics of True Scores
+2. Descriptive Statistics of Predicted Scores
+3. Mean Absolute Error
+4. Mean Squared Error
 
 Options
 =======
@@ -71,6 +67,11 @@ import argparse
 import os
 import json
 import numpy as np
+
+from kamrecsys.metrics import (
+    DescriptiveStatistics,
+    MeanAbsoluteError,
+    MeanSquaredError)
 
 #==============================================================================
 # Public symbols
@@ -121,41 +122,40 @@ def main(opt):
     x = np.genfromtxt(fname=opt.infile, delimiter='\t', dtype=dt)
 
     ### output statistics
-    stats = []
-    stats_name = []
+    stats = {}
+    y_true = x['t_score']
+    y_pred = x['p_score']
 
-    # mean scores
-    stats_name.append('nos_samples')
-    stats.append(x['t_score'].shape[0])
-    stats_name.append('mean_true_score')
-    stats.append(np.mean(x['t_score']))
-    stats_name.append('mean_predicted_score')
-    stats.append(np.mean(x['p_score']))
+    # descriptive statistics
+    metrics = DescriptiveStatistics(x['t_score'], name='true')
+    stats[metrics.name] = metrics
+    metrics = DescriptiveStatistics(x['p_score'], name='predicted')
+    stats[metrics.name] = metrics
 
-    # absolute error
-    errs = np.abs(x['t_score'] - x['p_score'])
-    stats_name.append('mean_absolute_error')
-    stats.append(np.mean(errs))
-    stats_name.append('mean_absolute_error_stdev')
-    stats.append(np.std(errs))
+    # mean absolute error
+    metrics = MeanAbsoluteError(x['t_score'], x['p_score'])
+    stats[metrics.name] = metrics
 
-    # squared error
-    errs = (x['t_score'] - x['p_score']) ** 2
-    stats_name.append('mean_squared_error')
-    stats.append(np.mean(errs))
-    stats_name.append('mean_squared_error_stdev')
-    stats.append(np.std(errs))
-    stats_name.append('root_mean_squared_error')
-    stats.append(np.sqrt(np.mean(errs)))
+    # mean squared error
+    metrics = MeanSquaredError(x['t_score'], x['p_score'])
+    stats[metrics.name] = metrics
 
     # output errors
     if opt.format == 'json':
-        json.dump(dict(zip(stats_name, stats)), opt.outfile)
-    elif opt.format == 'htsv':
-        print(*stats_name, sep='\t', end='\n', file=opt.outfile)
-        print(*stats, sep='\t', end='\n', file=opt.outfile)
+        res = {}
+        for key in stats.keys():
+            res[key] = stats[key].metrics
+        json.dump(res, opt.outfile)
     else:
-        print(*stats, sep='\t', end='\n', file=opt.outfile)
+        if opt.format == 'htsv':
+            res = []
+            for key in sorted(stats.keys()):
+                res.extend(stats[key].fullnames())
+            print(*res, sep='\t', end='\n', file=opt.outfile)
+        res = []
+        for key in sorted(stats.keys()):
+            res.extend(stats[key].values())
+        print(*res, sep='\t', end='\n', file=opt.outfile)
 
     # close file
     if opt.infile is not sys.stdin:
