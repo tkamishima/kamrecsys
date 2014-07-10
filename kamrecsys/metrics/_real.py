@@ -32,7 +32,8 @@ from . import BaseMetrics
 #==============================================================================
 
 __all__ = ['BaseRealMetrics',
-           'MeanAbsoluteError']
+           'MeanAbsoluteError',
+           'MeanSquaredError']
 
 #==============================================================================
 # Constants
@@ -45,45 +46,6 @@ __all__ = ['BaseRealMetrics',
 #==============================================================================
 # Functions
 #==============================================================================
-
-
-def mean_squared_error(y_true, y_pred):
-    """
-    Mean Squared Error
-
-    Parameters
-    ----------
-    y_true : array, shape=(n_samples), dtype=float or int
-        True values.
-    y_pred : array, shape=(n_samples), dtype=float or int
-        Estimated values
-
-    Returns
-    -------
-    name : str
-        returns "mean_squared_error"
-    metrics : dict
-
-        * mean : mean of errors
-        * stdev : standard deviation of errors
-        * rmse : root mean squared error
-    """
-
-    # check shape of inputs
-    if y_true.shape != y_pred.shape:
-        raise ValueError(
-            'The sizes of true and predicted values must be equal')
-
-    # empty metrics
-    metrics = {}
-
-    # mean absolute error
-    errs = (y_true - y_pred) ** 2
-    metrics['mean'] = np.mean(errs)
-    metrics['stdev'] = np.std(errs)
-    metrics['rmse'] = np.sqrt(metrics['mean'])
-
-    return "mean_squared_error", metrics
 
 #==============================================================================
 # Classes
@@ -133,6 +95,26 @@ class MeanAbsoluteError(BaseRealMetrics):
         errs = np.abs(self._y_true - self._y_pred)
         self.metrics['mean'] = np.mean(errs)
         self.metrics['stdev'] = np.std(errs)
+
+
+class MeanSquaredError(BaseRealMetrics):
+    """
+    Mean Squared Error
+
+    * mean : mean of errors
+    * stdev : standard deviation of errors
+    * rmse : root mean squared error
+    """
+
+    def __init__(self, y_true, y_pred, name='mean_squared_error'):
+
+        super(MeanSquaredError, self).__init__(y_true, y_pred, name=name)
+
+        # mean squared error
+        errs = (self._y_true - self._y_pred) ** 2
+        self.metrics['mean'] = np.mean(errs)
+        self.metrics['stdev'] = np.std(errs)
+        self.metrics['rmse'] = np.sqrt(self.metrics['mean'])
 
 #==============================================================================
 # Module initialization

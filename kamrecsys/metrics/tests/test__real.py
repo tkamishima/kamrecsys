@@ -52,5 +52,22 @@ class TestMeanAbsoluteError(unittest.TestCase):
                                0.6602899115612394,
                                delta=1e-5)
 
+class TestMeanSquaredError(unittest.TestCase):
+
+    def test_class(self):
+        from .. import MeanSquaredError
+
+        metrics = MeanSquaredError(y_true, y_pred)
+        self.assertEqual(metrics.name, 'mean_squared_error')
+        self.assertAlmostEqual(metrics.metrics['mean'],
+                               1.3449955092006309,
+                               delta=1e-5)
+        self.assertAlmostEqual(metrics.metrics['stdev'],
+                               1.4418716080648177,
+                               delta=1e-5)
+        self.assertAlmostEqual(metrics.metrics['rmse'],
+                               1.1597394143516166,
+                               delta=1e-5)
+
 if __name__ == '__main__':
     unittest.main()

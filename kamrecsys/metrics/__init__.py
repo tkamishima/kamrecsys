@@ -19,7 +19,8 @@ from ._base import (
     DescriptiveStatistics)
 from ._real import (
     BaseRealMetrics,
-    MeanAbsoluteError)
+    MeanAbsoluteError,
+    MeanSquaredError)
 
 #==============================================================================
 # Public symbols
@@ -28,4 +29,5 @@ from ._real import (
 __all__ = ['BaseMetrics',
            'DescriptiveStatistics',
            'BaseRealMetrics',
-           'MeanAbsoluteError']
+           'MeanAbsoluteError',
+           'MeanSquaredError']
