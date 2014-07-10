@@ -17,11 +17,13 @@ from __future__ import (
 from ._base import (
     BaseMetrics,
     DescriptiveStatistics)
-from ._score import *
+from ._real import (
+    BaseRealMetrics)
 
 #==============================================================================
 # Public symbols
 #==============================================================================
 
 __all__ = ['BaseMetrics',
-           'DescriptiveStatistics']
+           'DescriptiveStatistics',
+           'BaseRealMetrics']
