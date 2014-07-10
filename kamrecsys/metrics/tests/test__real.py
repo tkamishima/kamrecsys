@@ -29,8 +29,8 @@ class TestBaseMetrics(unittest.TestCase):
         from .. import BaseRealMetrics
 
         stats = BaseRealMetrics([], [])
-        self.assertDictEqual(vars(stats),
-            {'metrics': {}, 'name': 'real_metrics'})
+        self.assertDictEqual(stats.metrics, {})
+        self.assertEqual(stats.name, 'real_metrics')
         with self.assertRaises(ValueError):
             BaseRealMetrics([np.nan], [1.0])
         with self.assertRaises(ValueError):
@@ -38,22 +38,19 @@ class TestBaseMetrics(unittest.TestCase):
         with self.assertRaises(ValueError):
             BaseRealMetrics([[100]], [1.0])
 
-"""
-class TestDescriptiveStatistics(unittest.TestCase):
+class TestMeanAbsoluteError(unittest.TestCase):
 
     def test_class(self):
-        from .._base import DescriptiveStatistics
+        from .. import MeanAbsoluteError
 
-        metrics = DescriptiveStatistics(test_data, name="dummry")
-        self.assertEqual(metrics.name, "dummry")
-
-        metrics = DescriptiveStatistics(test_data)
-        self.assertEqual(metrics.name, "descriptive_statistics")
-        self.assertDictEqual(metrics.metrics,
-            {'nos_samples': 10,
-             'mean': np.mean(test_data),
-             'stdev': np.std(test_data)})
-"""
+        metrics = MeanAbsoluteError(y_true, y_pred)
+        self.assertEqual(metrics.name, 'mean_absolute_error')
+        self.assertAlmostEqual(metrics.metrics['mean'],
+                               0.9534215971390001,
+                               delta=1e-5)
+        self.assertAlmostEqual(metrics.metrics['stdev'],
+                               0.6602899115612394,
+                               delta=1e-5)
 
 if __name__ == '__main__':
     unittest.main()
