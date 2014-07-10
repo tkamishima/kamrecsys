@@ -33,6 +33,7 @@ import logging
 __all__ = ['cross_validation',
            'data',
            'datasets',
+           'metrics',
            'mf',
            'recommenders']
 
