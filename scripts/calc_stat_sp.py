@@ -127,17 +127,17 @@ def main(opt):
     y_pred = x['p_score']
 
     # descriptive statistics
-    metrics = DescriptiveStatistics(x['t_score'], name='true')
+    metrics = DescriptiveStatistics(y_true, name='true')
     stats[metrics.name] = metrics
-    metrics = DescriptiveStatistics(x['p_score'], name='predicted')
+    metrics = DescriptiveStatistics(y_pred, name='predicted')
     stats[metrics.name] = metrics
 
     # mean absolute error
-    metrics = MeanAbsoluteError(x['t_score'], x['p_score'])
+    metrics = MeanAbsoluteError(y_true, y_pred)
     stats[metrics.name] = metrics
 
     # mean squared error
-    metrics = MeanSquaredError(x['t_score'], x['p_score'])
+    metrics = MeanSquaredError(y_true, y_pred)
     stats[metrics.name] = metrics
 
     # output errors
