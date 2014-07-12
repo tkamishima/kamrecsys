@@ -20,6 +20,7 @@ setup(
         'numpy',
         'scipy',
         'scikit-learn'],
+    test_suite = 'nose.collector',
     package_data={
         'kamrecsys.datasets':
             ['samples/flixster*',
