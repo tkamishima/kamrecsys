@@ -58,6 +58,8 @@ class EventScorePredictor(BaseEventScorePredictor):
         :math:`\mathbf{q}_i`), default=1
     tol : optional, float
         tolerance parameter for optimizer
+    maxiter : int, default=200
+        maximum number of iterations is maxiter times the number of parameters
 
     Attributes
     ----------
@@ -103,12 +105,13 @@ class EventScorePredictor(BaseEventScorePredictor):
         Collaborative Filtering Model", KDD2008
     """
 
-    def __init__(self, C=1.0, k=1, tol=None, random_state=None):
+    def __init__(self, C=1.0, k=1, tol=None, maxiter=200, random_state=None):
         super(EventScorePredictor, self).__init__(random_state=random_state)
 
         self.C = np.float(C)
         self.k = np.int(k)
         self.tol = tol
+        self.maxiter = maxiter
         self.mu_ = None
         self.bu_ = None
         self.bi_ = None
@@ -345,6 +348,10 @@ class EventScorePredictor(BaseEventScorePredictor):
             del kwargs['gtol']
         if self.tol is not None:
             kwargs['gtol'] = self.tol
+        if 'maxiter' in kwargs:
+            kwargs['maxiter'] = kwargs['maxiter'] * self._coef.shape[0]
+        else:
+            kwargs['maxiter'] = self.maxiter * self._coef.shape[0]
 
         # get final loss
         self.i_loss_ = self.loss(self._coef, ev, sc, n_objects)

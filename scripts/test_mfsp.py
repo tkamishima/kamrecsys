@@ -49,8 +49,11 @@ Options
     regularization parameter, default=0.01.
 -k <K>, --dim <K>
     the number of latent factors, default=1.
--l <TOL>, --tol <TOL>
+--tol <TOL>
     optimization parameter. the size of norm of gradient. default=1e-05.
+--maxiter <MAXITER>
+    maximum number of iterations is maxiter times the number of parameters.
+    default=200
 -q, --quiet
     set logging level to ERROR, no messages unless errors
 --rseed <RSEED>
@@ -180,30 +183,35 @@ def training(opt, ev, tsc, event_feature=None, fold=0):
     data.set_events(ev, tsc, score_domain=score_domain,
                     event_feature=event_feature)
 
+    # init learning results
+    if 'training_start_time' not in opt:
+        opt.training_start_time = [0] * opt.fold
+    if 'training_end_time' not in opt:
+        opt.training_end_time = [0] * opt.fold
+    if 'learning_i_loss' not in opt:
+        opt.learning_i_loss = [np.inf] * opt.fold
+    if 'learning_f_loss' not in opt:
+        opt.learning_f_loss = [np.inf] * opt.fold
+    if 'learning_opt_outputs' not in opt:
+        opt.learning_opt_outputs = [None] * opt.fold
+
     # set starting time
     start_time = datetime.datetime.now()
     start_utime = os.times()[0]
-    if 'training_start_time' not in opt:
-        opt.training_start_time = [0] * opt.fold
     opt.training_start_time[fold] = start_time.isoformat()
     logger.info("training_start_time = " + start_time.isoformat())
 
     # create and learning model
-    rcmdr = EventScorePredictor(C=opt.C, k=opt.k, tol=opt.tol,
-                                random_state=opt.rseed)
+    rcmdr = EventScorePredictor(
+        C=opt.C, k=opt.k, tol=opt.tol, maxiter=opt.maxiter,
+        random_state=opt.rseed)
     rcmdr.fit(data)
-
-    # preserve optimizer's outputs
-    opt.learning_f_loss = rcmdr.f_loss_
-    opt.learning_opt_outputs = rcmdr.opt_outputs_
 
     # set end and elapsed time
     end_time = datetime.datetime.now()
     end_utime = os.times()[0]
     elapsed_time = end_time - start_time
     elapsed_utime = end_utime - start_utime
-    if 'training_end_time' not in opt:
-        opt.training_end_time = [0] * opt.fold
     opt.training_end_time[fold] = end_time.isoformat()
     logger.info("training_end_time = " + end_time.isoformat())
     if 'training_elapsed_time' not in opt:
@@ -216,6 +224,11 @@ def training(opt, ev, tsc, event_feature=None, fold=0):
     else:
         opt.training_elapsed_utime += elapsed_utime
     logger.info("training_elapsed_utime = " + str(opt.training_elapsed_utime))
+
+    # preserve optimizer's outputs
+    opt.learning_i_loss[fold] = rcmdr.i_loss_
+    opt.learning_f_loss[fold] = rcmdr.f_loss_
+    opt.learning_opt_outputs[fold] = rcmdr.opt_outputs_
 
     return rcmdr
 
@@ -480,6 +493,7 @@ if __name__ == '__main__':
     ap.add_argument('-C', '--lambda', dest='C', type=float, default=0.01)
     ap.add_argument('-k', '--dim', dest='k', type=int, default=1)
     ap.add_argument('--tol', type=float, default=1e-05)
+    ap.add_argument('--maxiter', type=int, default=200)
 
     # parsing
     opt = ap.parse_args()
