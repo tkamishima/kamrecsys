@@ -193,8 +193,9 @@ def training(opt, ev, tsc, event_feature=None, fold=0):
                                 random_state=opt.rseed)
     rcmdr.fit(data)
 
-    # preserve final loss
+    # preserve optimizer's outputs
     opt.learning_f_loss = rcmdr.f_loss_
+    opt.learning_opt_outputs = rcmdr.opt_outputs_
 
     # set end and elapsed time
     end_time = datetime.datetime.now()
