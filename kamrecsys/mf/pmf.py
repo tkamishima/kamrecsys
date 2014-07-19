@@ -75,6 +75,8 @@ class EventScorePredictor(BaseEventScorePredictor):
         the loss value after initialization
     `f_loss_` : float
         the loss value after fitting
+    `opt_outputs_` : tuple
+        extra outputs of an optimizer
 
     Notes
     -----
@@ -114,6 +116,7 @@ class EventScorePredictor(BaseEventScorePredictor):
         self.q_ = None
         self.i_loss_ = np.inf
         self.f_loss_ = np.inf
+        self.opt_outputs_ = None
 
         # private instance variables
         self._coef = None
@@ -349,14 +352,17 @@ class EventScorePredictor(BaseEventScorePredictor):
         # optimize model
         # fmin_bfgs is slow for large data, maybe because due to the
         # computation cost for the Hessian matrices.
-        self._coef[:] = fmin_cg(self.loss,
-                                self._coef,
-                                fprime=self.grad_loss,
-                                args=(ev, sc, n_objects),
-                                **kwargs)
+        res = fmin_cg(self.loss,
+                      self._coef,
+                      fprime=self.grad_loss,
+                      args=(ev, sc, n_objects),
+                      full_output=True,
+                      **kwargs)
 
-        # get final loss
-        self.f_loss_ = self.loss(self._coef, ev, sc, n_objects)
+        # get parameters
+        self._coef[:] = res[0]
+        self.f_loss_ = res[1]
+        self.opt_outputs_ = res[2:]
 
         # clean up temporary instance variables
         del self._reg
