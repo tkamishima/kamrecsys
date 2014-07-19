@@ -330,7 +330,7 @@ def holdout_test(opt):
     # load test data
     if opt.testfile is None:
         raise IOError('hold-out test data is required')
-    test_x = load_data(opt.testfile, opt)
+    test_x = load_data(opt.testfile, opt.timestamp)
     if opt.timestamp:
         ef = train_x['event_feature']
     else:
@@ -341,12 +341,12 @@ def holdout_test(opt):
 
     # test
     if opt.timestamp:
-        ef = test_x['event_feature']
+        ef = test_x['event_feature']['timestamp']
     else:
         ef = None
 
     testing(rcmdr, opt.outfile, opt,
-            test_x['event'], test_x['score'], ef['timestamp'])
+            test_x['event'], test_x['score'], ts=ef)
 
     # output tailing information
     finalize(opt.outfile, opt)
