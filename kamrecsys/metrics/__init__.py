@@ -16,7 +16,8 @@ from __future__ import (
 
 from ._base import (
     BaseMetrics,
-    DescriptiveStatistics)
+    DescriptiveStatistics,
+    Histogram)
 from ._real import (
     BaseRealMetrics,
     MeanAbsoluteError,
@@ -28,6 +29,7 @@ from ._real import (
 
 __all__ = ['BaseMetrics',
            'DescriptiveStatistics',
+           'Histogram',
            'BaseRealMetrics',
            'MeanAbsoluteError',
            'MeanSquaredError']

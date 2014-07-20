@@ -30,7 +30,8 @@ from sklearn.utils import (
 #==============================================================================
 
 __all__ = ['BaseMetrics',
-           'DescriptiveStatistics']
+           'DescriptiveStatistics',
+           'Histogram']
 
 #==============================================================================
 # Constants
@@ -134,6 +135,39 @@ class DescriptiveStatistics(BaseMetrics):
         # mean and standard deviation of true values
         self.metrics['mean'] = np.mean(x)
         self.metrics['stdev'] = np.std(x)
+
+
+class Histogram(BaseMetrics):
+    """
+    Histogram
+
+    * count : the numbers of samples in each bin
+    * density : densities of samples in each bin
+
+    Parameters
+    ----------
+    x : array, shape=(n_samples), dtype=float or int
+        samples
+    bins : array, shape=(n_bins)
+        boundaries of histogram bins
+    """
+
+    def __init__(self, x,
+                 bins=(-np.inf, 1.5, 2.5, 3.5, 4.5, np.inf),
+                 name='histogram'):
+        super(Histogram, self).__init__(name=name)
+
+        # check inputs
+        x = safe_asarray(x)
+        assert_all_finite(x)
+
+        # making histogram
+        hist = np.histogram(x, bins=bins)[0]
+
+        # set statistics
+        self.metrics['count'] = list(hist)
+        self.metrics['density'] = list(hist / np.sum(hist))
+
 
 #==============================================================================
 # Module initialization
