@@ -141,6 +141,7 @@ class Histogram(BaseMetrics):
     """
     Histogram
 
+    * bin : boundaries of bins
     * count : the numbers of samples in each bin
     * density : densities of samples in each bin
 
@@ -165,6 +166,7 @@ class Histogram(BaseMetrics):
         hist = np.histogram(x, bins=bins)[0]
 
         # set statistics
+        self.metrics['bin'] = list(bins)
         self.metrics['count'] = list(hist)
         self.metrics['density'] = list(hist / np.sum(hist))
 
