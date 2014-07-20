@@ -60,5 +60,26 @@ class TestDescriptiveStatistics(unittest.TestCase):
         with self.assertRaises(ValueError):
             metrics = DescriptiveStatistics([np.nan])
 
+
+class TestHistogram(unittest.TestCase):
+
+    def test_class(self):
+        from .. import Histogram
+
+        m = Histogram(test_data, name="dummry")
+        self.assertEqual(m.name, "dummry")
+        assert_allclose(m.metrics['count'], [0, 0, 2, 7, 1])
+        assert_allclose(m.metrics['density'], [0.0, 0.0, 0.2, 0.7, 0.1])
+
+        m = Histogram(test_data, bins=[-np.inf, 4.0, np.inf])
+        self.assertEqual(m.name, "histogram")
+        assert_allclose(m.metrics['count'], [3, 7])
+        assert_allclose(m.metrics['density'], [0.3, 0.7])
+
+        x = np.linspace(0.0, 1.0, 21)
+        m = Histogram(x, bins=[-np.inf, 0.3, np.inf])
+        assert_allclose(m.metrics['count'], [6, 15])
+        assert_allclose(m.metrics['density'], [0.28571429, 0.71428571])
+
 if __name__ == '__main__':
     unittest.main()
