@@ -349,9 +349,9 @@ class EventScorePredictor(BaseEventScorePredictor):
         if self.tol is not None:
             kwargs['gtol'] = self.tol
         if 'maxiter' in kwargs:
-            kwargs['maxiter'] = kwargs['maxiter'] * self._coef.shape[0]
+            kwargs['maxiter'] = int(kwargs['maxiter'] * self._coef.shape[0])
         else:
-            kwargs['maxiter'] = self.maxiter * self._coef.shape[0]
+            kwargs['maxiter'] = int(self.maxiter * self._coef.shape[0])
 
         # get final loss
         self.i_loss_ = self.loss(self._coef, ev, sc, n_objects)
