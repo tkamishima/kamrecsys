@@ -58,7 +58,7 @@ class EventScorePredictor(BaseEventScorePredictor):
         :math:`\mathbf{q}_i`), default=1
     tol : optional, float
         tolerance parameter for optimizer
-    maxiter : int, default=200
+    maxiter : float, default=200
         maximum number of iterations is maxiter times the number of parameters
 
     Attributes
@@ -302,7 +302,7 @@ class EventScorePredictor(BaseEventScorePredictor):
         return grad
 
     def fit(self, data, user_index=0, item_index=1, score_index=0, tol=None,
-            random_state=None, **kwargs):
+            maxiter=None, random_state=None, **kwargs):
         """
         fitting model
 
@@ -348,10 +348,10 @@ class EventScorePredictor(BaseEventScorePredictor):
             del kwargs['gtol']
         if self.tol is not None:
             kwargs['gtol'] = self.tol
-        if 'maxiter' in kwargs:
-            kwargs['maxiter'] = int(kwargs['maxiter'] * self._coef.shape[0])
-        else:
+        if maxiter is None:
             kwargs['maxiter'] = int(self.maxiter * self._coef.shape[0])
+        else:
+            kwargs['maxiter'] = int(maxiter * self._coef.shape[0])
 
         # get final loss
         self.i_loss_ = self.loss(self._coef, ev, sc, n_objects)
