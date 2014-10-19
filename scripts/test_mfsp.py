@@ -27,7 +27,7 @@ Options
 -o <OUTPUT>, --out <OUTPUT>
     specify output file name
 -m <METHOD>, --method <METHOD>
-    epecify algorithm: pmf
+    specify algorithm: pmf
 
     * pmf : probabilistic matrix factorization
 
@@ -333,7 +333,7 @@ def holdout_test(opt):
 
     Parameters
     ----------
-    opt : Optionn
+    opt : Option
         parsed command line options
     """
 
@@ -371,7 +371,7 @@ def cv_test(opt):
 
     Parameters
     ----------
-    opt : Optionn
+    opt : Option
         parsed command line options
     """
 
