@@ -26,7 +26,7 @@ class TestBaseMetrics(unittest.TestCase):
 
         stats = BaseMetrics()
         self.assertDictEqual(vars(stats),
-            {'metrics': {}, 'name': 'metrics'})
+            {'metrics': {}, 'params': {}, 'name': 'metrics'})
 
         stats.metrics['a'] = 1.0
         stats.metrics['b'] = 2.0

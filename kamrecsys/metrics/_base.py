@@ -72,6 +72,7 @@ class BaseMetrics(object):
     def __init__(self, name='metrics'):
         self.name = name
         self.metrics = {}
+        self.params = {}
 
     def subnames(self):
         """
