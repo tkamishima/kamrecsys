@@ -18,15 +18,11 @@ import logging
 import numpy as np
 from abc import ABCMeta
 
-from ._base import BaseData
+from .base import BaseData
 
 #==============================================================================
 # Public symbols
 #==============================================================================
-
-__all__ = ['EventUtilMixin',
-           'EventData',
-           'EventWithScoreData']
 
 #==============================================================================
 # Constants

@@ -14,11 +14,11 @@ from __future__ import (
 # Imports
 #==============================================================================
 
-from ._base import (
+from .base import (
     BaseMetrics,
     DescriptiveStatistics,
     Histogram)
-from ._real import (
+from .real import (
     BaseRealMetrics,
     MeanAbsoluteError,
     MeanSquaredError)
