@@ -24,7 +24,7 @@ class TestKFold(unittest.TestCase):
         self.assertEqual(len(kf), 3)
         self.assertEqual(kf.__repr__(),
                          "kamrecsys."
-                         "cross_validation._sklearn_cross_validation."
+                         "cross_validation.sklearn_cross_validation."
                          "KFold(n=6, n_folds=3, interlace=True, "
                          "shuffle=False, random_state=None)")
         iter = kf.__iter__()

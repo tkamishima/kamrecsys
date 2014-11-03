@@ -20,14 +20,11 @@ import logging
 import numpy as np
 
 from ..data import EventWithScoreData
-from ._base import SAMPLE_PATH
+from .base import SAMPLE_PATH
 
 #==============================================================================
 # Public symbols
 #==============================================================================
-
-__all__ = ['SUSHI3_INFO',
-           'load_sushi3b_score']
 
 #==============================================================================
 # Constants

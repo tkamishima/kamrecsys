@@ -14,8 +14,8 @@ from __future__ import (
 # Imports
 #==============================================================================
 
-from ._base import (BaseData)
-from ._event import (EventUtilMixin,
+from .base import (BaseData)
+from .event import (EventUtilMixin,
                      EventData,
                      EventWithScoreData)
 
