@@ -47,26 +47,27 @@ infile = open(os.path.join(pwd, 'ratings.txt'), 'r')
 outfile = open(os.path.join(target, stem + '.event'), 'w')
 
 print(
-"""# Flixster data set
-#
-# Original files are distributed by Mohsen Jamali at the site:
-# http://www.sfu.ca/~sja25/datasets/
-# To use this data, follow the license permitted by the original distributor.
-#
-# This data set consists of:
-#
-# * 8,196,077 ratings from 147,612 users on 48,794 movies.
-#
-# Format
-# ------
-# user : int
-#     user id of the user who rated the movie
-# item : int
-#     item id of the movie rated by the user
-# score : int
-#     rating score whose range is:
-#     {0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0}
-""", end='', file=outfile)
+    "# Flixster data set\n"
+    "#\n"
+    "# Original files are distributed by Mohsen Jamali at the site:\n"
+    "# http://www.sfu.ca/~sja25/datasets/\n"
+    "# To use this data, follow the license permitted by the original "
+    "distributor.\n"
+    "#\n"
+    "# This data set consists of:\n"
+    "#\n"
+    "# * 8,196,077 ratings from 147,612 users on 48,794 movies.\n"
+    "#\n"
+    "# Format\n"
+    "# ------\n"
+    "# user : int\n"
+    "#     user id of the user who rated the movie\n"
+    "# item : int\n"
+    "#     item id of the movie rated by the user\n"
+    "# score : int\n"
+    "#     rating score whose range is:\n"
+    "#     {0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0}\n",
+    end='', file=outfile)
 
 for line in infile.readlines():
     f = line.rstrip('\r\n').split('\t')

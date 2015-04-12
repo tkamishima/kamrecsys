@@ -69,9 +69,9 @@ from __future__ import (
     division,
     absolute_import)
 
-#==============================================================================
+# =============================================================================
 # Module metadata variables
-#==============================================================================
+# =============================================================================
 
 __author__ = "Toshihiro Kamishima ( http://www.kamishima.net/ )"
 __date__ = "2014/07/06"
@@ -79,9 +79,9 @@ __version__ = "1.0.0"
 __copyright__ = "Copyright (c) 2014 Toshihiro Kamishima all rights reserved."
 __license__ = "MIT License: http://www.opensource.org/licenses/mit-license.php"
 
-#==============================================================================
+# =============================================================================
 # Imports
-#==============================================================================
+# =============================================================================
 
 import sys
 import argparse
@@ -95,23 +95,23 @@ import numpy as np
 from kamrecsys.data import EventWithScoreData
 from kamrecsys.cross_validation import KFold
 
-#==============================================================================
+# =============================================================================
 # Public symbols
-#==============================================================================
+# =============================================================================
 
 __all__ = []
 
-#==============================================================================
+# =============================================================================
 # Constants
-#==============================================================================
+# =============================================================================
 
-#==============================================================================
+# =============================================================================
 # Module variables
-#==============================================================================
+# =============================================================================
 
-#==============================================================================
+# =============================================================================
 # Functions
-#==============================================================================
+# =============================================================================
 
 
 def load_data(fp, ts):
@@ -320,7 +320,7 @@ def finalize(fp, opt):
     for key, key_val in vars(opt).iteritems():
         print("#{0}={1}".format(key, str(key_val)), file=fp)
 
-    ### post process
+    # post process
 
     # close file
     if fp is not sys.stdout:
@@ -408,20 +408,20 @@ def cv_test(opt):
     finalize(opt.outfile, opt)
 
 
-#==============================================================================
+# =============================================================================
 # Classes
-#==============================================================================
+# =============================================================================
 
-#==============================================================================
+# =============================================================================
 # Main routine
-#==============================================================================
+# =============================================================================
 
 
 def main(opt):
     """ Main routine that exits with status code 0
     """
 
-    ### select validation scheme
+    # select validation scheme
     if opt.validation == 'holdout':
         opt.fold = 1
         logger.info("the nos of folds is set to 1")
@@ -434,19 +434,21 @@ def main(opt):
 
     sys.exit(0)
 
+# =============================================================================
+# Main Routines
+# =============================================================================
 
-### Preliminary processes before executing a main routine
 if __name__ == '__main__':
-    ### set script name
+    # set script name
     script_name = os.path.basename(sys.argv[0])
 
-    ### init logging system
+    # init logging system
     logger = logging.getLogger(script_name)
     logging.basicConfig(level=logging.INFO,
                         format='[%(name)s: %(levelname)s'
                                ' @ %(asctime)s] %(message)s')
 
-    ### command-line option parsing
+    # command-line option parsing
     ap = argparse.ArgumentParser(add_help=False)
 
     # common options
@@ -516,7 +518,7 @@ if __name__ == '__main__':
         opt.outfile = opt.outfilep
     del vars(opt)['outfilep']
 
-    ### set meta-data of script and machine
+    # set meta-data of script and machine
     opt.script_name = script_name
     opt.script_version = __version__
     opt.python_version = platform.python_version()
@@ -532,20 +534,20 @@ if __name__ == '__main__':
         opt.sys_info = commands.getoutput(
             'cat /proc/cpuinfo').split('\n')
 
-    ### suppress warnings in numerical computation
+    # suppress warnings in numerical computation
     np.seterr(all='ignore')
 
-    ### select algorithm
+    # select algorithm
     if opt.method == 'pmf':
         from kamrecsys.mf.pmf import EventScorePredictor
     else:
         raise argparse.ArgumentTypeError(
             "Invalid method name: {0:s}".format(opt.method))
 
-    ### output option information
+    # output option information
     logger.info("list of options:")
     for key, key_val in vars(opt).iteritems():
         logger.info("{0}={1}".format(key, str(key_val)))
 
-    ### call main routine
+    # call main routine
     main(opt)

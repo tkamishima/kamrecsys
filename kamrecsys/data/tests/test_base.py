@@ -1,17 +1,27 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function
-from __future__ import division
-from __future__ import absolute_import
-from __future__ import unicode_literals
-
-from numpy.testing import (assert_array_equal, assert_array_less,
-                           assert_allclose, assert_array_max_ulp,
-                           assert_array_almost_equal_nulp)
+from __future__ import (
+    print_function,
+    division,
+    absolute_import,
+    unicode_literals)
+from numpy.testing import (
+    assert_array_equal,
+    assert_array_less,
+    assert_allclose,
+    assert_array_max_ulp,
+    assert_array_almost_equal_nulp)
 import unittest
 
-##### Test Classes #####
+# =============================================================================
+# Utility Functions
+# =============================================================================
+
+# =============================================================================
+# Test Classes
+# =============================================================================
+
 
 class TestBaseData(unittest.TestCase):
 
@@ -27,6 +37,9 @@ class TestBaseData(unittest.TestCase):
         with self.assertRaises(ValueError):
             x = data.to_eid(1, 100)
 
-##### Main routine #####
+# =============================================================================
+# Main Routines
+# =============================================================================
+
 if __name__ == '__main__':
     unittest.main()

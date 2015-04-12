@@ -5,8 +5,8 @@ import re
 (author, author_email) = \
     re.search('([^\(\)]+)\s+\(\s+(.+)\s+\)', __author__).groups()
 
-with open('readme.md') as file:
-    long_description = file.read()
+with open('readme.md') as in_file:
+    long_description = in_file.read()
 
 setup(
     name='KamRecSys',
@@ -24,7 +24,7 @@ setup(
         'numpy',
         'scipy',
         'scikit-learn'],
-    test_suite = 'nose.collector',
+    test_suite='nose.collector',
     package_data={
         'kamrecsys.datasets':
             ['samples/flixster*',

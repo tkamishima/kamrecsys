@@ -85,7 +85,9 @@ class _PartitionIterator(with_metaclass(ABCMeta)):
 
 
 class _BaseKFold(with_metaclass(ABCMeta, _PartitionIterator)):
-    """Base class to validate KFold approaches"""
+    """
+    Base class to validate KFold approaches
+    """
 
     @abstractmethod
     def __init__(self, n, n_folds, indices, shuffle, random_state):
@@ -113,7 +115,8 @@ class _BaseKFold(with_metaclass(ABCMeta, _PartitionIterator)):
 
 
 class KFold(_BaseKFold):
-    """K-Folds cross validation iterator.
+    """
+    K-Folds cross validation iterator.
 
     Provides train/test indices to split data in train test sets. Split
     dataset into k consecutive folds (without shuffling). In a interlaced mode,
@@ -142,6 +145,7 @@ class KFold(_BaseKFold):
 
     Examples
     --------
+
     >>> from kamrecsys import cross_validation
     >>> X = np.array([[1, 2], [3, 4], [1, 2], [3, 4]])
     >>> y = np.array([1, 2, 3, 4])

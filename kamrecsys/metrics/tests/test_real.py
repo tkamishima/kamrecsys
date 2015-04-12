@@ -18,10 +18,19 @@ from sklearn.utils import (
     assert_all_finite,
     safe_asarray)
 
+# =============================================================================
+# Utilities
+# =============================================================================
+
 y_true = [5.0, 5.0, 5.0, 5.0, 4.0, 3.0, 5.0, 2.0, 4.0, 3.0]
 y_pred = [3.96063305016, 3.16580296689, 4.17585047905, 4.08648849520,
           4.11381603218, 3.45056765134, 4.31221525136, 4.08790965172,
           4.01993828853, 4.56297459028]
+
+# =============================================================================
+# Test Classes
+# =============================================================================
+
 
 class TestBaseMetrics(unittest.TestCase):
 
@@ -38,6 +47,7 @@ class TestBaseMetrics(unittest.TestCase):
         with self.assertRaises(ValueError):
             BaseRealMetrics([[100]], [1.0])
 
+
 class TestMeanAbsoluteError(unittest.TestCase):
 
     def test_class(self):
@@ -51,6 +61,7 @@ class TestMeanAbsoluteError(unittest.TestCase):
         self.assertAlmostEqual(metrics.metrics['stdev'],
                                0.6602899115612394,
                                delta=1e-5)
+
 
 class TestMeanSquaredError(unittest.TestCase):
 
@@ -68,6 +79,10 @@ class TestMeanSquaredError(unittest.TestCase):
         self.assertAlmostEqual(metrics.metrics['rmse'],
                                1.1597394143516166,
                                delta=1e-5)
+
+# =============================================================================
+# Main Routines
+# =============================================================================
 
 if __name__ == '__main__':
     unittest.main()

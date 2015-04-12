@@ -41,13 +41,15 @@ infile = open(os.path.join(target, 'movielens100k.event'), 'r')
 outfile = open(os.path.join(target, 'movielens_mini.event'), 'w')
 
 print(
-"""# Movielens mini data set
-#
-# This data set is the subset of the data in the `movielens100k` data set.
-# Users and items whose external ids are less or equal than 10 are collected.
-#
-# 30 events in total. 8 users rate 10 items.
-""", end='', file=outfile)
+    "# Movielens mini data set\n"
+    "#\n"
+    "# This data set is the subset of the data in the `movielens100k` data "
+    "set.\n"
+    "# Users and items whose external ids are less or equal than 10 are "
+    "collected.\n"
+    "#\n"
+    "# 30 events in total. 8 users rate 10 items.\n",
+    end='', file=outfile)
 
 for line in infile.readlines():
     if line[0] == '#':

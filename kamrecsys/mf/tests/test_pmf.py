@@ -1,17 +1,27 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function
-from __future__ import division
-from __future__ import absolute_import
-from __future__ import unicode_literals
-
-from numpy.testing import (assert_array_equal, assert_array_less,
-                           assert_allclose, assert_array_max_ulp,
-                           assert_array_almost_equal_nulp)
+from __future__ import (
+    print_function,
+    division,
+    absolute_import,
+    unicode_literals)
+from numpy.testing import (
+    assert_array_equal,
+    assert_array_less,
+    assert_allclose,
+    assert_array_max_ulp,
+    assert_array_almost_equal_nulp)
 import unittest
 
-##### Test Classes #####
+# =============================================================================
+# Utilities
+# =============================================================================
+
+# =============================================================================
+# Test Classes
+# =============================================================================
+
 
 class TestEventScorePredictor(unittest.TestCase):
 
@@ -56,7 +66,8 @@ class TestEventScorePredictor(unittest.TestCase):
                                3.9818882049478654, delta=1e-5)
         self.assertAlmostEqual(recommender.predict((5, 11)),
                                3.4710520150321895, delta=1e-5)
-        x = np.array([[1, 7], [1, 9], [1, 11],
+        x = np.array([
+            [1, 7], [1, 9], [1, 11],
             [3, 7], [3, 9], [3, 11],
             [5, 7], [5, 9], [5, 11]])
         assert_allclose(
@@ -65,6 +76,9 @@ class TestEventScorePredictor(unittest.TestCase):
              3.72369841, 3.41419681, 3.9818882, 3.47105202],
             rtol=1e-5)
 
-##### Main routine #####
+# =============================================================================
+# Main Routines
+# =============================================================================
+
 if __name__ == '__main__':
     unittest.main()
