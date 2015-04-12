@@ -212,10 +212,15 @@ class EventWithScoreData(EventData):
     Attributes
     ----------
     score_domain : tuple or 1d-array of tuple
-        i-th tuple is a pair of the minimum and the maximum score of i-th score
+        i-th tuple is a triple of the minimum, the maximum, and strides of the
+        i-th score
     score : array_like, shape=(n_events) or (n_events, n_stypes)
         rating scores of each events. this array takes a vector shape if
         `n_rtypes` is 1; otherwise takes
+    n_scores : int
+        number of score types
+    n_score_levels : int or array, dtype=int, shape=(,n_scores)
+        the number of score levels
 
     Raises
     ------
@@ -235,6 +240,8 @@ class EventWithScoreData(EventData):
         self.n_stypes = n_stypes
         self.score_domain = None
         self.score = None
+        self.n_scores = 0
+        self.n_score_levels = None
 
     def set_events(self, event, score, score_domain=None, event_feature=None):
         """
@@ -251,12 +258,19 @@ class EventWithScoreData(EventData):
             min and max of scores. as 
         event_feature : optional, array_like, shape=(n_events, variable)
             feature of events
+
+        Notes
+        -----
+        Currently, support only n_scores == 1 case
         """
 
         super(EventWithScoreData, self).set_events(event, event_feature)
 
         self.score = np.asanyarray(score)
         self.score_domain = np.asanyarray(score_domain)
+        self.n_scores = 1
+        self.n_score_levels = (
+            int((score_domain[1] - score_domain[0]) / score_domain[2]) + 1)
 
 # =============================================================================
 # Functions 
