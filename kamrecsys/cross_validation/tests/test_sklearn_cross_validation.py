@@ -14,6 +14,14 @@ from numpy.testing import (
     assert_array_almost_equal_nulp)
 import unittest
 
+# =============================================================================
+# Utility Functions
+# =============================================================================
+
+# =============================================================================
+# Test Classes
+# =============================================================================
+
 
 class TestKFold(unittest.TestCase):
 
@@ -27,27 +35,30 @@ class TestKFold(unittest.TestCase):
                          "cross_validation.sklearn_cross_validation."
                          "KFold(n=6, n_folds=3, interlace=True, "
                          "shuffle=False, random_state=None)")
-        iter = kf.__iter__()
-        train_index, test_index = iter.next()
+        kf_iter = kf.__iter__()
+        train_index, test_index = kf_iter.next()
         assert_array_equal(train_index, [1, 2, 4, 5])
         assert_array_equal(test_index, [0, 3])
-        train_index, test_index = iter.next()
+        train_index, test_index = kf_iter.next()
         assert_array_equal(train_index, [0, 2, 3, 5])
         assert_array_equal(test_index, [1, 4])
-        train_index, test_index = iter.next()
+        train_index, test_index = kf_iter.next()
         assert_array_equal(train_index, [0, 1, 3, 4])
         assert_array_equal(test_index, [2, 5])
 
         kf = KFold(5, n_folds=2, interlace=True)
         self.assertEqual(len(kf), 2)
-        iter = kf.__iter__()
-        train_index, test_index = iter.next()
+        kf_iter = kf.__iter__()
+        train_index, test_index = kf_iter.next()
         assert_array_equal(train_index, [1, 3])
         assert_array_equal(test_index, [0, 2, 4])
-        train_index, test_index = iter.next()
+        train_index, test_index = kf_iter.next()
         assert_array_equal(train_index, [0, 2, 4])
         assert_array_equal(test_index, [1, 3])
 
+# =============================================================================
+# Main Routines
+# =============================================================================
 
 if __name__ == '__main__':
     unittest.main()

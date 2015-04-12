@@ -15,9 +15,18 @@ from numpy.testing import (
 import unittest
 import numpy as np
 
+# =============================================================================
+# Utilities
+# =============================================================================
+
 test_data = [3.96063305016, 3.16580296689, 4.17585047905, 4.08648849520,
              4.11381603218, 3.45056765134, 4.31221525136, 4.08790965172,
              4.01993828853, 4.56297459028]
+
+# =============================================================================
+# Test Classes
+# =============================================================================
+
 
 class TestBaseMetrics(unittest.TestCase):
 
@@ -25,7 +34,8 @@ class TestBaseMetrics(unittest.TestCase):
         from .. import BaseMetrics
 
         stats = BaseMetrics()
-        self.assertDictEqual(vars(stats),
+        self.assertDictEqual(
+            vars(stats),
             {'metrics': {}, 'params': {}, 'name': 'metrics'})
 
         stats.metrics['a'] = 1.0
@@ -53,10 +63,12 @@ class TestDescriptiveStatistics(unittest.TestCase):
 
         metrics = DescriptiveStatistics(test_data)
         self.assertEqual(metrics.name, "descriptive_statistics")
-        self.assertDictEqual(metrics.metrics,
-            {'nos_samples': 10,
-             'mean': np.mean(test_data),
-             'stdev': np.std(test_data)})
+        self.assertDictEqual(
+            metrics.metrics,
+            {
+                'nos_samples': 10,
+                'mean': np.mean(test_data),
+                'stdev': np.std(test_data)})
         with self.assertRaises(ValueError):
             metrics = DescriptiveStatistics([np.nan])
 
@@ -80,6 +92,10 @@ class TestHistogram(unittest.TestCase):
         m = Histogram(x, bins=[-np.inf, 0.3, np.inf])
         assert_allclose(m.metrics['count'], [6, 15])
         assert_allclose(m.metrics['density'], [0.28571429, 0.71428571])
+
+# =============================================================================
+# Main Routines
+# =============================================================================
 
 if __name__ == '__main__':
     unittest.main()

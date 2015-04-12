@@ -14,7 +14,14 @@ from numpy.testing import (
     assert_array_almost_equal_nulp)
 import unittest
 
-##### Test Classes #####
+# =============================================================================
+# Utility Functions
+# =============================================================================
+
+# =============================================================================
+# Test Classes
+# =============================================================================
+
 
 class TestSushi3Class(unittest.TestCase):
     def test_load_sushi3_score(self):
@@ -71,7 +78,7 @@ class TestSushi3Class(unittest.TestCase):
 
         # items
 # todo: sushi name in unicode
-        #self.assertEqual(data.feature[1][8]['name'], u'とろ')
+        # self.assertEqual(data.feature[1][8]['name'], u'とろ')
         self.assertEqual(data.feature[1][8]['maki'], 1)
         self.assertEqual(data.feature[1][8]['seafood'], 0)
         self.assertEqual(data.feature[1][8]['genre'], 1)
@@ -84,7 +91,9 @@ class TestSushi3Class(unittest.TestCase):
         self.assertAlmostEqual(data.feature[1][8]['supply'],
                                0.8)
 
-##### Main routine #####
+# =============================================================================
+# Main Routines
+# =============================================================================
 
 if __name__ == '__main__':
     unittest.main()

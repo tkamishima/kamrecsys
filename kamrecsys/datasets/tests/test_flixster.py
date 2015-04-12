@@ -14,7 +14,14 @@ from numpy.testing import (
     assert_array_almost_equal_nulp)
 import unittest
 
-##### Test Classes #####
+# =============================================================================
+# Utility Functions
+# =============================================================================
+
+# =============================================================================
+# Test Classes
+# =============================================================================
+
 
 class TestFlixsterClass(unittest.TestCase):
     def test_load_flixster_rating(self):
@@ -39,12 +46,18 @@ class TestFlixsterClass(unittest.TestCase):
         assert_array_equal(data.score_domain, [0.5, 5.0])
         assert_array_equal(
             data.event[:5],
-            [[124545, 57], [124545, 665], [124545, 969],
-            [124545, 1650], [124545, 2230]])
+            [
+                [124545, 57], [124545, 665], [124545, 969],
+                [124545, 1650], [124545, 2230]
+            ]
+        )
         assert_array_equal(
             data.event[-5:],
-            [[14217, 28183], [14217, 36255], [14217, 37636],
-            [14217, 40326], [14217, 48445]])
+            [
+                [14217, 28183], [14217, 36255], [14217, 37636],
+                [14217, 40326], [14217, 48445]
+            ]
+        )
         assert_array_equal(data.eid[0][:5],
                            [6, 7, 8, 9, 11])
         assert_array_equal(data.eid[0][-5:],
@@ -56,7 +69,9 @@ class TestFlixsterClass(unittest.TestCase):
         assert_array_equal(data.score[:5], [1.5, 1.0, 2.0, 1.0, 5.0])
         assert_array_equal(data.score[-5:], [5.0, 4.0, 3.0, 4.0, 5.0])
 
-##### Main routine #####
+# =============================================================================
+# Main Routines
+# =============================================================================
 
 if __name__ == '__main__':
     unittest.main()

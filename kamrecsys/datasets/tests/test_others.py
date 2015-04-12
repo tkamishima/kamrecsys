@@ -1,17 +1,27 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function
-from __future__ import division
-from __future__ import absolute_import
-from __future__ import unicode_literals
-
-from numpy.testing import (assert_array_equal, assert_array_less,
-                           assert_allclose, assert_array_max_ulp,
-                           assert_array_almost_equal_nulp)
+from __future__ import (
+    print_function,
+    division,
+    absolute_import,
+    unicode_literals)
+from numpy.testing import (
+    assert_array_equal,
+    assert_array_less,
+    assert_allclose,
+    assert_array_max_ulp,
+    assert_array_almost_equal_nulp)
 import unittest
 
-##### Test Classes #####
+# =============================================================================
+# Utility Functions
+# =============================================================================
+
+# =============================================================================
+# Test Classes
+# =============================================================================
+
 
 class TestLoadPCISample(unittest.TestCase):
 
@@ -30,14 +40,22 @@ class TestLoadPCISample(unittest.TestCase):
              [0, 3], [0, 4], [3, 1], [3, 2], [3, 0], [3, 3], [3, 4],
              [3, 5], [6, 2], [6, 3], [6, 5], [1, 1], [1, 2], [1, 0],
              [1, 3], [1, 5], [1, 4], [4, 1], [4, 2], [4, 3], [4, 4]])
-        self.assertDictEqual(data.iid[0],
-                {'Jack Matthews': 2, 'Mick LaSalle': 5, 'Claudia Puig': 0,
-                 'Lisa Rose': 3, 'Toby': 6, 'Gene Seymour': 1,
-                 'Michael Phillips': 4})
-        self.assertDictEqual(data.iid[1],
-                {'Lady in the Water': 1, 'Just My Luck': 0,
-                 'Superman Returns': 3, 'You, Me and Dupree': 5,
-                 'Snakes on a Planet': 2, 'The Night Listener': 4})
+        self.assertDictEqual(
+            data.iid[0],
+            {
+                'Jack Matthews': 2, 'Mick LaSalle': 5, 'Claudia Puig': 0,
+                'Lisa Rose': 3, 'Toby': 6, 'Gene Seymour': 1,
+                'Michael Phillips': 4
+            }
+        )
+        self.assertDictEqual(
+            data.iid[1],
+            {
+                'Lady in the Water': 1, 'Just My Luck': 0,
+                'Superman Returns': 3, 'You, Me and Dupree': 5,
+                'Snakes on a Planet': 2, 'The Night Listener': 4
+            }
+        )
         self.assertIsNone(data.event_feature)
         assert_array_equal(
             data.score,
@@ -57,6 +75,9 @@ class TestLoadPCISample(unittest.TestCase):
         self.assertEqual(data.s_event, 2)
         assert_array_equal(data.score_domain, [1., 5.])
 
-##### Do Test #####
+# =============================================================================
+# Main Routines
+# =============================================================================
+
 if __name__ == '__main__':
     unittest.main()

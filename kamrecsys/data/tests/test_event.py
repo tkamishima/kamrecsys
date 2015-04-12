@@ -1,18 +1,28 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function
-from __future__ import division
-from __future__ import absolute_import
-
-from numpy.testing import (assert_array_equal, assert_array_less,
-                           assert_allclose, assert_array_max_ulp,
-                           assert_array_almost_equal_nulp)
+from __future__ import (
+    print_function,
+    division,
+    absolute_import)
+from numpy.testing import (
+    assert_array_equal,
+    assert_array_less,
+    assert_allclose,
+    assert_array_max_ulp,
+    assert_array_almost_equal_nulp)
 import unittest
 import os
 import numpy as np
 
-##### Test Classes #####
+# =============================================================================
+# Utility Functions
+# =============================================================================
+
+# =============================================================================
+# Test Classes
+# =============================================================================
+
 
 class TestEventUtilMixin(unittest.TestCase):
 
@@ -30,7 +40,6 @@ class TestEventUtilMixin(unittest.TestCase):
         # test to_eid_event
         check = data.to_eid_event(data.event)
         assert_array_equal(x['event'], check)
-
 
         # test to_eid_event / per line conversion
         check = np.empty_like(data.event, dtype=x['event'].dtype)
@@ -58,6 +67,9 @@ class TestEventUtilMixin(unittest.TestCase):
             check[i, :] = data.to_iid_event(j)
         assert_array_equal(data.event, check)
 
-##### Main routine #####
+# =============================================================================
+# Main Routines
+# =============================================================================
+
 if __name__ == '__main__':
     unittest.main()
