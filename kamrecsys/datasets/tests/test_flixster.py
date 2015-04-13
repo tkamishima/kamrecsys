@@ -4,8 +4,7 @@
 from __future__ import (
     print_function,
     division,
-    absolute_import,
-    unicode_literals)
+    absolute_import)
 from numpy.testing import (
     assert_array_equal,
     assert_array_less,
@@ -31,6 +30,7 @@ class TestFlixsterClass(unittest.TestCase):
 
         self.assertListEqual(data.__dict__.keys(),
                              ['event_otypes', 'n_otypes', 'n_events',
+                              'n_score_levels', 'n_scores',
                               'feature', 'event', 'iid',
                               'event_feature', 'score', 'eid', 'n_objects',
                               'n_stypes',
@@ -43,7 +43,7 @@ class TestFlixsterClass(unittest.TestCase):
 
         # events
         self.assertEqual(data.n_stypes, 1)
-        assert_array_equal(data.score_domain, [0.5, 5.0])
+        assert_array_equal(data.score_domain, [0.5, 5.0, 0.5])
         assert_array_equal(
             data.event[:5],
             [
