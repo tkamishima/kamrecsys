@@ -22,7 +22,7 @@ import logging
 import sys
 import numpy as np
 
-from ._base import BaseTopicModel
+from ..recommenders import BaseEventScorePredictor
 
 # =============================================================================
 # Public symbols
@@ -43,7 +43,7 @@ __all__ = ['EventScorePredictor']
 # =============================================================================
 
 
-class EventScorePredictor(BaseTopicModel):
+class EventScorePredictor(BaseEventScorePredictor):
     """
     A probabilistic latent semantic analysis model in [1]_ Figure 2(b).
 
@@ -72,7 +72,7 @@ class EventScorePredictor(BaseTopicModel):
     `pygz_` : array_like
         Item distribution: Pr[Y | Z]
     `prgz_` : array_like
-        Rating distribution: Pr[R | Z]
+        Raring distribution: Pr[R | Z]
 
     Notes
     -----
@@ -89,7 +89,6 @@ class EventScorePredictor(BaseTopicModel):
         Filtering", IJCAI 1999
     """
 
-
     def __init__(
             self, k=1, tol=1e-5, maxiter=100, alpha=1.0, random_state=None):
 
@@ -97,11 +96,13 @@ class EventScorePredictor(BaseTopicModel):
 
         # parameters
         self.k = k
-        self.tol=tol
-        self.maxiter=maxiter
+        self.tol = tol
+        self.maxiter = maxiter
         self.alpha = alpha
 
         # attributes
+        self.i_loss_ = np.inf
+        self.f_loss_ = np.inf
         self.pz_ = None
         self.pxgz_ = None
         self.pygz_ = None
@@ -114,23 +115,31 @@ class EventScorePredictor(BaseTopicModel):
         # internal vars
         self._q = None  # p[z | x, y]
 
-    def _init_model(
-            self, data,
-            user_index=0, item_index=1, score_index=0):
+    def _init_model(self, ev, sc):
         """
         model initialization
+
+        Parameters
+        ----------
+        ev : array, shape(n_events, 2)
+            event data
+        sc : array, shape(n_events,)
+            digitized scores corresponding to events
         """
-        self.n_users_ = data.shape[0]
-        self.n_items_ = data.shape[1]
 
         # responsibilities
-        self._q = self._rng.dirichlet(alpha=np.ones(self.n_z),
-                                      size=(self.n_x_, self.n_y_))
+        self._q = self._rng.dirichlet(
+            alpha=np.ones(self.k),
+            size=(self.n_score_levels_, self.n_users_, self.n_items_))
 
         # model parameters
-        self.pxgz_ = np.tile(self.alpha / self.n_x_, (self.n_x_, self.n_z))
-        self.pygz_ = np.tile(self.alpha / self.n_y_, (self.n_y_, self.n_z))
-        self.pz_ = np.tile(self.alpha / self.n_z, self.n_z)
+        self.pxgz_ = np.tile(
+            self.alpha / self.n_users_, (self.n_users_, self.k))
+        self.pygz_ = np.tile(
+            self.alpha / self.n_items_, (self.n_items_, self.k))
+        self.prgz_ = np.tile(
+            self.alpha / self.n_score_levels_, (self.n_score_levels_, self.k))
+        self.pz_ = np.tile(self.alpha / self.k, self.k)
 
     def _likelihood(self, data):
         """
@@ -186,12 +195,13 @@ class EventScorePredictor(BaseTopicModel):
         ev, sc, n_objects = (
             self._get_event_and_score(
                 data, (user_index, item_index), score_index))
+        self.n_users_ = n_objects[0]
+        self.n_items_ = n_objects[1]
+        self.n_score_levels_ = data.n_score_levels
+        self.n_events_ = ev.shape[0]
         sc = data.digitize(sc)
-        self._init_model(ev, sc, n_objects)
 
-
-
-        self._total = np.sum(data)
+        self._init_model(ev, sc)
         self.i_loss_ = self._likelihood(data)
 
         if disp:
