@@ -328,7 +328,7 @@ def load_movielens1m(infile=None,
 # init logging system ---------------------------------------------------------
 logger = logging.getLogger('kamrecsys')
 if not logger.handlers:
-    logger.addHandler(logging.NullHandler)
+    logger.addHandler(logging.NullHandler())
 
 # =============================================================================
 # Test routine

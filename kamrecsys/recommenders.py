@@ -21,6 +21,7 @@ from __future__ import (
 import logging
 from abc import ABCMeta, abstractmethod
 import numpy as np
+from sklearn.utils import check_random_state
 
 from .data import BaseData, EventData, EventWithScoreData, EventUtilMixin
 
@@ -376,7 +377,7 @@ class BaseEventScorePredictor(BaseEventRecommender):
 # init logging system ---------------------------------------------------------
 logger = logging.getLogger('kamrecsys')
 if not logger.handlers:
-    logger.addHandler(logging.NullHandler)
+    logger.addHandler(logging.NullHandler())
 
 # =============================================================================
 # Test routine

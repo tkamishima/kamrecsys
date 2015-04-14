@@ -73,6 +73,16 @@ class EventScorePredictor(BaseEventScorePredictor):
         Item distribution: Pr[Y | Z]
     `prgz_` : array_like
         Raring distribution: Pr[R | Z]
+    `n_iter_` : int
+        nos of iteration after convergence
+    `n_users_` : int
+        nos of users
+    `n_items_` : int
+        nos of items
+    `n_score_levels_` : int
+        nos of score levels
+    `n_events_` : int
+        nos of events in training data
 
     Notes
     -----
@@ -103,6 +113,7 @@ class EventScorePredictor(BaseEventScorePredictor):
         # attributes
         self.i_loss_ = np.inf
         self.f_loss_ = np.inf
+        self.n_iter_ = 0
         self.pz_ = None
         self.pxgz_ = None
         self.pygz_ = None
@@ -115,16 +126,9 @@ class EventScorePredictor(BaseEventScorePredictor):
         # internal vars
         self._q = None  # p[z | x, y]
 
-    def _init_model(self, ev, sc):
+    def _init_model(self):
         """
         model initialization
-
-        Parameters
-        ----------
-        ev : array, shape(n_events, 2)
-            event data
-        sc : array, shape(n_events,)
-            digitized scores corresponding to events
         """
 
         # responsibilities
@@ -162,13 +166,27 @@ class EventScorePredictor(BaseEventScorePredictor):
             self.pz_[np.newaxis, :] *
             self.prgz_[sc, :] *
             self.pxgz_[ev[:, 0], :] *
-            self.pygz_[ev[i, 1], :], axis=1)
+            self.pygz_[ev[:, 1], :], axis=1)
+        l = -np.sum(np.log(l)) / self.n_events_
 
-        return -np.sum(np.log(l))
+        #----------------------------
+        ll = 0
+        for i in xrange(self.n_events_):
+            ll += np.log(np.sum(
+                self.pz_ *
+                self.prgz_[sc[i], :] *
+                self.pxgz_[ev[i, 0], :] *
+                self.pygz_[ev[i, 1], :]))
+        ll = - ll / self.n_events_
+        if np.abs(l - ll) > 1e-14:
+            logger.error("{:g} {:g}\n".format(l, ll))
+        #----------------------------
+
+        return l
 
     def fit(
             self, data, user_index=0, item_index=1, score_index=0,
-            disp=False, random_state=None):
+            random_state=None):
         """
         fitting model
 
@@ -186,12 +204,11 @@ class EventScorePredictor(BaseEventScorePredictor):
             Ignored if score of data is a single criterion type. In a multi-
             criteria case, specify the position of the target score in a score
             vector. (default=0)
-        disp : bool, default=False
-            print intermediate states
 
         Notes
         -----
-        Currently `score_index` must be 0
+        * Currently `score_index` must be 0.
+        * output intermediate results, if the logging level is lower than INFO
         """
 
         # initialization
@@ -203,57 +220,184 @@ class EventScorePredictor(BaseEventScorePredictor):
         self.n_items_ = n_objects[1]
         self.n_score_levels_ = data.n_score_levels
         self.n_events_ = ev.shape[0]
-        sc = data.digitize(sc)
+        sc = data.digitize_score(sc)
 
-        self._init_model(ev, sc)
-        self.i_loss_ = self._likelihood(data)
-
-        if disp:
-            print("initial:", self.i_loss_, file=sys.stderr)
+        self._init_model()
+        self.i_loss_ = self._likelihood(ev, sc)
+        logger.info("initial: {:g}".format(self.i_loss_))
+        pre_loss = self.i_loss_
 
         # main loop
-        for iter_no in xrange(self.n_iter):
+        for iter_no in xrange(self.maxiter):
 
             # M-step ----------------------------------------------------------
 
+            # n[r, x, y] P[z | r, x, y]
+            n_rxyz = self._q[sc, ev[:, 0], ev[:, 1], :]
+            n_total = np.sum(n_rxyz, axis=0, keepdims=True) + 1
+
+            # p[r | z]
+            self.prgz_ = (
+                np.array([
+                    np.bincount(
+                        sc,
+                        weights=n_rxyz[:, k],
+                        minlength=self.n_score_levels_
+                    ) for k in xrange(self.k)]).T
+                + self.alpha / self.n_score_levels_) / n_total
+
+            #----------------------------
+            for z in xrange(self.k):
+                ll = 1
+                for i in xrange(self.n_events_):
+                    ll += self._q[sc[i], ev[i, 0], ev[i, 1], z]
+
+                for r in xrange(self.n_score_levels_):
+
+                    l = self.alpha / self.n_score_levels_
+                    for i in xrange(self.n_events_):
+                        if sc[i] == r:
+                            l += self._q[sc[i], ev[i, 0], ev[i, 1], z]
+                    diff = self.prgz_[r, z] - l / ll
+                    if np.abs(diff) > 1e-14:
+                        logger.error("r=%d, z=%d, diff=%g", r, z, diff)
+            #----------------------------
+
             # p[x | z]
-            self.pxgz_[:, :] = (
-                np.sum(data[:, :, np.newaxis] * self._q, axis=1)
-                + self.alpha / self.n_x_)
-            self.pxgz_ /= np.sum(self.pxgz_, axis=0, keepdims=True)
+            self.pxgz_ = (
+                np.array([
+                    np.bincount(
+                        ev[:, 0],
+                        weights=n_rxyz[:, k],
+                        minlength=self.n_users_
+                    ) for k in xrange(self.k)]).T
+                + self.alpha / self.n_users_) / n_total
+
+            #----------------------------
+            for z in xrange(self.k):
+                ll = 1
+                for i in xrange(self.n_events_):
+                    ll += self._q[sc[i], ev[i, 0], ev[i, 1], z]
+
+                for x in xrange(self.n_users_):
+
+                    l = self.alpha / self.n_users_
+                    for i in xrange(self.n_events_):
+                        if ev[i, 0] == x:
+                            l += self._q[sc[i], ev[i, 0], ev[i, 1], z]
+                    diff = self.pxgz_[x, z] - l / ll
+                    if np.abs(diff) > 1e-14:
+                        logger.error("x=%d, z=%d, diff=%g", x, z, diff)
+            #----------------------------
 
             # p[y | z]
-            self.pygz_[:, :] = (
-                np.sum(data[:, :, np.newaxis] * self._q, axis=0)
-                + self.alpha / self.n_y_)
-            self.pygz_ /= np.sum(self.pygz_, axis=0, keepdims=True)
+            self.pygz_ = (
+                np.array([
+                    np.bincount(
+                        ev[:, 1],
+                        weights=n_rxyz[:, k],
+                        minlength=self.n_items_
+                    ) for k in xrange(self.k)]).T
+                + self.alpha / self.n_items_) / n_total
+
+            #----------------------------
+            for z in xrange(self.k):
+                ll = 1
+                for i in xrange(self.n_events_):
+                    ll += self._q[sc[i], ev[i, 0], ev[i, 1], z]
+
+                for y in xrange(self.n_items_):
+
+                    l = self.alpha / self.n_items_
+                    for i in xrange(self.n_events_):
+                        if ev[i, 1] == y:
+                            l += self._q[sc[i], ev[i, 0], ev[i, 1], z]
+                    diff = self.pygz_[y, z] - l / ll
+                    if np.abs(diff) > 1e-14:
+                        logger.error("y=%d, z=%d, diff=%g", y, z, diff)
+            #----------------------------
 
             # p[z]
-            self.pz_[:] = (
-                np.sum(data[:, :, np.newaxis] * self._q, axis=(0, 1))
-                + self.alpha / self.n_z)
+            self.pz_[:] = np.sum(n_rxyz, axis=0) + self.alpha / self.k
             self.pz_[:] /= np.sum(self.pz_[:])
+
+            #----------------------------
+            for z in xrange(self.k):
+
+                l = self.alpha / self.k
+                for i in xrange(self.n_events_):
+                    l += self._q[sc[i], ev[i, 0], ev[i, 1], z]
+                diff = self.pz_[z] - l / (self.n_events_ + 1)
+                if np.abs(diff) > 1e-14:
+                    logger.error("z=%d, diff=%g", z, diff)
+            #----------------------------
 
             # E-Step ----------------------------------------------------------
 
-            # p[z | y, z]
+            #----------------------------
+            for z in xrange(self.k):
+
+                l = self.alpha / self.k
+                for i in xrange(self.n_events_):
+                    l += self._q[sc[i], ev[i, 0], ev[i, 1], z]
+                diff = self.pz_[z] - l / (self.n_events_ + 1)
+                if np.abs(diff) > 1e-14:
+                    logger.error("z=%d, diff=%g", z, diff)
+            #----------------------------
+
+            # p[z | r, y, z]
             self._q = (
-                self.pz_[np.newaxis, np.newaxis, :] *
-                self.pxgz_[:, np.newaxis, :] * self.pygz_[np.newaxis, :, :])
-            self._q /= (np.sum(self._q, axis=2, keepdims=True))
+                self.pz_[np.newaxis, np.newaxis, np.newaxis, :] *
+                self.prgz_[:, np.newaxis, np.newaxis, :] *
+                self.pxgz_[np.newaxis, :, np.newaxis, :] *
+                self.pygz_[np.newaxis, np.newaxis, :, :])
+            self._q /= (np.sum(self._q, axis=3, keepdims=True))
 
-            if disp:
-                print("iter ", iter_no + 1, ":", self._likelihood(data),
-                      file=sys.stderr)
+            #----------------------------
+            for r in xrange(self.n_score_levels_):
+                for x in xrange(self.n_users_):
+                    for y in xrange(self.n_items_):
 
-        self.f_loss_ = self._likelihood(data)
-        if disp:
-            print("final:", self.f_loss_, file=sys.stderr)
+                        l = np.zeros(self.k, dtype=np.float)
+                        for i in xrange(self.n_events_):
+                            if sc[i] == r and ev[i, 0] == x and ev[i, 1] == y:
+                                l += (
+                                    self.pz_[:] *
+                                    self.prgz_[r, :] *
+                                    self.pxgz_[x, :] *
+                                    self.pygz_[y, :])
+                        if np.sum(l) > 0:
+                            l = l / np.sum(l)
+
+                            for z in xrange(self.k):
+                                diff = self._q[r, x, y, z] - l[z]
+                                if np.abs(diff) > 1e-14:
+                                    logger.error(
+                                        "(r,x,y,z)=(%d,%d,%d,%d), diff=%g",
+                                        r, x, y, z, diff)
+            #----------------------------
+
+            cur_loss = self._likelihood(ev, sc)
+            logger.info("iter {:d}: {:g}".format(iter_no + 1, cur_loss))
+            precision = np.abs((cur_loss - pre_loss) / cur_loss)
+            if precision < self.tol:
+                logger.info(
+                    "Reached to specified tolerance: {:g}".format(precision))
+                break
+            pre_loss = cur_loss
+
+        if iter_no >= self.maxiter - 1:
+            logger.warning(
+                "Exceeded the maximum number of iterations".format(
+                    self.maxiter))
+
+        self.f_loss_ = cur_loss
+        logger.info("final: {:g}".format(self.f_loss_))
+        self.n_iter_ = iter_no + 1
+        logger.info("nos of iterations: {:d}".format(self.n_iter_))
 
         # clean garbage variables
-        del self.__dict__['_rng']
         del self.__dict__['_q']
-        del self.__dict__['_total']
 
     def raw_predict(self, ev):
         """
@@ -297,7 +441,7 @@ class EventScorePredictor(BaseEventScorePredictor):
 # init logging system ---------------------------------------------------------
 logger = logging.getLogger('kamrecsys')
 if not logger.handlers:
-    logger.addHandler(logging.NullHandler)
+    logger.addHandler(logging.NullHandler())
 
 # =============================================================================
 # Test routine
