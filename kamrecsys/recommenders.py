@@ -80,16 +80,20 @@ class BaseRecommender(object):
         self.random_state = random_state
         self._rng = None
 
-    @abstractmethod
-    def fit(self, data, **kwargs):
+    def fit(self, random_state=None):
         """
-        abstract method: fitting model
+        fitting model
 
         Parameters
         ----------
-        data : :class:`kamrecsys.data.BaseData`
-            data to fit
+        random_state: RandomState or an int seed (None by default)
+            A random number generator instance
         """
+
+        # set random state
+        if random_state is None:
+            random_state = self.random_state
+        self._rng = check_random_state(random_state)
 
     @abstractmethod
     def predict(self, eev, **kwargs):
@@ -107,6 +111,7 @@ class BaseRecommender(object):
         sc : float or array_like, shape=(n_events,), dtype=float
             predicted scores for given inputs
         """
+        pass
 
     def to_eid(self, otype, iid):
         """
@@ -224,6 +229,16 @@ class BaseEventRecommender(BaseRecommender, EventUtilMixin):
         self.event_otypes = data.event_otypes
         self.s_event = data.s_event
 
+    def fit(self, random_state=None):
+        """
+        fitting model
+        """
+        super(BaseEventRecommender, self).fit(random_state=random_state)
+
+    @abstractmethod
+    def predict(self, eev, **kwargs):
+        pass
+
 
 class BaseEventItemFinder(BaseEventRecommender):
     """
@@ -236,6 +251,16 @@ class BaseEventItemFinder(BaseEventRecommender):
         super(BaseEventItemFinder, self).\
             __init__(random_state=random_state)
 
+    def fit(self, random_state=None):
+        """
+        fitting model
+        """
+        super(BaseEventItemFinder, self).fit(random_state=random_state)
+
+    @abstractmethod
+    def predict(self, eev, **kwargs):
+        pass
+
 
 class BaseEventScorePredictor(BaseEventRecommender):
     """
@@ -247,6 +272,12 @@ class BaseEventScorePredictor(BaseEventRecommender):
     def __init__(self, random_state=None):
         super(BaseEventScorePredictor, self).\
             __init__(random_state=random_state)
+
+    def fit(self, random_state=None):
+        """
+        fitting model
+        """
+        super(BaseEventScorePredictor, self).fit(random_state=random_state)
 
     @abstractmethod
     def raw_predict(self, ev, **kwargs):
