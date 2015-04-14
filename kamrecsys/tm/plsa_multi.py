@@ -141,14 +141,16 @@ class EventScorePredictor(BaseEventScorePredictor):
             self.alpha / self.n_score_levels_, (self.n_score_levels_, self.k))
         self.pz_ = np.tile(self.alpha / self.k, self.k)
 
-    def _likelihood(self, data):
+    def _likelihood(self, ev, sc):
         """
         likelihood
 
         Parameters
         ----------
-        data : array, dtype=int, shape=(n_x, n_y)
-            rows = x, columns = y, elements are the frequencies
+        ev : array, shape(n_events, 2)
+            event data
+        sc : array, shape(n_events,)
+            digitized scores corresponding to events
 
         Returns
         -------
@@ -157,10 +159,12 @@ class EventScorePredictor(BaseEventScorePredictor):
         """
 
         l = np.sum(
-            self.pz_[np.newaxis, np.newaxis, :] *
-            self.pxgz_[:, np.newaxis, :] *
-            self.pygz_[np.newaxis, :, :], axis=2)
-        return - np.sum(data * np.log(l))
+            self.pz_[np.newaxis, :] *
+            self.prgz_[sc, :] *
+            self.pxgz_[ev[:, 0], :] *
+            self.pygz_[ev[i, 1], :], axis=1)
+
+        return -np.sum(np.log(l))
 
     def fit(
             self, data, user_index=0, item_index=1, score_index=0,
