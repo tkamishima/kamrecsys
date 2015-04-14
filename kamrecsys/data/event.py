@@ -272,9 +272,15 @@ class EventWithScoreData(EventData):
         self.n_score_levels = (
             int((score_domain[1] - score_domain[0]) / score_domain[2]) + 1)
 
-    def digitize_score(self):
+    def digitize_score(self, score=None):
         """
         Returns discretized scores that starts with 0
+
+        Parameters
+        ----------
+        score : array, optional
+            if specified, the scores in this array is digitized; otherwise
+            `self.score` is converted.
 
         Returns
         -------
@@ -283,7 +289,10 @@ class EventWithScoreData(EventData):
         bins = np.arange(
             self.score_domain[0], self.score_domain[1], self.score_domain[2])
         bins = np.r_[-np.inf, bins + self.score_domain[2] / 2, np.inf]
-        digitized_scores = np.digitize(self.score, bins) - 1
+        if score is None:
+            digitized_scores = np.digitize(self.score, bins) - 1
+        else:
+            digitized_scores = np.digitize(score, bins) - 1
 
         return digitized_scores
 
