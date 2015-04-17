@@ -84,6 +84,9 @@ class TestEventWithScoreData(unittest.TestCase):
         assert_array_equal(digitized_scores[:5], [4, 6, 5, 8, 4])
         assert_array_equal(digitized_scores[-5:], [4, 3, 4, 5, 6])
 
+        digitized_scores = data.digitize_score(np.linspace(1.0, 5.0, 9))
+        assert_array_equal(digitized_scores, np.arange(9))
+
 # =============================================================================
 # Main Routines
 # =============================================================================

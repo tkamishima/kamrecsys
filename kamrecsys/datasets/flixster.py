@@ -102,7 +102,7 @@ def load_flixster_rating(infile=None, event_dtype=None):
 # init logging system ---------------------------------------------------------
 logger = logging.getLogger('kamrecsys')
 if not logger.handlers:
-    logger.addHandler(logging.NullHandler)
+    logger.addHandler(logging.NullHandler())
 
 # =============================================================================
 # Test routine
