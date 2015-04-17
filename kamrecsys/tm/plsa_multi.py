@@ -246,23 +246,6 @@ class EventScorePredictor(BaseEventScorePredictor):
                     ) for k in xrange(self.k)]).T
                 + self.alpha / self.n_score_levels_) / n_total
 
-            #----------------------------
-            for z in xrange(self.k):
-                ll = 1
-                for i in xrange(self.n_events_):
-                    ll += self._q[sc[i], ev[i, 0], ev[i, 1], z]
-
-                for r in xrange(self.n_score_levels_):
-
-                    l = self.alpha / self.n_score_levels_
-                    for i in xrange(self.n_events_):
-                        if sc[i] == r:
-                            l += self._q[sc[i], ev[i, 0], ev[i, 1], z]
-                    diff = self.prgz_[r, z] - l / ll
-                    if np.abs(diff) > 1e-14:
-                        logger.error("r=%d, z=%d, diff=%g", r, z, diff)
-            #----------------------------
-
             # p[x | z]
             self.pxgz_ = (
                 np.array([
@@ -272,23 +255,6 @@ class EventScorePredictor(BaseEventScorePredictor):
                         minlength=self.n_users_
                     ) for k in xrange(self.k)]).T
                 + self.alpha / self.n_users_) / n_total
-
-            #----------------------------
-            for z in xrange(self.k):
-                ll = 1
-                for i in xrange(self.n_events_):
-                    ll += self._q[sc[i], ev[i, 0], ev[i, 1], z]
-
-                for x in xrange(self.n_users_):
-
-                    l = self.alpha / self.n_users_
-                    for i in xrange(self.n_events_):
-                        if ev[i, 0] == x:
-                            l += self._q[sc[i], ev[i, 0], ev[i, 1], z]
-                    diff = self.pxgz_[x, z] - l / ll
-                    if np.abs(diff) > 1e-14:
-                        logger.error("x=%d, z=%d, diff=%g", x, z, diff)
-            #----------------------------
 
             # p[y | z]
             self.pygz_ = (
@@ -300,50 +266,11 @@ class EventScorePredictor(BaseEventScorePredictor):
                     ) for k in xrange(self.k)]).T
                 + self.alpha / self.n_items_) / n_total
 
-            #----------------------------
-            for z in xrange(self.k):
-                ll = 1
-                for i in xrange(self.n_events_):
-                    ll += self._q[sc[i], ev[i, 0], ev[i, 1], z]
-
-                for y in xrange(self.n_items_):
-
-                    l = self.alpha / self.n_items_
-                    for i in xrange(self.n_events_):
-                        if ev[i, 1] == y:
-                            l += self._q[sc[i], ev[i, 0], ev[i, 1], z]
-                    diff = self.pygz_[y, z] - l / ll
-                    if np.abs(diff) > 1e-14:
-                        logger.error("y=%d, z=%d, diff=%g", y, z, diff)
-            #----------------------------
-
             # p[z]
             self.pz_[:] = np.sum(n_rxyz, axis=0) + self.alpha / self.k
             self.pz_[:] /= np.sum(self.pz_[:])
 
-            #----------------------------
-            for z in xrange(self.k):
-
-                l = self.alpha / self.k
-                for i in xrange(self.n_events_):
-                    l += self._q[sc[i], ev[i, 0], ev[i, 1], z]
-                diff = self.pz_[z] - l / (self.n_events_ + 1)
-                if np.abs(diff) > 1e-14:
-                    logger.error("z=%d, diff=%g", z, diff)
-            #----------------------------
-
             # E-Step ----------------------------------------------------------
-
-            #----------------------------
-            for z in xrange(self.k):
-
-                l = self.alpha / self.k
-                for i in xrange(self.n_events_):
-                    l += self._q[sc[i], ev[i, 0], ev[i, 1], z]
-                diff = self.pz_[z] - l / (self.n_events_ + 1)
-                if np.abs(diff) > 1e-14:
-                    logger.error("z=%d, diff=%g", z, diff)
-            #----------------------------
 
             # p[z | r, y, z]
             self._q = (
@@ -352,30 +279,6 @@ class EventScorePredictor(BaseEventScorePredictor):
                 self.pxgz_[np.newaxis, :, np.newaxis, :] *
                 self.pygz_[np.newaxis, np.newaxis, :, :])
             self._q /= (np.sum(self._q, axis=3, keepdims=True))
-
-            #----------------------------
-            for r in xrange(self.n_score_levels_):
-                for x in xrange(self.n_users_):
-                    for y in xrange(self.n_items_):
-
-                        l = np.zeros(self.k, dtype=np.float)
-                        for i in xrange(self.n_events_):
-                            if sc[i] == r and ev[i, 0] == x and ev[i, 1] == y:
-                                l += (
-                                    self.pz_[:] *
-                                    self.prgz_[r, :] *
-                                    self.pxgz_[x, :] *
-                                    self.pygz_[y, :])
-                        if np.sum(l) > 0:
-                            l = l / np.sum(l)
-
-                            for z in xrange(self.k):
-                                diff = self._q[r, x, y, z] - l[z]
-                                if np.abs(diff) > 1e-14:
-                                    logger.error(
-                                        "(r,x,y,z)=(%d,%d,%d,%d), diff=%g",
-                                        r, x, y, z, diff)
-            #----------------------------
 
             cur_loss = self._likelihood(ev, sc)
             logger.info("iter {:d}: {:g}".format(iter_no + 1, cur_loss))
