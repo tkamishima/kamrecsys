@@ -169,19 +169,6 @@ class EventScorePredictor(BaseEventScorePredictor):
             self.pygz_[ev[:, 1], :], axis=1)
         l = -np.sum(np.log(l)) / self.n_events_
 
-        #----------------------------
-        ll = 0
-        for i in xrange(self.n_events_):
-            ll += np.log(np.sum(
-                self.pz_ *
-                self.prgz_[sc[i], :] *
-                self.pxgz_[ev[i, 0], :] *
-                self.pygz_[ev[i, 1], :]))
-        ll = - ll / self.n_events_
-        if np.abs(l - ll) > 1e-14:
-            logger.error("{:g} {:g}\n".format(l, ll))
-        #----------------------------
-
         return l
 
     def fit(
