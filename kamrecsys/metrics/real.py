@@ -21,9 +21,7 @@ from __future__ import (
 import logging
 from abc import ABCMeta, abstractmethod
 import numpy as np
-from sklearn.utils import (
-    assert_all_finite,
-    safe_asarray)
+from sklearn.utils import check_array
 
 from . import BaseMetrics
 
@@ -66,10 +64,10 @@ class BaseRealMetrics(BaseMetrics):
         super(BaseRealMetrics, self).__init__(name=name)
 
         # check inputs
-        self._y_true = safe_asarray(y_true)
-        assert_all_finite(self._y_true)
-        self._y_pred = safe_asarray(y_pred)
-        assert_all_finite(self._y_pred)
+        self._y_true = check_array(
+            y_true, ensure_2d=False, ensure_min_samples=0)
+        self._y_pred = check_array(
+            y_pred, ensure_2d=False, ensure_min_samples=0)
         if self._y_true.shape != self._y_pred.shape:
             raise ValueError(
                 'The sizes of true and predicted vectors must be equal')

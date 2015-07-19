@@ -21,9 +21,7 @@ from __future__ import (
 import logging
 from abc import ABCMeta, abstractmethod
 import numpy as np
-from sklearn.utils import (
-    assert_all_finite,
-    safe_asarray)
+from sklearn.utils import check_array
 
 # =============================================================================
 # Public symbols
@@ -123,8 +121,7 @@ class DescriptiveStatistics(BaseMetrics):
         super(DescriptiveStatistics, self).__init__(name=name)
 
         # check inputs
-        x = safe_asarray(x)
-        assert_all_finite(x)
+        x = check_array(x, ensure_2d=False, ensure_min_samples=0)
 
         # the number of samples
         self.metrics['nos_samples'] = x.shape[0]
@@ -156,8 +153,7 @@ class Histogram(BaseMetrics):
         super(Histogram, self).__init__(name=name)
 
         # check inputs
-        x = safe_asarray(x)
-        assert_all_finite(x)
+        x = check_array(x, ensure_2d=False, ensure_min_samples=0)
 
         # making histogram
         hist = np.histogram(x, bins=bins)[0]
