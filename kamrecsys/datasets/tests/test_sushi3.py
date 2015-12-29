@@ -58,10 +58,10 @@ class TestSushi3Class(unittest.TestCase):
         assert_array_equal(data.eid[0][-5:], [4995, 4996, 4997, 4998, 4999])
         assert_array_equal(data.eid[1][:5], [0, 1, 2, 3, 4])
         assert_array_equal(data.eid[1][-5:], [95, 96, 97, 98, 99])
-        assert_array_equal(data.score[:5], [4., 0., 2., 3., 3.])
+        assert_array_equal(data.score[:5], [0., 4., 2., 1., 1.])
         assert_array_equal(data.score[3220:3230],
-                           [1., 0., 0., 1., 0., 2., 2., 1., 0., 4.])
-        assert_array_equal(data.score[-5:], [0., 2., 4., 2., 0.])
+                           [3., 4., 4., 3., 4., 2., 2., 3., 4., 0.])
+        assert_array_equal(data.score[-5:], [4., 2., 0., 2., 4.])
 
         # users
         self.assertEqual(data.feature[0][322]['original_uid'], 0)
@@ -78,7 +78,7 @@ class TestSushi3Class(unittest.TestCase):
 
         # items
 # todo: sushi name in unicode
-        # self.assertEqual(data.feature[1][8]['name'], u'とろ')
+        # self.assertEqual(data.feature[1][8]['name'], u'toro')
         self.assertEqual(data.feature[1][8]['maki'], 1)
         self.assertEqual(data.feature[1][8]['seafood'], 0)
         self.assertEqual(data.feature[1][8]['genre'], 1)
