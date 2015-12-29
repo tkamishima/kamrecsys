@@ -6,7 +6,8 @@ Convert sushi3 data sets to KamRecSys Sample format
 Instruction
 -----------
 
-1. Download original file, ``sushi3b.tgz``, from `SUSHI Preference Data Sets
+1. Download original file, ``sushi3-2016.zip``, from `SUSHI Preference Data
+Sets
    <http://www.kamishima.net/sushi/>`_.
 2. Unpack this ``sushi3b.tgz``, and place the following files at
    this directory:
@@ -57,7 +58,7 @@ print(
     '#\n'
     '# This data set consists of:\n'
     '#\n'
-    '# * 5,000 ratings (0-4) from 5000 users on 100 sushis.\n'
+    '# * 50,000 ratings (0-4) from 5000 users on 100 sushis.\n'
     '# * Each user has rated exactly 10 sushis selected at random.\n'
     '#\n'
     '# Format\n'
