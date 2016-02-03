@@ -158,7 +158,7 @@ def load_movielens100k(infile=None,
     x = np.genfromtxt(fname=infile, delimiter='\t', dtype=dtype)
     data = EventWithScoreData(n_otypes=2, n_stypes=1,
                               event_otypes=np.array([0, 1]))
-    data.set_events(x['event'], x['score'], score_domain=(1.0, 5.0),
+    data.set_events(x['event'], x['score'], score_domain=(1.0, 5.0, 1.0),
                     event_feature=x['event_feature'])
 
     # load user's feature file
@@ -296,7 +296,7 @@ def load_movielens1m(infile=None,
     x = np.genfromtxt(fname=infile, delimiter='\t', dtype=dtype)
     data = EventWithScoreData(n_otypes=2, n_stypes=1,
                               event_otypes=np.array([0, 1]))
-    data.set_events(x['event'], x['score'], score_domain=(1.0, 5.0),
+    data.set_events(x['event'], x['score'], score_domain=(1.0, 5.0, 1.0),
                     event_feature=x['event_feature'])
 
     # load user's feature file
@@ -328,7 +328,7 @@ def load_movielens1m(infile=None,
 # init logging system ---------------------------------------------------------
 logger = logging.getLogger('kamrecsys')
 if not logger.handlers:
-    logger.addHandler(logging.NullHandler)
+    logger.addHandler(logging.NullHandler())
 
 # =============================================================================
 # Test routine

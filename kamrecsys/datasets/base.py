@@ -48,7 +48,7 @@ SAMPLE_PATH = os.path.join(os.path.dirname(__file__), 'samples')
 
 logger = logging.getLogger('kamrecsys')
 if not logger.handlers:
-    logger.addHandler(logging.NullHandler)
+    logger.addHandler(logging.NullHandler())
 
 # =============================================================================
 # Test routine

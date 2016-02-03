@@ -6,6 +6,11 @@ from __future__ import (
     division,
     absolute_import,
     unicode_literals)
+
+# =============================================================================
+# Imports
+# =============================================================================
+
 from numpy.testing import (
     assert_array_equal,
     assert_array_less,
@@ -13,15 +18,20 @@ from numpy.testing import (
     assert_array_max_ulp,
     assert_array_almost_equal_nulp)
 import unittest
+
 import numpy as np
 
 # =============================================================================
-# Utilities
+# Module variables
 # =============================================================================
 
 test_data = [3.96063305016, 3.16580296689, 4.17585047905, 4.08648849520,
              4.11381603218, 3.45056765134, 4.31221525136, 4.08790965172,
              4.01993828853, 4.56297459028]
+
+# =============================================================================
+# Functions
+# =============================================================================
 
 # =============================================================================
 # Test Classes
@@ -31,7 +41,7 @@ test_data = [3.96063305016, 3.16580296689, 4.17585047905, 4.08648849520,
 class TestBaseMetrics(unittest.TestCase):
 
     def test_class(self):
-        from .. import BaseMetrics
+        from kamrecsys.metrics import BaseMetrics
 
         stats = BaseMetrics()
         self.assertDictEqual(
@@ -56,7 +66,7 @@ class TestBaseMetrics(unittest.TestCase):
 class TestDescriptiveStatistics(unittest.TestCase):
 
     def test_class(self):
-        from .. import DescriptiveStatistics
+        from kamrecsys.metrics import DescriptiveStatistics
 
         metrics = DescriptiveStatistics(test_data, name="dummry")
         self.assertEqual(metrics.name, "dummry")
@@ -70,13 +80,13 @@ class TestDescriptiveStatistics(unittest.TestCase):
                 'mean': np.mean(test_data),
                 'stdev': np.std(test_data)})
         with self.assertRaises(ValueError):
-            metrics = DescriptiveStatistics([np.nan])
+            DescriptiveStatistics([np.nan])
 
 
 class TestHistogram(unittest.TestCase):
 
     def test_class(self):
-        from .. import Histogram
+        from kamrecsys.metrics import Histogram
 
         m = Histogram(test_data, name="dummry")
         self.assertEqual(m.name, "dummry")

@@ -4,8 +4,12 @@
 from __future__ import (
     print_function,
     division,
-    absolute_import,
-    unicode_literals)
+    absolute_import)
+
+# =============================================================================
+# Imports
+# =============================================================================
+
 from numpy.testing import (
     assert_array_equal,
     assert_array_less,
@@ -15,7 +19,11 @@ from numpy.testing import (
 import unittest
 
 # =============================================================================
-# Utility Functions
+# Module variables
+# =============================================================================
+
+# =============================================================================
+# Functions
 # =============================================================================
 
 # =============================================================================
@@ -25,12 +33,13 @@ import unittest
 
 class TestSushi3Class(unittest.TestCase):
     def test_load_sushi3_score(self):
-        from .. import load_sushi3b_score
+        from kamrecsys.datasets import load_sushi3b_score
 
         data = load_sushi3b_score()
 
         self.assertListEqual(data.__dict__.keys(),
                              ['event_otypes', 'n_otypes', 'n_events',
+                              'n_score_levels', 'n_scores',
                               'feature', 'event', 'iid',
                               'event_feature', 'score', 'eid', 'n_objects',
                               'n_stypes',
@@ -43,7 +52,7 @@ class TestSushi3Class(unittest.TestCase):
 
         # events
         self.assertEqual(data.n_stypes, 1)
-        assert_array_equal(data.score_domain, [0., 4.])
+        assert_array_equal(data.score_domain, [0., 4., 1.0])
         assert_array_equal(
             data.event[:5],
             [[0, 1], [0, 3], [0, 4], [0, 12], [0, 44]])
@@ -77,8 +86,7 @@ class TestSushi3Class(unittest.TestCase):
         self.assertEqual(data.feature[0][322]['moved'], 1)
 
         # items
-# todo: sushi name in unicode
-        # self.assertEqual(data.feature[1][8]['name'], u'toro')
+        self.assertEqual(data.feature[1][8]['name'], u'toro')
         self.assertEqual(data.feature[1][8]['maki'], 1)
         self.assertEqual(data.feature[1][8]['seafood'], 0)
         self.assertEqual(data.feature[1][8]['genre'], 1)

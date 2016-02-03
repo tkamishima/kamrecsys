@@ -12,9 +12,10 @@ Requirements
 We tested this module under the following packages:
 
 * Python 2.7.x (Python 3.x's are not supported)
-* NumPy 1.6.x or later
-* SciPy 0.11.x or later
-* Scikit-learn 0.11 or later
+* NumPy
+* SciPy
+* Scikit-learn
+* numexpr
 
 Install
 -------
@@ -28,6 +29,10 @@ Algorithms
 * Matrix Factorization
 
     * Probabilistic Matrix Factorization
+
+* Topic Model
+
+    * Probabilistic Latent Semantic Analysis (Multinomial)
 
 DataSets
 --------

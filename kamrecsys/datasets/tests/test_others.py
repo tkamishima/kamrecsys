@@ -6,6 +6,11 @@ from __future__ import (
     division,
     absolute_import,
     unicode_literals)
+
+# =============================================================================
+# Imports
+# =============================================================================
+
 from numpy.testing import (
     assert_array_equal,
     assert_array_less,
@@ -15,7 +20,11 @@ from numpy.testing import (
 import unittest
 
 # =============================================================================
-# Utility Functions
+# Module variables
+# =============================================================================
+
+# =============================================================================
+# Functions
 # =============================================================================
 
 # =============================================================================
@@ -26,7 +35,7 @@ import unittest
 class TestLoadPCISample(unittest.TestCase):
 
     def test_load_pci_sample(self):
-        from .. import load_pci_sample
+        from kamrecsys.datasets import load_pci_sample
 
         data = load_pci_sample()
         assert_array_equal(data.event_otypes, [0, 1])
@@ -73,7 +82,7 @@ class TestLoadPCISample(unittest.TestCase):
         assert_array_equal(data.n_objects, [7, 6])
         self.assertEqual(data.n_stypes, 1)
         self.assertEqual(data.s_event, 2)
-        assert_array_equal(data.score_domain, [1., 5.])
+        assert_array_equal(data.score_domain, [1., 5., 0.5])
 
 # =============================================================================
 # Main Routines

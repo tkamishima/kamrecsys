@@ -23,7 +23,7 @@ setup(
     install_requires=[
         'numpy',
         'scipy',
-        'scikit-learn'],
+        'sklearn'],
     test_suite='nose.collector',
     package_data={
         'kamrecsys.datasets':

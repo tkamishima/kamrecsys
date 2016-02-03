@@ -117,7 +117,7 @@ class MeanSquaredError(BaseRealMetrics):
 # init logging system
 logger = logging.getLogger('kamrecsys')
 if not logger.handlers:
-    logger.addHandler(logging.NullHandler)
+    logger.addHandler(logging.NullHandler())
 
 # =============================================================================
 # Test routine
