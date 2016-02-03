@@ -11,10 +11,6 @@ from __future__ import (
     unicode_literals)
 
 # =============================================================================
-# Module metadata variables
-# =============================================================================
-
-# =============================================================================
 # Imports
 # =============================================================================
 
@@ -24,6 +20,10 @@ import numpy as np
 from sklearn.utils import check_random_state
 
 from .data import BaseData, EventData, EventWithScoreData, EventUtilMixin
+
+# =============================================================================
+# Module metadata variables
+# =============================================================================
 
 # =============================================================================
 # Public symbols
@@ -288,7 +288,7 @@ class BaseEventScorePredictor(BaseEventRecommender):
 
         Parameters
         ----------
-        eev : array_like, shape=(s_event,) or (n_events, s_event)
+        ev : array_like, shape=(s_event,) or (n_events, s_event)
             events represented by internal id
 
         Returns

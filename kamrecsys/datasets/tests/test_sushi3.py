@@ -5,6 +5,11 @@ from __future__ import (
     print_function,
     division,
     absolute_import)
+
+# =============================================================================
+# Imports
+# =============================================================================
+
 from numpy.testing import (
     assert_array_equal,
     assert_array_less,
@@ -14,7 +19,11 @@ from numpy.testing import (
 import unittest
 
 # =============================================================================
-# Utility Functions
+# Module variables
+# =============================================================================
+
+# =============================================================================
+# Functions
 # =============================================================================
 
 # =============================================================================
@@ -24,7 +33,7 @@ import unittest
 
 class TestSushi3Class(unittest.TestCase):
     def test_load_sushi3_score(self):
-        from .. import load_sushi3b_score
+        from kamrecsys.datasets import load_sushi3b_score
 
         data = load_sushi3b_score()
 
@@ -77,8 +86,7 @@ class TestSushi3Class(unittest.TestCase):
         self.assertEqual(data.feature[0][322]['moved'], 1)
 
         # items
-# todo: sushi name in unicode
-        # self.assertEqual(data.feature[1][8]['name'], u'toro')
+        self.assertEqual(data.feature[1][8]['name'], u'toro')
         self.assertEqual(data.feature[1][8]['maki'], 1)
         self.assertEqual(data.feature[1][8]['seafood'], 0)
         self.assertEqual(data.feature[1][8]['genre'], 1)

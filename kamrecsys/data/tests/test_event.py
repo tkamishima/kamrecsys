@@ -5,6 +5,11 @@ from __future__ import (
     print_function,
     division,
     absolute_import)
+
+# =============================================================================
+# Imports
+# =============================================================================
+
 from numpy.testing import (
     assert_array_equal,
     assert_array_less,
@@ -12,17 +17,22 @@ from numpy.testing import (
     assert_array_max_ulp,
     assert_array_almost_equal_nulp)
 import unittest
+
 import os
 import numpy as np
 
 # =============================================================================
-# Utilities
+# Module variables
+# =============================================================================
+
+# =============================================================================
+# Functions
 # =============================================================================
 
 
 def load_test_data():
-    from .. import EventWithScoreData
-    from ...datasets import SAMPLE_PATH
+    from kamrecsys.data import EventWithScoreData
+    from kamrecsys.datasets import SAMPLE_PATH
 
     infile = os.path.join(SAMPLE_PATH, 'pci.event')
     dtype = np.dtype([('event', 'S18', 2), ('score', np.float)])
@@ -31,6 +41,7 @@ def load_test_data():
                               event_otypes=np.array([0, 1]))
     data.set_events(x['event'], x['score'], score_domain=(1.0, 5.0, 0.5))
     return data, x
+
 
 # =============================================================================
 # Test Classes
@@ -53,7 +64,7 @@ class TestEventUtilMixin(unittest.TestCase):
         assert_array_equal(x['event'], check)
 
     def test_to_iid_event(self):
-        from .. import EventWithScoreData
+        from kamrecsys.data import EventWithScoreData
         data, x = load_test_data()
 
         # test EventData.to_iid_event
@@ -77,7 +88,7 @@ class TestEventWithScoreData(unittest.TestCase):
         self.assertEqual(data.n_scores, 1)
         self.assertEqual(data.n_score_levels, 9)
 
-    def test_digitize_score(sefl):
+    def test_digitize_score(self):
         data, x = load_test_data()
 
         digitized_scores = data.digitize_score()

@@ -6,6 +6,11 @@ from __future__ import (
     division,
     absolute_import,
     unicode_literals)
+
+# =============================================================================
+# Imports
+# =============================================================================
+
 from numpy.testing import (
     assert_array_equal,
     assert_array_less,
@@ -13,16 +18,21 @@ from numpy.testing import (
     assert_array_max_ulp,
     assert_array_almost_equal_nulp)
 import unittest
+
 import numpy as np
 
 # =============================================================================
-# Utilities
+# Module variables
 # =============================================================================
 
 y_true = [5.0, 5.0, 5.0, 5.0, 4.0, 3.0, 5.0, 2.0, 4.0, 3.0]
 y_pred = [3.96063305016, 3.16580296689, 4.17585047905, 4.08648849520,
           4.11381603218, 3.45056765134, 4.31221525136, 4.08790965172,
           4.01993828853, 4.56297459028]
+
+# =============================================================================
+# Functions
+# =============================================================================
 
 # =============================================================================
 # Test Classes
@@ -32,7 +42,7 @@ y_pred = [3.96063305016, 3.16580296689, 4.17585047905, 4.08648849520,
 class TestBaseMetrics(unittest.TestCase):
 
     def test_class(self):
-        from .. import BaseRealMetrics
+        from kamrecsys.metrics import BaseRealMetrics
 
         stats = BaseRealMetrics([], [])
         self.assertDictEqual(stats.metrics, {})
@@ -48,7 +58,7 @@ class TestBaseMetrics(unittest.TestCase):
 class TestMeanAbsoluteError(unittest.TestCase):
 
     def test_class(self):
-        from .. import MeanAbsoluteError
+        from kamrecsys.metrics import MeanAbsoluteError
 
         metrics = MeanAbsoluteError(y_true, y_pred)
         self.assertEqual(metrics.name, 'mean_absolute_error')
@@ -63,7 +73,7 @@ class TestMeanAbsoluteError(unittest.TestCase):
 class TestMeanSquaredError(unittest.TestCase):
 
     def test_class(self):
-        from .. import MeanSquaredError
+        from kamrecsys.metrics import MeanSquaredError
 
         metrics = MeanSquaredError(y_true, y_pred)
         self.assertEqual(metrics.name, 'mean_squared_error')

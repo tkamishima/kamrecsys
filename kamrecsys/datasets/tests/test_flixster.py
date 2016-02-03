@@ -5,6 +5,11 @@ from __future__ import (
     print_function,
     division,
     absolute_import)
+
+# =============================================================================
+# Imports
+# =============================================================================
+
 from numpy.testing import (
     assert_array_equal,
     assert_array_less,
@@ -14,7 +19,11 @@ from numpy.testing import (
 import unittest
 
 # =============================================================================
-# Utility Functions
+# Module variables
+# =============================================================================
+
+# =============================================================================
+# Functions
 # =============================================================================
 
 # =============================================================================
@@ -24,7 +33,7 @@ import unittest
 
 class TestFlixsterClass(unittest.TestCase):
     def test_load_flixster_rating(self):
-        from .. import load_flixster_rating
+        from kamrecsys.datasets import load_flixster_rating
 
         data = load_flixster_rating()
 

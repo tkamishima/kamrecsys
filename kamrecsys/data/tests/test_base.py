@@ -6,6 +6,11 @@ from __future__ import (
     division,
     absolute_import,
     unicode_literals)
+
+# =============================================================================
+# Imports
+# =============================================================================
+
 from numpy.testing import (
     assert_array_equal,
     assert_array_less,
@@ -15,7 +20,11 @@ from numpy.testing import (
 import unittest
 
 # =============================================================================
-# Utility Functions
+# Module variables
+# =============================================================================
+
+# =============================================================================
+# Functions
 # =============================================================================
 
 # =============================================================================
@@ -26,7 +35,7 @@ import unittest
 class TestBaseData(unittest.TestCase):
 
     def test_class(self):
-        from ...datasets import load_pci_sample
+        from kamrecsys.datasets import load_pci_sample
 
         data = load_pci_sample()
 
@@ -35,7 +44,7 @@ class TestBaseData(unittest.TestCase):
             x = data.to_iid(0, 'Dr. X')
         self.assertEqual(data.to_eid(1, 4), 'The Night Listener')
         with self.assertRaises(ValueError):
-            x = data.to_eid(1, 100)
+            data.to_eid(1, 100)
 
 # =============================================================================
 # Main Routines

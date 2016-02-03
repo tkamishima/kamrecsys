@@ -5,6 +5,11 @@ from __future__ import (
     print_function,
     division,
     absolute_import)
+
+# =============================================================================
+# Imports
+# =============================================================================
+
 from numpy.testing import (
     assert_array_equal,
     assert_array_less,
@@ -12,10 +17,15 @@ from numpy.testing import (
     assert_array_max_ulp,
     assert_array_almost_equal_nulp)
 import unittest
+
 import numpy as np
 
 # =============================================================================
-# Utility Functions
+# Module variables
+# =============================================================================
+
+# =============================================================================
+# Functions
 # =============================================================================
 
 # =============================================================================
@@ -25,7 +35,7 @@ import numpy as np
 
 class TestLoadMovielens100k(unittest.TestCase):
     def test_load_movielens100k(self):
-        from .. import load_movielens100k
+        from kamrecsys.datasets import load_movielens100k
 
         data = load_movielens100k()
         self.assertListEqual(data.__dict__.keys(),
@@ -121,7 +131,7 @@ class TestLoadMovielens100k(unittest.TestCase):
         self.assertEqual(len(data.feature[1]), 1682)
 
     def test_MOVIELENS100K_INFO(self):
-        from .. import MOVIELENS100K_INFO
+        from kamrecsys.datasets import MOVIELENS100K_INFO
 
         assert_array_equal(
             MOVIELENS100K_INFO['user_occupation'],
@@ -140,7 +150,7 @@ class TestLoadMovielens100k(unittest.TestCase):
 
 class TestLoadMovielens1m(unittest.TestCase):
     def test_load_movielens1m(self):
-        from .. import load_movielens1m
+        from kamrecsys.datasets import load_movielens1m
 
         data = load_movielens1m()
         self.assertListEqual(
@@ -232,7 +242,7 @@ class TestLoadMovielens1m(unittest.TestCase):
         self.assertEqual(len(data.feature[1]), 3706)
 
     def test_MOVIELENS1M_INFO(self):
-        from .. import MOVIELENS1M_INFO
+        from kamrecsys.datasets import MOVIELENS1M_INFO
 
         assert_array_equal(
             MOVIELENS1M_INFO['user_age'],

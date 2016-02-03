@@ -6,6 +6,11 @@ from __future__ import (
     division,
     absolute_import,
     unicode_literals)
+
+# =============================================================================
+# Imports
+# =============================================================================
+
 from numpy.testing import (
     assert_array_equal,
     assert_array_less,
@@ -15,7 +20,11 @@ from numpy.testing import (
 import unittest
 
 # =============================================================================
-# Utilities
+# Module variables
+# =============================================================================
+
+# =============================================================================
+# Functions
 # =============================================================================
 
 # =============================================================================
@@ -27,8 +36,8 @@ class TestEventScorePredictor(unittest.TestCase):
 
     def test_class(self):
         import numpy as np
-        from ...datasets import load_movielens_mini
-        from ..plsa_multi import EventScorePredictor
+        from kamrecsys.datasets import load_movielens_mini
+        from kamrecsys.tm.plsa_multi import EventScorePredictor
 
         data = load_movielens_mini()
 

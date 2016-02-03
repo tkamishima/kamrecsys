@@ -70,16 +70,6 @@ from __future__ import (
     absolute_import)
 
 # =============================================================================
-# Module metadata variables
-# =============================================================================
-
-__author__ = "Toshihiro Kamishima ( http://www.kamishima.net/ )"
-__date__ = "2014/07/06"
-__version__ = "1.0.0"
-__copyright__ = "Copyright (c) 2014 Toshihiro Kamishima all rights reserved."
-__license__ = "MIT License: http://www.opensource.org/licenses/mit-license.php"
-
-# =============================================================================
 # Imports
 # =============================================================================
 
@@ -94,6 +84,16 @@ import numpy as np
 
 from kamrecsys.data import EventWithScoreData
 from kamrecsys.cross_validation import KFold
+
+# =============================================================================
+# Module metadata variables
+# =============================================================================
+
+__author__ = "Toshihiro Kamishima ( http://www.kamishima.net/ )"
+__date__ = "2014/07/06"
+__version__ = "1.0.0"
+__copyright__ = "Copyright (c) 2014 Toshihiro Kamishima all rights reserved."
+__license__ = "MIT License: http://www.opensource.org/licenses/mit-license.php"
 
 # =============================================================================
 # Public symbols

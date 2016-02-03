@@ -58,7 +58,7 @@ class EventScorePredictor(BaseEventScorePredictor):
         :math:`\mathbf{q}_i`), default=1
     tol : optional, float
         tolerance parameter for optimizer
-    maxiter : float, default=200
+    maxiter : int, default=200
         maximum number of iterations is maxiter times the number of parameters
 
     Attributes

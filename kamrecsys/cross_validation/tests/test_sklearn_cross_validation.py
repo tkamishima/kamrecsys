@@ -6,6 +6,11 @@ from __future__ import (
     division,
     absolute_import,
     unicode_literals)
+
+# =============================================================================
+# Imports
+# =============================================================================
+
 from numpy.testing import (
     assert_array_equal,
     assert_array_less,
@@ -15,7 +20,11 @@ from numpy.testing import (
 import unittest
 
 # =============================================================================
-# Utility Functions
+# Module variables
+# =============================================================================
+
+# =============================================================================
+# Functions
 # =============================================================================
 
 # =============================================================================
@@ -26,7 +35,7 @@ import unittest
 class TestKFold(unittest.TestCase):
 
     def test_class(self):
-        from .. import KFold
+        from kamrecsys.cross_validation import KFold
 
         kf = KFold(6, interlace=True)
         self.assertEqual(len(kf), 3)

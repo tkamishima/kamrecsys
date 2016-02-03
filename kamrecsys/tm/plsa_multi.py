@@ -215,6 +215,8 @@ class EventScorePredictor(BaseEventScorePredictor):
         pre_loss = self.i_loss_
 
         # main loop
+        iter_no = 0
+        cur_loss = np.inf
         for iter_no in xrange(self.maxiter):
 
             # M-step ----------------------------------------------------------
@@ -230,8 +232,8 @@ class EventScorePredictor(BaseEventScorePredictor):
                         sc,
                         weights=n_rxyz[:, k],
                         minlength=self.n_score_levels_
-                    ) for k in xrange(self.k)]).T
-                + self.alpha / self.n_score_levels_) / n_total
+                    ) for k in xrange(self.k)]).T +
+                self.alpha / self.n_score_levels_) / n_total
 
             # p[x | z]
             self.pxgz_ = (
@@ -240,8 +242,8 @@ class EventScorePredictor(BaseEventScorePredictor):
                         ev[:, 0],
                         weights=n_rxyz[:, k],
                         minlength=self.n_users_
-                    ) for k in xrange(self.k)]).T
-                + self.alpha / self.n_users_) / n_total
+                    ) for k in xrange(self.k)]).T +
+                self.alpha / self.n_users_) / n_total
 
             # p[y | z]
             self.pygz_ = (
@@ -250,8 +252,8 @@ class EventScorePredictor(BaseEventScorePredictor):
                         ev[:, 1],
                         weights=n_rxyz[:, k],
                         minlength=self.n_items_
-                    ) for k in xrange(self.k)]).T
-                + self.alpha / self.n_items_) / n_total
+                    ) for k in xrange(self.k)]).T +
+                self.alpha / self.n_items_) / n_total
 
             # p[z]
             self.pz_[:] = np.sum(n_rxyz, axis=0) + self.alpha / self.k

@@ -4,10 +4,17 @@
 KamRecSys: Algorithms for recommender systems in Python
 """
 
-from __future__ import print_function
-from __future__ import division
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import (
+    print_function,
+    division,
+    absolute_import,
+    unicode_literals)
+
+# =============================================================================
+# Imports
+# =============================================================================
+
+import logging
 
 # =============================================================================
 # Module metadata variables
@@ -19,12 +26,6 @@ __version__ = "4.0.0"
 __copyright__ = "Copyright (c) 2012 Toshihiro Kamishima all rights reserved."
 __license__ = "MIT License: http://www.opensource.org/licenses/mit-license.php"
 __docformat__ = "restructuredtext en"
-
-# =============================================================================
-# Imports
-# =============================================================================
-
-import logging
 
 # =============================================================================
 # Public symbols
