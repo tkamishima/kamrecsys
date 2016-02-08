@@ -65,23 +65,23 @@ class EventScorePredictor(BaseEventScorePredictor):
 
     Attributes
     ----------
-    `pz_` : array_like
+    pz_ : array_like
         Latent distribution: Pr[Z]
-    `pxgz_` : array_like
+    pxgz_ : array_like
         User distribution: Pr[X | Z]
-    `pygz_` : array_like
+    pygz_ : array_like
         Item distribution: Pr[Y | Z]
-    `prgz_` : array_like
+    prgz_ : array_like
         Raring distribution: Pr[R | Z]
-    `n_iter_` : int
+    n_iter_ : int
         nos of iteration after convergence
-    `n_users_` : int
+    n_users_ : int
         nos of users
-    `n_items_` : int
+    n_items_ : int
         nos of items
-    `n_score_levels_` : int
+    n_score_levels_ : int
         nos of score levels
-    `n_events_` : int
+    n_events_ : int
         nos of events in training data
 
     Notes
