@@ -63,21 +63,21 @@ class EventScorePredictor(BaseEventScorePredictor):
 
     Attributes
     ----------
-    `mu_` : array_like
+    mu_ : array_like
         global bias
-    `bu_` : array_like
+    bu_ : array_like
         users' biases
-    `bi_` : array_like
+    bi_ : array_like
         items' biases
-    `p_` : array_like
+    p_ : array_like
         latent factors of users
-    `q_` : array_like
+    q_ : array_like
         latent factors of items
-    `i_loss_` : float
+    i_loss_ : float
         the loss value after initialization
-    `f_loss_` : float
+    f_loss_ : float
         the loss value after fitting
-    `opt_outputs_` : tuple
+    opt_outputs_ : tuple
         extra outputs of an optimizer
 
     Notes
