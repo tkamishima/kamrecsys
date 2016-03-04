@@ -179,7 +179,8 @@ def training(opt, ev, tsc, event_feature=None, fold=0):
 
     # generate event data
     data = EventWithScoreData(n_otypes=2, n_stypes=1)
-    score_domain = (np.min(tsc), np.max(tsc), 1.0)
+    score_domain = (np.min(tsc), np.max(tsc), np.min(np.diff(np.unique(tsc))))
+    logger.info("score_domain = " + str(score_domain))
     data.set_events(ev, tsc, score_domain=score_domain,
                     event_feature=event_feature)
 
