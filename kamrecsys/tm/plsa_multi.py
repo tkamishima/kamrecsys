@@ -132,7 +132,7 @@ class EventScorePredictor(BaseEventScorePredictor):
         """
 
         # responsibilities
-        self._q = self._rng.dirichlet(
+        self._qq = self._rng.dirichlet(
             alpha=np.ones(self.k),
             size=(self.n_score_levels_, self.n_users_, self.n_items_))
 
@@ -207,6 +207,7 @@ class EventScorePredictor(BaseEventScorePredictor):
         sc = data.digitize_score(sc)
 
         self._init_model()
+        self._q = self._qq[sc, ev[:, 0], ev[:, 1], :]
         self.i_loss_ = self._likelihood(ev, sc)
         logger.info("initial: {:g}".format(self.i_loss_))
         pre_loss = self.i_loss_
@@ -218,15 +219,12 @@ class EventScorePredictor(BaseEventScorePredictor):
 
             # M-step #####
 
-            # n[r, x, y] P[z | r, x, y]
-            n_rxyz = self._q[sc, ev[:, 0], ev[:, 1], :]
-
             # p[r | z]
             self.prgz_ = (
                 np.array([
                     np.bincount(
                         sc,
-                        weights=n_rxyz[:, k],
+                        weights=self._q[:, k],
                         minlength=self.n_score_levels_
                     ) for k in xrange(self.k)]).T +
                 self.alpha)
@@ -237,7 +235,7 @@ class EventScorePredictor(BaseEventScorePredictor):
                 np.array([
                     np.bincount(
                         ev[:, 0],
-                        weights=n_rxyz[:, k],
+                        weights=self._q[:, k],
                         minlength=self.n_users_
                     ) for k in xrange(self.k)]).T +
                 self.alpha)
@@ -248,25 +246,25 @@ class EventScorePredictor(BaseEventScorePredictor):
                 np.array([
                     np.bincount(
                         ev[:, 1],
-                        weights=n_rxyz[:, k],
+                        weights=self._q[:, k],
                         minlength=self.n_items_
                     ) for k in xrange(self.k)]).T +
                 self.alpha)
             self.pygz_ /= self.pygz_.sum(axis=1, keepdims=True)
 
             # p[z]
-            self.pz_[:] = np.sum(n_rxyz, axis=0) + self.alpha
+            self.pz_ = np.sum(self._q, axis=0) + self.alpha
             self.pz_ /= np.sum(self.pz_)
 
             # E-Step #####
 
             # p[z | r, y, z]
             self._q = (
-                self.pz_[np.newaxis, np.newaxis, np.newaxis, :] *
-                self.prgz_[:, np.newaxis, np.newaxis, :] *
-                self.pxgz_[np.newaxis, :, np.newaxis, :] *
-                self.pygz_[np.newaxis, np.newaxis, :, :])
-            self._q /= (np.sum(self._q, axis=3, keepdims=True))
+                self.pz_[np.newaxis, :] *
+                self.prgz_[sc, :] *
+                self.pxgz_[ev[:, 0], :] *
+                self.pygz_[ev[:, 1], :])
+            self._q /= (self._q.sum(axis=1, keepdims=True))
 
             cur_loss = self._likelihood(ev, sc)
             logger.info("iter {:d}: {:g}".format(iter_no + 1, cur_loss))
