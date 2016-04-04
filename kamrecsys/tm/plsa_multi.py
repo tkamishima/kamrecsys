@@ -137,13 +137,10 @@ class EventScorePredictor(BaseEventScorePredictor):
             size=(self.n_score_levels_, self.n_users_, self.n_items_))
 
         # model parameters
-        self.pxgz_ = np.tile(
-            self.alpha / self.n_users_, (self.n_users_, self.k))
-        self.pygz_ = np.tile(
-            self.alpha / self.n_items_, (self.n_items_, self.k))
-        self.prgz_ = np.tile(
-            self.alpha / self.n_score_levels_, (self.n_score_levels_, self.k))
-        self.pz_ = np.tile(self.alpha / self.k, self.k)
+        self.pxgz_ = np.tile(self.alpha, (self.n_users_, self.k))
+        self.pygz_ = np.tile(self.alpha, (self.n_items_, self.k))
+        self.prgz_ = np.tile(self.alpha, (self.n_score_levels_, self.k))
+        self.pz_ = np.tile(self.alpha, self.k)
 
     def _likelihood(self, ev, sc):
         """
@@ -219,11 +216,10 @@ class EventScorePredictor(BaseEventScorePredictor):
         cur_loss = np.inf
         for iter_no in xrange(self.maxiter):
 
-            # M-step ----------------------------------------------------------
+            # M-step #####
 
             # n[r, x, y] P[z | r, x, y]
             n_rxyz = self._q[sc, ev[:, 0], ev[:, 1], :]
-            n_total = np.sum(n_rxyz, axis=0, keepdims=True) + 1
 
             # p[r | z]
             self.prgz_ = (
@@ -233,7 +229,8 @@ class EventScorePredictor(BaseEventScorePredictor):
                         weights=n_rxyz[:, k],
                         minlength=self.n_score_levels_
                     ) for k in xrange(self.k)]).T +
-                self.alpha / self.n_score_levels_) / n_total
+                self.alpha)
+            self.prgz_ /= self.prgz_.sum(axis=1, keepdims=True)
 
             # p[x | z]
             self.pxgz_ = (
@@ -243,7 +240,8 @@ class EventScorePredictor(BaseEventScorePredictor):
                         weights=n_rxyz[:, k],
                         minlength=self.n_users_
                     ) for k in xrange(self.k)]).T +
-                self.alpha / self.n_users_) / n_total
+                self.alpha)
+            self.pxgz_ /= self.pxgz_.sum(axis=1, keepdims=True)
 
             # p[y | z]
             self.pygz_ = (
@@ -253,13 +251,14 @@ class EventScorePredictor(BaseEventScorePredictor):
                         weights=n_rxyz[:, k],
                         minlength=self.n_items_
                     ) for k in xrange(self.k)]).T +
-                self.alpha / self.n_items_) / n_total
+                self.alpha)
+            self.pygz_ /= self.pygz_.sum(axis=1, keepdims=True)
 
             # p[z]
-            self.pz_[:] = np.sum(n_rxyz, axis=0) + self.alpha / self.k
-            self.pz_[:] /= np.sum(self.pz_[:])
+            self.pz_[:] = np.sum(n_rxyz, axis=0) + self.alpha
+            self.pz_ /= np.sum(self.pz_)
 
-            # E-Step ----------------------------------------------------------
+            # E-Step #####
 
             # p[z | r, y, z]
             self._q = (

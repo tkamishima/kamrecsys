@@ -56,9 +56,9 @@ class TestEventScorePredictor(unittest.TestCase):
         # logging.getLogger('kamrecsys').addHandler(logging.StreamHandler())
         rcmdr.fit(data)
         self.assertAlmostEqual(rcmdr.i_loss_,
-                               5.99146454710798446, delta=1e-5)
+                               -0.69314718056, delta=1e-5)
         self.assertAlmostEqual(rcmdr.f_loss_,
-                               4.9585507078144815, delta=1e-5)
+                               0.532957519604, delta=1e-5)
 
         # self.assertAlmostEqual(rcmdr.predict((1, 7)),
         #                        3.9873641434545979, delta=1e-5)
