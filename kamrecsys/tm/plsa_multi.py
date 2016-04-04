@@ -21,7 +21,6 @@ from __future__ import (
 import logging
 import sys
 import numpy as np
-import os
 
 from ..recommenders import BaseEventScorePredictor
 
@@ -209,9 +208,6 @@ class EventScorePredictor(BaseEventScorePredictor):
 
         self._init_model()
         self._q = self._qq[sc, ev[:, 0], ev[:, 1], :]
-
-        ri = np.arange(self.n_score_levels_, dtype=int)
-
         self.i_loss_ = self._likelihood(ev, sc)
         logger.info("initial: {:g}".format(self.i_loss_))
         pre_loss = self.i_loss_
@@ -224,27 +220,15 @@ class EventScorePredictor(BaseEventScorePredictor):
             # M-step #####
 
             # p[r | z]
-            start_utime = os.times()[0]
-            for i in xrange(100000):
-                self.prgz_ = (
-                    np.where(
-                        (sc[:, np.newaxis, np.newaxis] ==
-                         ri[np.newaxis, :, np.newaxis]),
-                        self._q[:, np.newaxis, :],
-                        0
-                    ).sum(axis=0) + self.alpha)
-                self.prgz_ /= self.prgz_.sum(axis=1, keepdims=True)
-            end_utime = os.times()[0]
-            print("elapsed_utime =", end_utime - start_utime)
-            # self.prgz_ = (
-            #     np.array([
-            #         np.bincount(
-            #             sc,
-            #             weights=self._q[:, k],
-            #             minlength=self.n_score_levels_
-            #         ) for k in xrange(self.k)]).T +
-            #     self.alpha)
-            # self.prgz_ /= self.prgz_.sum(axis=1, keepdims=True)
+            self.prgz_ = (
+                np.array([
+                    np.bincount(
+                        sc,
+                        weights=self._q[:, k],
+                        minlength=self.n_score_levels_
+                    ) for k in xrange(self.k)]).T +
+                self.alpha)
+            self.prgz_ /= self.prgz_.sum(axis=1, keepdims=True)
 
             # p[x | z]
             self.pxgz_ = (
