@@ -17,7 +17,7 @@ from __future__ import (
 import logging
 from abc import ABCMeta, abstractmethod
 import numpy as np
-from sklearn.utils import check_random_state
+from sklearn.utils import check_random_state, check_array
 
 from .data import BaseData, EventData, EventWithScoreData, EventUtilMixin
 
@@ -288,7 +288,7 @@ class BaseEventScorePredictor(BaseEventRecommender):
 
         Parameters
         ----------
-        ev : array_like, shape=(s_event,) or (n_events, s_event)
+        ev : array_like, shape=(n_events, s_event)
             events represented by internal id
 
         Returns
@@ -364,7 +364,12 @@ class BaseEventScorePredictor(BaseEventRecommender):
             predicted scores for given inputs
         """
 
-        return self.raw_predict(self.to_iid_event(np.asarray(eev)))
+        eev = np.atleast_2d(
+            check_array(eev, dtype=int, ensure_2d=False))
+        if eev.shape[1] != self.s_event:
+            raise TypeError("unmatched sized of events")
+
+        return np.squeeze(self.raw_predict(self.to_iid_event(eev)))
 
 # =============================================================================
 # Functions 
