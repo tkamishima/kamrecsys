@@ -46,11 +46,12 @@ class TestEventScorePredictor(unittest.TestCase):
             vars(rcmdr), {
                 'k': 2, 'tol': 1e-05, 'maxiter': 100, 'alpha': 1.0,
                 'random_state': 1234, '_rng': None,
-                'iid': None,  'eid': None, 'n_objects': None, 'n_otypes': 0,
+                'iid': None, 'eid': None, 'n_objects': None, 'n_otypes': 0,
                 'n_score_levels_': 0,
                 'i_loss_': np.inf, 'f_loss_': np.inf, 'n_iter_': 0,
                 'pz_': None, 'pygz_': None, 'prgz_': None, 'pxgz_': None,
-                 'n_events_': 0, 'n_users_': 0, 'n_items_': 0, '_q': None})
+                'n_events_': 0, 'n_users_': 0, 'n_items_': 0, '_q': None,
+                'score_levels_': None, 'mean_score_': 0.0})
 
         # import logging
         # logging.getLogger('kamrecsys').addHandler(logging.StreamHandler())
@@ -59,6 +60,9 @@ class TestEventScorePredictor(unittest.TestCase):
                                1.97477687885788, delta=1e-5)
         self.assertAlmostEqual(rcmdr.f_loss_,
                                0.532957494417634, delta=1e-5)
+        self.assertAlmostEqual(rcmdr.mean_score_,
+                               3.83333333333, delta=1e-5)
+        assert_allclose(rcmdr.score_levels_, [1, 2, 3, 4, 5], rtol=1e-5)
 
         # self.assertAlmostEqual(rcmdr.predict((1, 7)),
         #                        3.9873641434545979, delta=1e-5)

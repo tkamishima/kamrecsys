@@ -74,6 +74,10 @@ class EventScorePredictor(BaseEventScorePredictor):
         Item distribution: Pr[Y | Z]
     prgz_ : array_like
         Raring distribution: Pr[R | Z]
+    mean_score_ : float
+        mean score of training data before digitized
+    score_levels_ : array, dtype=float, shape=(n_score_levels_,)
+        1d-array of score levels corresponding to each digitized score
     n_iter_ : int
         nos of iteration after convergence
     n_users_ : int
@@ -121,8 +125,10 @@ class EventScorePredictor(BaseEventScorePredictor):
         self.prgz_ = None
         self.n_users_ = 0
         self.n_items_ = 0
+        self.score_levels_ = None
         self.n_score_levels_ = 0
         self.n_events_ = 0
+        self.mean_score_ = 0.0
 
         # internal vars
         self._q = None  # p[z | x, y]
@@ -236,6 +242,9 @@ class EventScorePredictor(BaseEventScorePredictor):
         self.n_users_ = n_objects[0]
         self.n_items_ = n_objects[1]
         self.n_score_levels_ = data.n_score_levels
+        self.score_levels_ = np.linspace(
+            data.score_domain[0], data.score_domain[1], self.n_score_levels_)
+        self.mean_score_ = np.mean(sc)
         self.n_events_ = ev.shape[0]
         sc = data.digitize_score(sc)
 
