@@ -61,7 +61,7 @@ class TestEventScorePredictor(unittest.TestCase):
         self.assertAlmostEqual(rcmdr.f_loss_,
                                0.532957494417634, delta=1e-5)
         assert_allclose(rcmdr.score_dist_,
-                        [0.03333333, 0.06666667, 0.2, 0.43333333, 0.26666667],
+                        [0.05714286, 0.08571429, 0.2, 0.4, 0.25714286],
                         rtol=1e-5)
         assert_allclose(rcmdr.score_levels_, [1, 2, 3, 4, 5], rtol=1e-5)
 
@@ -89,7 +89,7 @@ class TestEventScorePredictor(unittest.TestCase):
 
         # unknown user and item
         self.assertAlmostEqual(rcmdr.predict((3, 11)),
-                               3.83333333333, delta=1e-5)
+                               3.71428571429, delta=1e-5)
         # x = np.array([
         #     [1, 7], [1, 9], [1, 11],
         #     [3, 7], [3, 9], [3, 11],

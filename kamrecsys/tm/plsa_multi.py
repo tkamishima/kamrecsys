@@ -246,7 +246,8 @@ class EventScorePredictor(BaseEventScorePredictor):
             data.score_domain[0], data.score_domain[1], self.n_score_levels_)
         self.n_events_ = ev.shape[0]
         sc = data.digitize_score(sc)
-        self.score_dist_ = np.bincount(sc, minlength=self.n_score_levels_)
+        self.score_dist_ = (
+            np.bincount(sc, minlength=self.n_score_levels_) + self.alpha)
         self.score_dist_ = np.true_divide(
             self.score_dist_, self.score_dist_.sum())
 
