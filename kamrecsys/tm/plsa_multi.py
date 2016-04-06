@@ -74,8 +74,8 @@ class EventScorePredictor(BaseEventScorePredictor):
         Item distribution: Pr[Y | Z]
     prgz_ : array_like
         Raring distribution: Pr[R | Z]
-    mean_score_ : float
-        mean score of training data before digitized
+    score_dist_ : array, shape=(n_score_levels_,), dtype=float
+        distribution of digitized scores
     score_levels_ : array, dtype=float, shape=(n_score_levels_,)
         1d-array of score levels corresponding to each digitized score
     n_iter_ : int
@@ -126,9 +126,9 @@ class EventScorePredictor(BaseEventScorePredictor):
         self.n_users_ = 0
         self.n_items_ = 0
         self.score_levels_ = None
+        self.score_dist_ = None
         self.n_score_levels_ = 0
         self.n_events_ = 0
-        self.mean_score_ = 0.0
 
         # internal vars
         self._q = None  # p[z | x, y]
@@ -244,9 +244,11 @@ class EventScorePredictor(BaseEventScorePredictor):
         self.n_score_levels_ = data.n_score_levels
         self.score_levels_ = np.linspace(
             data.score_domain[0], data.score_domain[1], self.n_score_levels_)
-        self.mean_score_ = np.mean(sc)
         self.n_events_ = ev.shape[0]
         sc = data.digitize_score(sc)
+        self.score_dist_ = np.bincount(sc, minlength=self.n_score_levels_)
+        self.score_dist_ = np.true_divide(
+            self.score_dist_, self.score_dist_.sum())
 
         # random init of responsibilities
         self._q = self._rng.dirichlet(
@@ -322,16 +324,26 @@ class EventScorePredictor(BaseEventScorePredictor):
             shape of an input array is illegal
         """
 
-        if ev.ndim == 1:
-            return (self.mu_[0] + self.bu_[ev[0]] + self.bi_[ev[1]] +
-                    np.dot(self.p_[ev[0]], self.q_[ev[1]]))
-        elif ev.ndim == 2:
-            return (self.mu_[0] + self.bu_[ev[:, 0]] + self.bi_[ev[:, 1]] +
-                    np.sum(self.p_[ev[:, 0], :] * self.q_[ev[:, 1], :],
-                           axis=1))
-        else:
-            raise TypeError('argument has illegal shape')
+        n_events = ev.shape[0]
+        missing_values = self.n_objects[self.event_otypes]
+        pRgXY = np.empty((n_events, self.n_score_levels_), dtype=float)
 
+        for i in xrange(n_events):
+            xi, yi = ev[i, :]
+
+            if xi < missing_values[0] and yi < missing_values[1]:
+                # known user and item
+                pRgXY[i, :] = np.sum(
+                    self.pz_[np.newaxis, :] *
+                    self.prgz_[:, :] *
+                    self.pxgz_[xi, :][np.newaxis, :] *
+                    self.pygz_[yi, :][np.newaxis, :], axis=1)
+                pRgXY[i, :] /= pRgXY[i, :].sum()
+            else:
+                # unknown user and item
+                pRgXY[i, :] = self.score_dist_
+
+        return np.dot(pRgXY, self.score_levels_[:, np.newaxis])
 
 # =============================================================================
 # Functions

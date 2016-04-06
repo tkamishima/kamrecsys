@@ -85,7 +85,7 @@ class EventUtilMixin(object):
             array whose elements are represented by external ids
         missing_values : optional, int or array_like, shape=(s_event,)
             if unknown external ids are detected, these will be converted to
-            -1. as default, numbers of possible objects are used.
+            max_id. as default, numbers of possible objects are used.
 
         Returns
         -------
