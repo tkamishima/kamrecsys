@@ -333,15 +333,31 @@ class EventScorePredictor(BaseEventScorePredictor):
             xi, yi = ev[i, :]
 
             if xi < missing_values[0] and yi < missing_values[1]:
-                # known user and item
+                # known user and item: Pr[R | x, y]
                 pRgXY[i, :] = np.sum(
                     self.pz_[np.newaxis, :] *
                     self.prgz_[:, :] *
                     self.pxgz_[xi, :][np.newaxis, :] *
                     self.pygz_[yi, :][np.newaxis, :], axis=1)
                 pRgXY[i, :] /= pRgXY[i, :].sum()
+            elif xi < missing_values[0]:
+                # known user and unknwon item
+                # marginal score over items: Pr[R | x]
+                pRgXY[i, :] = np.sum(
+                    self.pz_[np.newaxis, :] *
+                    self.prgz_[:, :] *
+                    self.pxgz_[xi, :][np.newaxis, :], axis=1)
+                pRgXY[i, :] /= pRgXY[i, :].sum()
+            elif yi < missing_values[1]:
+                # unknown user and knwon item
+                # marginal score over users: Pr[R | y]
+                pRgXY[i, :] = np.sum(
+                    self.pz_[np.newaxis, :] *
+                    self.prgz_[:, :] *
+                    self.pygz_[yi, :][np.newaxis, :], axis=1)
+                pRgXY[i, :] /= pRgXY[i, :].sum()
             else:
-                # unknown user and item
+                # unknown user and item: P[R]
                 pRgXY[i, :] = self.score_dist_
 
         return np.dot(pRgXY, self.score_levels_[:, np.newaxis])

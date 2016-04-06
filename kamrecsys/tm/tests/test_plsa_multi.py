@@ -70,22 +70,23 @@ class TestEventScorePredictor(unittest.TestCase):
                                3.15758362953, delta=1e-5)
         self.assertAlmostEqual(rcmdr.predict((1, 9)),
                                3.15755141779, delta=1e-5)
-        assert_allclose(
-            rcmdr.predict([[5, 7], [5, 9]]),
-            [3.15736862434, 3.15725064792],
-            rtol=1e-5)
+        assert_allclose(rcmdr.predict([[5, 7], [5, 9]]),
+                        [3.15736862434, 3.15725064792],
+                        rtol=1e-5)
 
         # known user and unknown item
-        # self.assertAlmostEqual(rcmdr.predict((1, 11)),
-        #                       3.6480799850368273, delta=1e-5)
-        # self.assertAlmostEqual(rcmdr.predict((5, 12)),
-        #                        3.4710520150321895, delta=1e-5)
+        self.assertAlmostEqual(rcmdr.predict((1, 11)),
+                               3.15710024514, delta=1e-5)
+        assert_allclose(rcmdr.predict([[5, 12], [5, 9]]),
+                        [3.15560057575, 3.15725064792],
+                        rtol=1e-5)
 
         # unknown user and known item
-        # self.assertAlmostEqual(rcmdr.predict((3, 7)),
-        #                        3.6336318795279228, delta=1e-5)
-        # self.assertAlmostEqual(rcmdr.predict((11, 9)),
-        #                        4.2482001235634943, delta=1e-5)
+        self.assertAlmostEqual(rcmdr.predict((3, 7)),
+                               3.15677852794, delta=1e-5)
+        assert_allclose(rcmdr.predict([[5, 7], [11, 9]]),
+                        [3.15736862434, 3.15642545907],
+                        rtol=1e-5)
 
         # unknown user and item
         self.assertAlmostEqual(rcmdr.predict((3, 11)),
