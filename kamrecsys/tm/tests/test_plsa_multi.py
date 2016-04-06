@@ -51,7 +51,7 @@ class TestEventScorePredictor(unittest.TestCase):
                 'i_loss_': np.inf, 'f_loss_': np.inf, 'n_iter_': 0,
                 'pz_': None, 'pygz_': None, 'prgz_': None, 'pxgz_': None,
                 'n_events_': 0, 'n_users_': 0, 'n_items_': 0, '_q': None,
-                'score_levels_': None, 'score_dist_': None})
+                'score_levels_': None})
 
         # import logging
         # logging.getLogger('kamrecsys').addHandler(logging.StreamHandler())
@@ -60,9 +60,6 @@ class TestEventScorePredictor(unittest.TestCase):
                                1.97477687885788, delta=1e-5)
         self.assertAlmostEqual(rcmdr.f_loss_,
                                0.532957494417634, delta=1e-5)
-        assert_allclose(rcmdr.score_dist_,
-                        [0.05714286, 0.08571429, 0.2, 0.4, 0.25714286],
-                        rtol=1e-5)
         assert_allclose(rcmdr.score_levels_, [1, 2, 3, 4, 5], rtol=1e-5)
 
         # known user and item
@@ -90,7 +87,8 @@ class TestEventScorePredictor(unittest.TestCase):
 
         # unknown user and item
         self.assertAlmostEqual(rcmdr.predict((3, 11)),
-                               3.71428571429, delta=1e-5)
+                               3.15150656272, delta=1e-5)
+
         # x = np.array([
         #     [1, 7], [1, 9], [1, 11],
         #     [3, 7], [3, 9], [3, 11],

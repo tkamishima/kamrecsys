@@ -74,10 +74,6 @@ class EventScorePredictor(BaseEventScorePredictor):
         Item distribution: Pr[Y | Z]
     prgz_ : array_like
         Raring distribution: Pr[R | Z]
-    score_dist_ : array, shape=(n_score_levels_,), dtype=float
-        distribution of digitized scores
-    score_levels_ : array, dtype=float, shape=(n_score_levels_,)
-        1d-array of score levels corresponding to each digitized score
     n_iter_ : int
         nos of iteration after convergence
     n_users_ : int
@@ -86,6 +82,8 @@ class EventScorePredictor(BaseEventScorePredictor):
         nos of items
     n_score_levels_ : int
         nos of score levels
+    score_levels_ : array, dtype=float, shape=(n_score_levels_,)
+        1d-array of score levels corresponding to each digitized score
     n_events_ : int
         nos of events in training data
 
@@ -126,7 +124,6 @@ class EventScorePredictor(BaseEventScorePredictor):
         self.n_users_ = 0
         self.n_items_ = 0
         self.score_levels_ = None
-        self.score_dist_ = None
         self.n_score_levels_ = 0
         self.n_events_ = 0
 
@@ -246,10 +243,6 @@ class EventScorePredictor(BaseEventScorePredictor):
             data.score_domain[0], data.score_domain[1], self.n_score_levels_)
         self.n_events_ = ev.shape[0]
         sc = data.digitize_score(sc)
-        self.score_dist_ = (
-            np.bincount(sc, minlength=self.n_score_levels_) + self.alpha)
-        self.score_dist_ = np.true_divide(
-            self.score_dist_, self.score_dist_.sum())
 
         # random init of responsibilities
         self._q = self._rng.dirichlet(
@@ -358,7 +351,10 @@ class EventScorePredictor(BaseEventScorePredictor):
                 pRgXY[i, :] /= pRgXY[i, :].sum()
             else:
                 # unknown user and item: P[R]
-                pRgXY[i, :] = self.score_dist_
+                pRgXY[i, :] = np.sum(
+                    self.pz_[np.newaxis, :] *
+                    self.prgz_[:, :], axis=1)
+                pRgXY[i, :] /= pRgXY[i, :].sum()
 
         return np.dot(pRgXY, self.score_levels_[:, np.newaxis])
 
