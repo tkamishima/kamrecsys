@@ -30,6 +30,7 @@ from ..recommenders import BaseEventScorePredictor
 
 __all__ = ['EventScorePredictor']
 
+
 # =============================================================================
 # Constants
 # =============================================================================
@@ -81,6 +82,8 @@ class EventScorePredictor(BaseEventScorePredictor):
         nos of items
     n_score_levels_ : int
         nos of score levels
+    score_levels_ : array, dtype=float, shape=(n_score_levels_,)
+        1d-array of score levels corresponding to each digitized score
     n_events_ : int
         nos of events in training data
 
@@ -120,27 +123,12 @@ class EventScorePredictor(BaseEventScorePredictor):
         self.prgz_ = None
         self.n_users_ = 0
         self.n_items_ = 0
+        self.score_levels_ = None
         self.n_score_levels_ = 0
         self.n_events_ = 0
 
         # internal vars
         self._q = None  # p[z | x, y]
-
-    def _init_model(self):
-        """
-        model initialization
-        """
-
-        # responsibilities
-        self._qq = self._rng.dirichlet(
-            alpha=np.ones(self.k),
-            size=(self.n_score_levels_, self.n_users_, self.n_items_))
-
-        # model parameters
-        self.pxgz_ = np.tile(self.alpha, (self.n_users_, self.k))
-        self.pygz_ = np.tile(self.alpha, (self.n_items_, self.k))
-        self.prgz_ = np.tile(self.alpha, (self.n_score_levels_, self.k))
-        self.pz_ = np.tile(self.alpha, self.k)
 
     def _likelihood(self, ev, sc):
         """
@@ -168,8 +156,56 @@ class EventScorePredictor(BaseEventScorePredictor):
 
         return l
 
-    def fit(
-            self, data, user_index=0, item_index=1, score_index=0,
+    def maximization_step(self, ev, sc):
+        """
+        maximization step
+
+        Parameters
+        ----------
+        ev : array, shape(n_events, 2)
+            event data
+        sc : array, shape(n_events,)
+            digitized scores corresponding to events
+        """
+
+        # p[r | z]
+        self.prgz_ = (
+            np.array([
+                         np.bincount(
+                             sc,
+                             weights=self._q[:, k],
+                             minlength=self.n_score_levels_
+                         ) for k in xrange(self.k)]).T +
+            self.alpha)
+        self.prgz_ /= self.prgz_.sum(axis=1, keepdims=True)
+
+        # p[x | z]
+        self.pxgz_ = (
+            np.array([
+                         np.bincount(
+                             ev[:, 0],
+                             weights=self._q[:, k],
+                             minlength=self.n_users_
+                         ) for k in xrange(self.k)]).T +
+            self.alpha)
+        self.pxgz_ /= self.pxgz_.sum(axis=1, keepdims=True)
+
+        # p[y | z]
+        self.pygz_ = (
+            np.array([
+                         np.bincount(
+                             ev[:, 1],
+                             weights=self._q[:, k],
+                             minlength=self.n_items_
+                         ) for k in xrange(self.k)]).T +
+            self.alpha)
+        self.pygz_ /= self.pygz_.sum(axis=1, keepdims=True)
+
+        # p[z]
+        self.pz_ = np.sum(self._q, axis=0) + self.alpha
+        self.pz_ /= np.sum(self.pz_)
+
+    def fit(self, data, user_index=0, item_index=1, score_index=0,
             random_state=None):
         """
         fitting model
@@ -195,7 +231,7 @@ class EventScorePredictor(BaseEventScorePredictor):
         * output intermediate results, if the logging level is lower than INFO
         """
 
-        # initialization
+        # initialization #####
         super(EventScorePredictor, self).fit(random_state=random_state)
         ev, sc, n_objects = (
             self._get_event_and_score(
@@ -203,13 +239,20 @@ class EventScorePredictor(BaseEventScorePredictor):
         self.n_users_ = n_objects[0]
         self.n_items_ = n_objects[1]
         self.n_score_levels_ = data.n_score_levels
+        self.score_levels_ = np.linspace(
+            data.score_domain[0], data.score_domain[1], self.n_score_levels_)
         self.n_events_ = ev.shape[0]
         sc = data.digitize_score(sc)
 
-        self._init_model()
-        self._q = self._qq[sc, ev[:, 0], ev[:, 1], :]
+        # random init of responsibilities
+        self._q = self._rng.dirichlet(
+            alpha=np.ones(self.k), size=self.n_events_)
+
+        # first m-step
+        self.maximization_step(ev, sc)
+
         self.i_loss_ = self._likelihood(ev, sc)
-        logger.info("initial: {:g}".format(self.i_loss_))
+        logger.info("initial: {:.15g}".format(self.i_loss_))
         pre_loss = self.i_loss_
 
         # main loop
@@ -217,46 +260,7 @@ class EventScorePredictor(BaseEventScorePredictor):
         cur_loss = np.inf
         for iter_no in xrange(self.maxiter):
 
-            # M-step #####
-
-            # p[r | z]
-            self.prgz_ = (
-                np.array([
-                    np.bincount(
-                        sc,
-                        weights=self._q[:, k],
-                        minlength=self.n_score_levels_
-                    ) for k in xrange(self.k)]).T +
-                self.alpha)
-            self.prgz_ /= self.prgz_.sum(axis=1, keepdims=True)
-
-            # p[x | z]
-            self.pxgz_ = (
-                np.array([
-                    np.bincount(
-                        ev[:, 0],
-                        weights=self._q[:, k],
-                        minlength=self.n_users_
-                    ) for k in xrange(self.k)]).T +
-                self.alpha)
-            self.pxgz_ /= self.pxgz_.sum(axis=1, keepdims=True)
-
-            # p[y | z]
-            self.pygz_ = (
-                np.array([
-                    np.bincount(
-                        ev[:, 1],
-                        weights=self._q[:, k],
-                        minlength=self.n_items_
-                    ) for k in xrange(self.k)]).T +
-                self.alpha)
-            self.pygz_ /= self.pygz_.sum(axis=1, keepdims=True)
-
-            # p[z]
-            self.pz_ = np.sum(self._q, axis=0) + self.alpha
-            self.pz_ /= np.sum(self.pz_)
-
-            # E-Step #####
+            # E-Step
 
             # p[z | r, y, z]
             self._q = (
@@ -266,12 +270,17 @@ class EventScorePredictor(BaseEventScorePredictor):
                 self.pygz_[ev[:, 1], :])
             self._q /= (self._q.sum(axis=1, keepdims=True))
 
+            # M-step
+            self.maximization_step(ev, sc)
+
+            # check loss
             cur_loss = self._likelihood(ev, sc)
-            logger.info("iter {:d}: {:g}".format(iter_no + 1, cur_loss))
+            logger.info("iter {:d}: {:.15g}".format(iter_no + 1, cur_loss))
             precision = np.abs((cur_loss - pre_loss) / cur_loss)
             if precision < self.tol:
                 logger.info(
-                    "Reached to specified tolerance: {:g}".format(precision))
+                    "Reached to specified tolerance:"
+                    " {:.15g}".format(precision))
                 break
             pre_loss = cur_loss
 
@@ -281,7 +290,7 @@ class EventScorePredictor(BaseEventScorePredictor):
                     self.maxiter))
 
         self.f_loss_ = cur_loss
-        logger.info("final: {:g}".format(self.f_loss_))
+        logger.info("final: {:.15g}".format(self.f_loss_))
         self.n_iter_ = iter_no + 1
         logger.info("nos of iterations: {:d}".format(self.n_iter_))
 
@@ -309,15 +318,45 @@ class EventScorePredictor(BaseEventScorePredictor):
             shape of an input array is illegal
         """
 
-        if ev.ndim == 1:
-            return (self.mu_[0] + self.bu_[ev[0]] + self.bi_[ev[1]] +
-                    np.dot(self.p_[ev[0]], self.q_[ev[1]]))
-        elif ev.ndim == 2:
-            return (self.mu_[0] + self.bu_[ev[:, 0]] + self.bi_[ev[:, 1]] +
-                    np.sum(self.p_[ev[:, 0], :] * self.q_[ev[:, 1], :],
-                           axis=1))
-        else:
-            raise TypeError('argument has illegal shape')
+        n_events = ev.shape[0]
+        missing_values = self.n_objects[self.event_otypes]
+        pRgXY = np.empty((n_events, self.n_score_levels_), dtype=float)
+
+        for i in xrange(n_events):
+            xi, yi = ev[i, :]
+
+            if xi < missing_values[0] and yi < missing_values[1]:
+                # known user and item: Pr[R | x, y]
+                pRgXY[i, :] = np.sum(
+                    self.pz_[np.newaxis, :] *
+                    self.prgz_[:, :] *
+                    self.pxgz_[xi, :][np.newaxis, :] *
+                    self.pygz_[yi, :][np.newaxis, :], axis=1)
+                pRgXY[i, :] /= pRgXY[i, :].sum()
+            elif xi < missing_values[0]:
+                # known user and unknwon item
+                # marginal score over items: Pr[R | x]
+                pRgXY[i, :] = np.sum(
+                    self.pz_[np.newaxis, :] *
+                    self.prgz_[:, :] *
+                    self.pxgz_[xi, :][np.newaxis, :], axis=1)
+                pRgXY[i, :] /= pRgXY[i, :].sum()
+            elif yi < missing_values[1]:
+                # unknown user and knwon item
+                # marginal score over users: Pr[R | y]
+                pRgXY[i, :] = np.sum(
+                    self.pz_[np.newaxis, :] *
+                    self.prgz_[:, :] *
+                    self.pygz_[yi, :][np.newaxis, :], axis=1)
+                pRgXY[i, :] /= pRgXY[i, :].sum()
+            else:
+                # unknown user and item: P[R]
+                pRgXY[i, :] = np.sum(
+                    self.pz_[np.newaxis, :] *
+                    self.prgz_[:, :], axis=1)
+                pRgXY[i, :] /= pRgXY[i, :].sum()
+
+        return np.dot(pRgXY, self.score_levels_[:, np.newaxis])
 
 # =============================================================================
 # Functions
@@ -331,6 +370,7 @@ class EventScorePredictor(BaseEventScorePredictor):
 logger = logging.getLogger('kamrecsys')
 if not logger.handlers:
     logger.addHandler(logging.NullHandler())
+
 
 # =============================================================================
 # Test routine
@@ -348,6 +388,7 @@ def _test():
     doctest.testmod()
 
     sys.exit(0)
+
 
 # Check if this is call as command script -------------------------------------
 

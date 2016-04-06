@@ -1,5 +1,5 @@
 """
-test "matrix factorization score predictors"
+test "topic model score predictors"
 
 Description
 ===========
@@ -23,9 +23,9 @@ Options
 -o <OUTPUT>, --out <OUTPUT>
     specify output file name
 -m <METHOD>, --method <METHOD>
-    specify algorithm: pmf
+    specify algorithm: plsam
 
-    * pmf : probabilistic matrix factorization
+    * plsam : pLSA (multinomial)
 
 -v <VALIDATION>, --validation <VALIDATION>
     validation scheme: default=holdout
@@ -41,10 +41,10 @@ Options
 --header or --no-header
     output column information or not
     default=no-header
--C <C>, --lambda <C>
-    regularization parameter, default=0.01.
+-a <ALPHA>, --alpha <ALPHA>
+    smoothing parameter of multinomial pLSAI
 -k <K>, --dim <K>
-    the number of latent factors, default=1.
+    the number of latent factors, default=2.
 --tol <TOL>
     optimization parameter. the size of norm of gradient. default=1e-05.
 --maxiter <MAXITER>
@@ -86,9 +86,9 @@ from kamrecsys.cross_validation import KFold
 # =============================================================================
 
 __author__ = "Toshihiro Kamishima ( http://www.kamishima.net/ )"
-__date__ = "2014/07/06"
+__date__ = "2016/04/07"
 __version__ = "1.0.0"
-__copyright__ = "Copyright (c) 2014 Toshihiro Kamishima all rights reserved."
+__copyright__ = "Copyright (c) 2016 Toshihiro Kamishima all rights reserved."
 __license__ = "MIT License: http://www.opensource.org/licenses/mit-license.php"
 
 # =============================================================================
@@ -200,7 +200,7 @@ def training(opt, ev, tsc, event_feature=None, fold=0):
 
     # create and learning model
     rcmdr = EventScorePredictor(
-        C=opt.C, k=opt.k, tol=opt.tol, maxiter=opt.maxiter,
+        alpha=opt.alpha, k=opt.k, tol=opt.tol, maxiter=opt.maxiter,
         random_state=opt.rseed)
     rcmdr.fit(data)
 
@@ -225,7 +225,6 @@ def training(opt, ev, tsc, event_feature=None, fold=0):
     # preserve optimizer's outputs
     opt.learning_i_loss[fold] = rcmdr.i_loss_
     opt.learning_f_loss[fold] = rcmdr.f_loss_
-    opt.learning_opt_outputs[fold] = rcmdr.opt_outputs_
 
     return rcmdr
 
@@ -474,8 +473,8 @@ if __name__ == '__main__':
                     type=argparse.FileType('r'))
 
     # script specific options
-    ap.add_argument('-m', '--method', type=str, default='pmf',
-                    choices=['pmf'])
+    ap.add_argument('-m', '--method', type=str, default='plsam',
+                    choices=['plsam'])
     ap.add_argument('-v', '--validation', type=str, default='holdout',
                     choices=['holdout', 'cv'])
     ap.add_argument('-f', '--fold', type=int, default=5)
@@ -489,8 +488,8 @@ if __name__ == '__main__':
     apg.set_defaults(header=False)
     apg.add_argument('--no-header', dest='header', action='store_false')
     apg.add_argument('--header', dest='header', action='store_true')
-    ap.add_argument('-C', '--lambda', dest='C', type=float, default=0.01)
-    ap.add_argument('-k', '--dim', dest='k', type=int, default=1)
+    ap.add_argument('-a', '--alpha', dest='alpha', type=float, default=1.0)
+    ap.add_argument('-k', '--dim', dest='k', type=int, default=2)
     ap.add_argument('--tol', type=float, default=1e-05)
     ap.add_argument('--maxiter', type=float, default=200)
 
@@ -532,8 +531,8 @@ if __name__ == '__main__':
     np.seterr(all='ignore')
 
     # select algorithm
-    if opt.method == 'pmf':
-        from kamrecsys.mf.pmf import EventScorePredictor
+    if opt.method == 'plsam':
+        from kamrecsys.tm.plsa_multi import EventScorePredictor
     else:
         raise argparse.ArgumentTypeError(
             "Invalid method name: {0:s}".format(opt.method))

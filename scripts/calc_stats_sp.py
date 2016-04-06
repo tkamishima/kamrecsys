@@ -3,10 +3,6 @@
 """
 Calculate evaluation metrics for predicted scores
 
-SYNOPSIS::
-
-    SCRIPT [options]
-
 Description
 ===========
 
@@ -168,13 +164,13 @@ def main(opt):
 
 
 if __name__ == '__main__':
-    ap = argparse.ArgumentParser(add_help=False)
+    ap = argparse.ArgumentParser(
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        description=__doc__)
 
     # common options
     ap.add_argument('--version', action='version',
                     version='%(prog)s ' + __version__)
-    ap.add_argument('-h', '--help', action='store_true', dest='help')
-    ap.set_defaults(help=False)
 
     ap.add_argument("--rseed", type=int, default=None)
 
@@ -202,10 +198,6 @@ if __name__ == '__main__':
     opt = ap.parse_args()
 
     # post-processing for command-line options
-    # help message
-    if opt.help:
-        print(__doc__, file=sys.stderr)
-        sys.exit(0)
 
     # basic file i/o
     if opt.infile is None:
