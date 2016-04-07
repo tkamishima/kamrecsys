@@ -41,6 +41,9 @@ Options
 --header or --no-header
     output column information or not
     default=no-header
+--expectation or --no-expectation
+    use expecation of scores, if True; use mode, otherwise
+    default=expectation
 -a <ALPHA>, --alpha <ALPHA>
     smoothing parameter of multinomial pLSAI
 -k <K>, --dim <K>
@@ -201,7 +204,7 @@ def training(opt, ev, tsc, event_feature=None, fold=0):
     # create and learning model
     rcmdr = EventScorePredictor(
         alpha=opt.alpha, k=opt.k, tol=opt.tol, maxiter=opt.maxiter,
-        random_state=opt.rseed)
+        use_expectation=opt.use_expectation, random_state=opt.rseed)
     rcmdr.fit(data)
 
     # set end and elapsed time
@@ -480,14 +483,20 @@ if __name__ == '__main__':
     ap.add_argument('-f', '--fold', type=int, default=5)
     apg = ap.add_mutually_exclusive_group()
     apg.set_defaults(timestamp=True)
-    apg.add_argument('-n', '--no-timestamp', dest='timestamp',
-                     action='store_false')
-    apg.add_argument('--timestamp', dest='timestamp',
-                     action='store_true')
+    apg.add_argument('-n', '--no-timestamp',
+                     dest='timestamp', action='store_false')
+    apg.add_argument('--timestamp',
+                     dest='timestamp', action='store_true')
     apg = ap.add_mutually_exclusive_group()
     apg.set_defaults(header=False)
     apg.add_argument('--no-header', dest='header', action='store_false')
     apg.add_argument('--header', dest='header', action='store_true')
+    apg = ap.add_mutually_exclusive_group()
+    apg.set_defaults(use_expectation=True)
+    apg.add_argument('--no-expectation',
+                     dest='use_expectation', action='store_false')
+    apg.add_argument('--expectation',
+                     dest='use_expectation', action='store_true')
     ap.add_argument('-a', '--alpha', dest='alpha', type=float, default=1.0)
     ap.add_argument('-k', '--dim', dest='k', type=int, default=2)
     ap.add_argument('--tol', type=float, default=1e-05)
