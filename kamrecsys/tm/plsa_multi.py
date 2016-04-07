@@ -50,19 +50,16 @@ class EventScorePredictor(BaseEventScorePredictor):
 
     Parameters
     ----------
-    k : int, optional
-        the number of latent factors, default=1
-    maxiter : int, default=100
-        maximum number of iterations is maxiter times the number of parameters
-
-    Parameters
-    ----------
     k : int, default=1
         nos of latent factors
     maxiter : int, default=100
         maximum number of iterations
     alpha : float, default=1.0
         Laplace smoothing parameter
+    tol : float
+        tolerance parameter of conversion
+    use_expectation : bool, default=True
+        use expecation in prediction if True, use mode if False
 
     Attributes
     ----------
@@ -103,7 +100,8 @@ class EventScorePredictor(BaseEventScorePredictor):
     """
 
     def __init__(
-            self, k=1, tol=1e-5, maxiter=100, alpha=1.0, random_state=None):
+            self, k=1, tol=1e-5, maxiter=100, alpha=1.0, use_expectation=True,
+            random_state=None):
 
         super(EventScorePredictor, self).__init__(random_state=random_state)
 
@@ -112,6 +110,7 @@ class EventScorePredictor(BaseEventScorePredictor):
         self.tol = tol
         self.maxiter = maxiter
         self.alpha = alpha
+        self.use_expectation = use_expectation
 
         # attributes
         self.i_loss_ = np.inf
@@ -303,7 +302,7 @@ class EventScorePredictor(BaseEventScorePredictor):
 
         Parameters
         ----------
-        (user, item) : array_like
+        ev : array_like
             a target user's and item's ids. unknwon objects assumed to be
             represented by n_object[event_otype]
 
@@ -356,7 +355,12 @@ class EventScorePredictor(BaseEventScorePredictor):
                     self.prgz_[:, :], axis=1)
                 pRgXY[i, :] /= pRgXY[i, :].sum()
 
-        return np.dot(pRgXY, self.score_levels_[:, np.newaxis])
+        if self.use_expectation:
+            sc = np.dot(pRgXY, self.score_levels_[:, np.newaxis])
+        else:
+            sc = self.score_levels_[np.argmax(pRgXY, axis=1)]
+
+        return sc
 
 # =============================================================================
 # Functions

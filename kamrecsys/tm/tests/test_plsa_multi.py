@@ -51,7 +51,7 @@ class TestEventScorePredictor(unittest.TestCase):
                 'i_loss_': np.inf, 'f_loss_': np.inf, 'n_iter_': 0,
                 'pz_': None, 'pygz_': None, 'prgz_': None, 'pxgz_': None,
                 'n_events_': 0, 'n_users_': 0, 'n_items_': 0, '_q': None,
-                'score_levels_': None})
+                'score_levels_': None, 'use_expectation': True})
 
         # import logging
         # logging.getLogger('kamrecsys').addHandler(logging.StreamHandler())
@@ -67,37 +67,43 @@ class TestEventScorePredictor(unittest.TestCase):
                                3.15758362953, delta=1e-5)
         self.assertAlmostEqual(rcmdr.predict((1, 9)),
                                3.15755141779, delta=1e-5)
-        assert_allclose(rcmdr.predict([[5, 7], [5, 9]]),
-                        [3.15736862434, 3.15725064792],
-                        rtol=1e-5)
+        self.assertAlmostEqual(rcmdr.predict((5, 7)),
+                               3.15736862434, delta=1e-5)
+        self.assertAlmostEqual(rcmdr.predict((5, 9)),
+                               3.15725064792, delta=1e-5)
 
         # known user and unknown item
         self.assertAlmostEqual(rcmdr.predict((1, 11)),
                                3.15710024514, delta=1e-5)
-        assert_allclose(rcmdr.predict([[5, 12], [5, 9]]),
-                        [3.15560057575, 3.15725064792],
-                        rtol=1e-5)
+        self.assertAlmostEqual(rcmdr.predict((5, 12)),
+                               3.15560057575, delta=1e-5)
 
         # unknown user and known item
         self.assertAlmostEqual(rcmdr.predict((3, 7)),
                                3.15677852794, delta=1e-5)
-        assert_allclose(rcmdr.predict([[5, 7], [11, 9]]),
-                        [3.15736862434, 3.15642545907],
-                        rtol=1e-5)
+        self.assertAlmostEqual(rcmdr.predict((11, 9)),
+                               3.15642545907, delta=1e-5)
 
         # unknown user and item
         self.assertAlmostEqual(rcmdr.predict((3, 11)),
                                3.15150656272, delta=1e-5)
 
-        # x = np.array([
-        #     [1, 7], [1, 9], [1, 11],
-        #     [3, 7], [3, 9], [3, 11],
-        #     [5, 7], [5, 9], [5, 11]])
-        # assert_allclose(
-        #     rcmdr.predict(x),
-        #     [3.98736414, 4.98921188, 3.64807999, 3.63363188, 4.24820012,
-        #      3.72369841, 3.41419681, 3.9818882, 3.47105202],
-        #     rtol=1e-5)
+        x = np.array([
+            [1, 7], [1, 9], [1, 11],
+            [3, 7], [3, 7], [3, 11],
+            [5, 7], [5, 9], [5, 12]])
+        assert_allclose(
+            rcmdr.predict(x),
+            [3.15758362953, 3.15755141779, 3.15710024514,
+             3.15677852794, 3.15677852794, 3.15150656272,
+             3.15736862434, 3.15725064792, 3.15560057575],
+            rtol=1e-5)
+
+        rcmdr.use_expectation = False
+        assert_allclose(
+            rcmdr.predict(x),
+            [4., 4., 4., 4., 4., 4., 4., 4., 4.],
+            rtol=1e-5)
 
 # =============================================================================
 # Main Routines
