@@ -25,7 +25,8 @@ Options
 -m <METHOD>, --method <METHOD>
     specify algorithm: plsam
 
-    * plsam : pLSA (multinomial)
+    * plsam : pLSA (multinomial / use expectation in prediction)
+    * plsamm : pLSA (multinomial / use mode in prediction)
 
 -v <VALIDATION>, --validation <VALIDATION>
     validation scheme: default=holdout
@@ -41,9 +42,6 @@ Options
 --header or --no-header
     output column information or not
     default=no-header
---expectation or --no-expectation
-    use expecation of scores, if True; use mode, otherwise
-    default=expectation
 -a <ALPHA>, --alpha <ALPHA>
     smoothing parameter of multinomial pLSAI
 -k <K>, --dim <K>
@@ -202,9 +200,14 @@ def training(opt, ev, tsc, event_feature=None, fold=0):
     logger.info("training_start_time = " + start_time.isoformat())
 
     # create and learning model
-    rcmdr = EventScorePredictor(
-        alpha=opt.alpha, k=opt.k, tol=opt.tol, maxiter=opt.maxiter,
-        use_expectation=opt.use_expectation, random_state=opt.rseed)
+    if opt.method == 'plsam':
+        rcmdr = EventScorePredictor(
+            alpha=opt.alpha, k=opt.k, tol=opt.tol, maxiter=opt.maxiter,
+            use_expectation=True, random_state=opt.rseed)
+    else:
+        rcmdr = EventScorePredictor(
+            alpha=opt.alpha, k=opt.k, tol=opt.tol, maxiter=opt.maxiter,
+            use_expectation=False, random_state=opt.rseed)
     rcmdr.fit(data)
 
     # set end and elapsed time
@@ -477,7 +480,7 @@ if __name__ == '__main__':
 
     # script specific options
     ap.add_argument('-m', '--method', type=str, default='plsam',
-                    choices=['plsam'])
+                    choices=['plsam', 'plsamm'])
     ap.add_argument('-v', '--validation', type=str, default='holdout',
                     choices=['holdout', 'cv'])
     ap.add_argument('-f', '--fold', type=int, default=5)
@@ -491,12 +494,6 @@ if __name__ == '__main__':
     apg.set_defaults(header=False)
     apg.add_argument('--no-header', dest='header', action='store_false')
     apg.add_argument('--header', dest='header', action='store_true')
-    apg = ap.add_mutually_exclusive_group()
-    apg.set_defaults(use_expectation=True)
-    apg.add_argument('--no-expectation',
-                     dest='use_expectation', action='store_false')
-    apg.add_argument('--expectation',
-                     dest='use_expectation', action='store_true')
     ap.add_argument('-a', '--alpha', dest='alpha', type=float, default=1.0)
     ap.add_argument('-k', '--dim', dest='k', type=int, default=2)
     ap.add_argument('--tol', type=float, default=1e-05)
@@ -540,7 +537,7 @@ if __name__ == '__main__':
     np.seterr(all='ignore')
 
     # select algorithm
-    if opt.method == 'plsam':
+    if opt.method in ['plsam', 'plsamm']:
         from kamrecsys.tm.plsa_multi import EventScorePredictor
     else:
         raise argparse.ArgumentTypeError(
