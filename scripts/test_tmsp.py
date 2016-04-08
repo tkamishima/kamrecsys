@@ -497,7 +497,7 @@ if __name__ == '__main__':
     ap.add_argument('-a', '--alpha', dest='alpha', type=float, default=1.0)
     ap.add_argument('-k', '--dim', dest='k', type=int, default=2)
     ap.add_argument('--tol', type=float, default=1e-05)
-    ap.add_argument('--maxiter', type=float, default=200)
+    ap.add_argument('--maxiter', type=int, default=200)
 
     # parsing
     opt = ap.parse_args()
