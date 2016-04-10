@@ -364,8 +364,7 @@ class BaseEventScorePredictor(BaseEventRecommender):
             predicted scores for given inputs
         """
 
-        eev = np.atleast_2d(
-            check_array(eev, dtype=int, ensure_2d=False))
+        eev = check_array(np.atleast_2d(eev), dtype=int)
         if eev.shape[1] != self.s_event:
             raise TypeError("unmatched sized of events")
 
