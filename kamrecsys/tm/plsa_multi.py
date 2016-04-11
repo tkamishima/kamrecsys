@@ -204,6 +204,21 @@ class EventScorePredictor(BaseEventScorePredictor):
         self.pz_ = np.sum(self._q, axis=0) + self.alpha
         self.pz_ /= np.sum(self.pz_)
 
+        print("pZ =", self.pz_, sep='\n')
+        print("pXgZ =\n",
+              self.pxgz_[:3, ],
+              self.pxgz_[497:503, :],
+              self.pxgz_[-3:, :],
+              sep='\n')
+        print("pYgZ =\n",
+              self.pygz_[:3, ],
+              self.pygz_[497:503, :],
+              self.pygz_[-3:, :],
+              sep='\n')
+        print("pRgZ =",
+              self.prgz_,
+              sep='\n')
+
     def fit(self, data, user_index=0, item_index=1, score_index=0,
             random_state=None):
         """
@@ -246,6 +261,18 @@ class EventScorePredictor(BaseEventScorePredictor):
         # random init of responsibilities
         self._q = self._rng.dirichlet(
             alpha=np.ones(self.k), size=self.n_events_)
+        self._q = np.empty((self.n_events_, self.k), dtype=float)
+        for i in xrange(self.n_events_):
+            if i < (self.n_events_ / 2):
+                if sc[i] < 1:
+                    self._q[i, :] = (0.97, 0.001, 0.001, 0.01)
+                else:
+                    self._q[i, :] = (0.001, 0.97, 0.001, 0.01)
+            else:
+                if sc[i] < 1:
+                    self._q[i, :] = (0.001, 0.01, 0.97, 0.001)
+                else:
+                    self._q[i, :] = (0.001, 0.01, 0.001, 0.97)
 
         # first m-step
         self.maximization_step(ev, sc)
