@@ -49,7 +49,7 @@ class TestEventScorePredictor(unittest.TestCase):
                 'iid': None, 'eid': None, 'n_objects': None, 'n_otypes': 0,
                 'n_score_levels_': 0,
                 'i_loss_': np.inf, 'f_loss_': np.inf, 'n_iter_': 0,
-                'pz_': None, 'pygz_': None, 'prgz_': None, 'pxgz_': None,
+                'pZ_': None, 'pYgZ_': None, 'pRgZ_': None, 'pXgZ_': None,
                 'n_events_': 0, 'n_users_': 0, 'n_items_': 0, '_q': None,
                 'score_levels_': None, 'use_expectation': True})
 
