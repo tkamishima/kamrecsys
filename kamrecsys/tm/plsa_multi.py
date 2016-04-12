@@ -218,6 +218,21 @@ class EventScorePredictor(BaseEventScorePredictor):
         self.pz_ = np.sum(self._q, axis=0) + self.alpha
         self.pz_ /= np.sum(self.pz_)
 
+        print("pZ =", self.pz_, sep='\n')
+        print("pXgZ =\n",
+              self.pxgz_[:3, ],
+              self.pxgz_[497:503, :],
+              self.pxgz_[-3:, :],
+              sep='\n')
+        print("pYgZ =\n",
+              self.pygz_[:3, ],
+              self.pygz_[497:503, :],
+              self.pygz_[-3:, :],
+              sep='\n')
+        print("pRgZ =",
+              self.prgz_,
+              sep='\n')
+
     def fit(self, data, user_index=0, item_index=1, score_index=0,
             random_state=None):
         """
