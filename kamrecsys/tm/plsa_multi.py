@@ -166,17 +166,8 @@ class EventScorePredictor(BaseEventScorePredictor):
         sc : array, shape(n_events,)
             digitized scores corresponding to events
         """
-        a = np.empty((self.n_score_levels_, self.k), dtype=float)
-        for r in xrange(self.n_score_levels_):
-            for k in xrange(self.k):
-                if (k % self.n_score_levels_) == r:
-                    a[r, k] = 1000.0
-                else:
-                    a[r, k] = 1.0
-
-        self._q = np.empty((self.n_events_, self.k), dtype=float)
-        for i in xrange(self.n_events_):
-            self._q[i, :] = self._rng.dirichlet(alpha=a[sc[i], :])
+        self._q = self._rng.dirichlet(
+            alpha=np.ones(self.k), size=self.n_events_)
 
     def maximization_step(self, ev, sc):
         """
@@ -226,21 +217,6 @@ class EventScorePredictor(BaseEventScorePredictor):
         # p[z]
         self.pz_ = np.sum(self._q, axis=0) + self.alpha
         self.pz_ /= np.sum(self.pz_)
-
-        print("pZ =", self.pz_, sep='\n')
-        print("pXgZ =\n",
-              self.pxgz_[:3, ],
-              self.pxgz_[497:503, :],
-              self.pxgz_[-3:, :],
-              sep='\n')
-        print("pYgZ =\n",
-              self.pygz_[:3, ],
-              self.pygz_[497:503, :],
-              self.pygz_[-3:, :],
-              sep='\n')
-        print("pRgZ =",
-              self.prgz_,
-              sep='\n')
 
     def fit(self, data, user_index=0, item_index=1, score_index=0,
             random_state=None):
