@@ -57,7 +57,7 @@ class EventScorePredictor(BaseEventScorePredictor):
     alpha : float, default=1.0
         Laplace smoothing parameter
     tol : float
-        tolerance parameter of conversion
+        tolerance parameter of conversion, default=1e-10
     use_expectation : bool, default=True
         use expecation in prediction if True, use mode if False
 
@@ -100,7 +100,7 @@ class EventScorePredictor(BaseEventScorePredictor):
     """
 
     def __init__(
-            self, k=1, tol=1e-5, maxiter=100, alpha=1.0, use_expectation=True,
+            self, k=1, tol=1e-10, maxiter=100, alpha=1.0, use_expectation=True,
             random_state=None):
 
         super(EventScorePredictor, self).__init__(random_state=random_state)
@@ -166,8 +166,18 @@ class EventScorePredictor(BaseEventScorePredictor):
         sc : array, shape(n_events,)
             digitized scores corresponding to events
         """
-        self._q = self._rng.dirichlet(
-            alpha=np.ones(self.k), size=self.n_events_)
+
+        a = np.empty((self.n_score_levels_, self.k), dtype=float)
+        for r in xrange(self.n_score_levels_):
+            for k in xrange(self.k):
+                if (k % self.n_score_levels_) == r:
+                    a[r, k] = 1000.0
+                else:
+                    a[r, k] = 1.0
+
+        self._q = np.empty((self.n_events_, self.k), dtype=float)
+        for i in xrange(self.n_events_):
+            self._q[i, :] = self._rng.dirichlet(alpha=a[sc[i], :])
 
     def maximization_step(self, ev, sc):
         """
