@@ -129,9 +129,9 @@ class EventScorePredictor(BaseEventScorePredictor):
         # internal vars
         self._q = None  # p[z | x, y]
 
-    def _likelihood(self, ev, sc):
+    def loss(self, ev, sc):
         """
-        likelihood
+        negative log-likelihood
 
         Parameters
         ----------
@@ -154,6 +154,20 @@ class EventScorePredictor(BaseEventScorePredictor):
         l = -np.sum(np.log(l)) / self.n_events_
 
         return l
+
+    def _init_params(self, ev, sc):
+        """
+        initialize latent variables
+
+        Parameters
+        ----------
+        ev : array, shape(n_events, 2)
+            event data
+        sc : array, shape(n_events,)
+            digitized scores corresponding to events
+        """
+        self._q = self._rng.dirichlet(
+            alpha=np.ones(self.k), size=self.n_events_)
 
     def maximization_step(self, ev, sc):
         """
@@ -242,15 +256,12 @@ class EventScorePredictor(BaseEventScorePredictor):
             data.score_domain[0], data.score_domain[1], self.n_score_levels_)
         self.n_events_ = ev.shape[0]
         sc = data.digitize_score(sc)
-
-        # random init of responsibilities
-        self._q = self._rng.dirichlet(
-            alpha=np.ones(self.k), size=self.n_events_)
+        self._init_params(ev, sc)
 
         # first m-step
         self.maximization_step(ev, sc)
 
-        self.i_loss_ = self._likelihood(ev, sc)
+        self.i_loss_ = self.loss(ev, sc)
         logger.info("initial: {:.15g}".format(self.i_loss_))
         pre_loss = self.i_loss_
 
@@ -273,7 +284,7 @@ class EventScorePredictor(BaseEventScorePredictor):
             self.maximization_step(ev, sc)
 
             # check loss
-            cur_loss = self._likelihood(ev, sc)
+            cur_loss = self.loss(ev, sc)
             logger.info("iter {:d}: {:.15g}".format(iter_no + 1, cur_loss))
             precision = np.abs((cur_loss - pre_loss) / cur_loss)
             if precision < self.tol:
