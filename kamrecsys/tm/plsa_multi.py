@@ -190,7 +190,7 @@ class EventScorePredictor(BaseEventScorePredictor):
                              minlength=self.n_score_levels_
                          ) for k in xrange(self.k)]).T +
             self.alpha)
-        self.pRgZ_ /= self.pRgZ_.sum(axis=1, keepdims=True)
+        self.pRgZ_ /= self.pRgZ_.sum(axis=0, keepdims=True)
 
         # p[x | z]
         self.pXgZ_ = (
@@ -201,7 +201,7 @@ class EventScorePredictor(BaseEventScorePredictor):
                              minlength=self.n_users_
                          ) for k in xrange(self.k)]).T +
             self.alpha)
-        self.pXgZ_ /= self.pXgZ_.sum(axis=1, keepdims=True)
+        self.pXgZ_ /= self.pXgZ_.sum(axis=0, keepdims=True)
 
         # p[y | z]
         self.pYgZ_ = (
@@ -212,7 +212,7 @@ class EventScorePredictor(BaseEventScorePredictor):
                              minlength=self.n_items_
                          ) for k in xrange(self.k)]).T +
             self.alpha)
-        self.pYgZ_ /= self.pYgZ_.sum(axis=1, keepdims=True)
+        self.pYgZ_ /= self.pYgZ_.sum(axis=0, keepdims=True)
 
         # p[z]
         self.pZ_ = np.sum(self._q, axis=0) + self.alpha
