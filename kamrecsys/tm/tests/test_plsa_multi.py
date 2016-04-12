@@ -19,6 +19,9 @@ from numpy.testing import (
     assert_array_almost_equal_nulp)
 import unittest
 
+import numpy as np
+from sklearn.utils import check_random_state
+
 # =============================================================================
 # Module variables
 # =============================================================================
@@ -34,8 +37,33 @@ import unittest
 
 class TestEventScorePredictor(unittest.TestCase):
 
+    def test__init_params(self):
+        from kamrecsys.datasets import load_movielens_mini
+        from kamrecsys.tm.plsa_multi import EventScorePredictor
+
+        data = load_movielens_mini()
+
+        rcmdr = EventScorePredictor(k=7)
+        rcmdr._rng = check_random_state(1234)
+        rcmdr.n_score_levels_ = data.n_score_levels
+        ev, sc, _ = rcmdr._get_event_and_score(data, (0, 1), 0)
+        rcmdr.n_events_ = ev.shape[0]
+        sc = data.digitize_score(sc)
+        rcmdr._init_params(ev, sc)
+
+        assert_allclose(
+            rcmdr._q[0, :],
+            [2.02037583e-04, 9.24806626e-04, 9.93708976e-01, 3.02458235e-04,
+             3.07529874e-04, 1.53842507e-03, 3.01576650e-03],
+            rtol=1e-5)
+
+        assert_allclose(
+            rcmdr._q[12, :],
+            [5.80971583e-05, 1.09346454e-03, 1.43951449e-03, 1.21643700e-03,
+             9.96005511e-01, 1.57245892e-04, 2.97297431e-05],
+            rtol=1e-5)
+
     def test_class(self):
-        import numpy as np
         from kamrecsys.datasets import load_movielens_mini
         from kamrecsys.tm.plsa_multi import EventScorePredictor
 
