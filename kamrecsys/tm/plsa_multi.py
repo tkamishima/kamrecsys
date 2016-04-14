@@ -191,37 +191,33 @@ class EventScorePredictor(BaseEventScorePredictor):
             digitized scores corresponding to events
         """
 
+        ki = np.arange(self.k, dtype=int)
+
         # p[r | z]
-        self.pRgZ_ = (
-            np.array([
-                         np.bincount(
-                             sc,
-                             weights=self._q[:, k],
-                             minlength=self.n_score_levels_
-                         ) for k in xrange(self.k)]).T +
-            self.alpha)
+        self.pRgZ_ = np.vstack(
+            np.frompyfunc(
+                lambda k: np.bincount(
+                    sc,
+                    weights=self._q[:, k],
+                    minlength=self.n_score_levels_), 1, 1)(ki)).T + self.alpha
         self.pRgZ_ /= self.pRgZ_.sum(axis=0, keepdims=True)
 
         # p[x | z]
-        self.pXgZ_ = (
-            np.array([
-                         np.bincount(
-                             ev[:, 0],
-                             weights=self._q[:, k],
-                             minlength=self.n_users_
-                         ) for k in xrange(self.k)]).T +
-            self.alpha)
+        self.pXgZ_ = np.vstack(
+            np.frompyfunc(
+                lambda k: np.bincount(
+                    ev[:, 0],
+                    weights=self._q[:, k],
+                    minlength=self.n_users_), 1, 1)(ki)).T + self.alpha
         self.pXgZ_ /= self.pXgZ_.sum(axis=0, keepdims=True)
 
         # p[y | z]
-        self.pYgZ_ = (
-            np.array([
-                         np.bincount(
-                             ev[:, 1],
-                             weights=self._q[:, k],
-                             minlength=self.n_items_
-                         ) for k in xrange(self.k)]).T +
-            self.alpha)
+        self.pYgZ_ = np.vstack(
+            np.frompyfunc(
+                lambda k: np.bincount(
+                    ev[:, 1],
+                    weights=self._q[:, k],
+                    minlength=self.n_items_), 1, 1)(ki)).T + self.alpha
         self.pYgZ_ /= self.pYgZ_.sum(axis=0, keepdims=True)
 
         # p[z]
