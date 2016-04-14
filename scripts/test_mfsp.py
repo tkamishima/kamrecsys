@@ -23,7 +23,7 @@ Options
 -o <OUTPUT>, --out <OUTPUT>
     specify output file name
 -m <METHOD>, --method <METHOD>
-    specify algorithm: pmf
+    specify algorithm: default=pmf
 
     * pmf : probabilistic matrix factorization
 
@@ -38,6 +38,9 @@ Options
 -n, --no-timestamp or --timestamp
     specify whether .event files has 'timestamp' information,
     default=timestamp
+-d <DOMAIN>, --domain <DOMAIN>
+    The domain of scores specified by three floats: min, max, increment
+    default=auto
 --header or --no-header
     output column information or not
     default=no-header
@@ -175,7 +178,11 @@ def training(opt, ev, tsc, event_feature=None, fold=0):
 
     # generate event data
     data = EventWithScoreData(n_otypes=2, n_stypes=1)
-    score_domain = (np.min(tsc), np.max(tsc), np.min(np.diff(np.unique(tsc))))
+    if np.all(opt.domain == [0, 0, 0]):
+        score_domain = (
+            np.min(tsc), np.max(tsc), np.min(np.diff(np.unique(tsc))))
+    else:
+        score_domain = tuple(opt.domain)
     logger.info("score_domain = " + str(score_domain))
     data.set_events(ev, tsc, score_domain=score_domain,
                     event_feature=event_feature)
@@ -479,12 +486,13 @@ if __name__ == '__main__':
     ap.add_argument('-v', '--validation', type=str, default='holdout',
                     choices=['holdout', 'cv'])
     ap.add_argument('-f', '--fold', type=int, default=5)
+    ap.add_argument('-d', '--domain', nargs=3, default=[0, 0, 0], type=float)
     apg = ap.add_mutually_exclusive_group()
     apg.set_defaults(timestamp=True)
-    apg.add_argument('-n', '--no-timestamp', dest='timestamp',
-                     action='store_false')
-    apg.add_argument('--timestamp', dest='timestamp',
-                     action='store_true')
+    apg.add_argument('-n', '--no-timestamp',
+                     dest='timestamp', action='store_false')
+    apg.add_argument('--timestamp',
+                     dest='timestamp', action='store_true')
     apg = ap.add_mutually_exclusive_group()
     apg.set_defaults(header=False)
     apg.add_argument('--no-header', dest='header', action='store_false')

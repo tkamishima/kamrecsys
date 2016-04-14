@@ -33,6 +33,9 @@ Options
         * htsv: tsv with a header line
         * json: json
 
+-d <DOMAIN>, --domain <DOMAIN>
+    The domain of scores specified by three floats: min, max, increment
+    (default=1.0, 5,0, 1.0)
 -h, --help
     show this help message and exit
 --version
@@ -185,6 +188,7 @@ if __name__ == '__main__':
                     default=sys.stdout, type=argparse.FileType('w'))
 
     # script specific options
+    ap.add_argument('-d', '--domain', nargs=3, default=[1, 5, 1], type=float)
     apg = ap.add_mutually_exclusive_group()
     apg.set_defaults(timestamp=True)
     apg.add_argument('-n', '--no-timestamp', dest='timestamp',
