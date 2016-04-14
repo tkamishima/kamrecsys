@@ -23,7 +23,7 @@ Options
 -o <OUTPUT>, --out <OUTPUT>
     specify output file name
 -m <METHOD>, --method <METHOD>
-    specify algorithm: plsam
+    specify algorithm: default=plsam
 
     * plsam : pLSA (multinomial / use expectation in prediction)
     * plsamm : pLSA (multinomial / use mode in prediction)
@@ -39,6 +39,9 @@ Options
 -n, --no-timestamp or --timestamp
     specify whether .event files has 'timestamp' information,
     default=timestamp
+-d <DOMAIN>, --domain <DOMAIN>
+    The domain of scores specified by three floats: min, max, increment
+    default=auto
 --header or --no-header
     output column information or not
     default=no-header
@@ -47,10 +50,10 @@ Options
 -k <K>, --dim <K>
     the number of latent factors, default=2.
 --tol <TOL>
-    optimization parameter. the size of norm of gradient. default=1e-05.
+    optimization parameter. the size of norm of gradient. default=1e-08.
 --maxiter <MAXITER>
     maximum number of iterations is maxiter times the number of parameters.
-    default=200
+    default=100
 -q, --quiet
     set logging level to ERROR, no messages unless errors
 --rseed <RSEED>
@@ -176,7 +179,11 @@ def training(opt, ev, tsc, event_feature=None, fold=0):
 
     # generate event data
     data = EventWithScoreData(n_otypes=2, n_stypes=1)
-    score_domain = (np.min(tsc), np.max(tsc), np.min(np.diff(np.unique(tsc))))
+    if np.all(opt.domain == [0, 0, 0]):
+        score_domain = (
+            np.min(tsc), np.max(tsc), np.min(np.diff(np.unique(tsc))))
+    else:
+        score_domain = tuple(opt.domain)
     logger.info("score_domain = " + str(score_domain))
     data.set_events(ev, tsc, score_domain=score_domain,
                     event_feature=event_feature)
@@ -484,6 +491,7 @@ if __name__ == '__main__':
     ap.add_argument('-v', '--validation', type=str, default='holdout',
                     choices=['holdout', 'cv'])
     ap.add_argument('-f', '--fold', type=int, default=5)
+    ap.add_argument('-d', '--domain', nargs=3, default=[0, 0, 0], type=float)
     apg = ap.add_mutually_exclusive_group()
     apg.set_defaults(timestamp=True)
     apg.add_argument('-n', '--no-timestamp',
@@ -496,8 +504,8 @@ if __name__ == '__main__':
     apg.add_argument('--header', dest='header', action='store_true')
     ap.add_argument('-a', '--alpha', dest='alpha', type=float, default=1.0)
     ap.add_argument('-k', '--dim', dest='k', type=int, default=2)
-    ap.add_argument('--tol', type=float, default=1e-05)
-    ap.add_argument('--maxiter', type=int, default=200)
+    ap.add_argument('--tol', type=float, default=1e-08)
+    ap.add_argument('--maxiter', type=int, default=100)
 
     # parsing
     opt = ap.parse_args()

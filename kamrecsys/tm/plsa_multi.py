@@ -57,19 +57,19 @@ class EventScorePredictor(BaseEventScorePredictor):
     alpha : float, default=1.0
         Laplace smoothing parameter
     tol : float
-        tolerance parameter of conversion
+        tolerance parameter of conversion, default=1e-10
     use_expectation : bool, default=True
         use expecation in prediction if True, use mode if False
 
     Attributes
     ----------
-    pz_ : array_like
+    pZ_ : array_like
         Latent distribution: Pr[Z]
-    pxgz_ : array_like
+    pXgZ_ : array_like
         User distribution: Pr[X | Z]
-    pygz_ : array_like
+    pYgZ_ : array_like
         Item distribution: Pr[Y | Z]
-    prgz_ : array_like
+    pRgZ_ : array_like
         Raring distribution: Pr[R | Z]
     n_iter_ : int
         nos of iteration after convergence
@@ -91,7 +91,7 @@ class EventScorePredictor(BaseEventScorePredictor):
 
     .. math::
 
-       \Pr[X, Y, R] = \sum_{Z} \Pr[X | Z] \Pr[Y | Z] \Pr[R | Z] Pr[Z]
+       \Pr[X, Y, R] = \sum_{Z} \Pr[X | Z] \Pr[Y | Z] \Pr[R | Z] \Pr[Z]
 
     References
     ----------
@@ -100,7 +100,7 @@ class EventScorePredictor(BaseEventScorePredictor):
     """
 
     def __init__(
-            self, k=1, tol=1e-5, maxiter=100, alpha=1.0, use_expectation=True,
+            self, k=1, tol=1e-10, maxiter=100, alpha=1.0, use_expectation=True,
             random_state=None):
 
         super(EventScorePredictor, self).__init__(random_state=random_state)
@@ -116,10 +116,10 @@ class EventScorePredictor(BaseEventScorePredictor):
         self.i_loss_ = np.inf
         self.f_loss_ = np.inf
         self.n_iter_ = 0
-        self.pz_ = None
-        self.pxgz_ = None
-        self.pygz_ = None
-        self.prgz_ = None
+        self.pZ_ = None
+        self.pXgZ_ = None
+        self.pYgZ_ = None
+        self.pRgZ_ = None
         self.n_users_ = 0
         self.n_items_ = 0
         self.score_levels_ = None
@@ -129,9 +129,9 @@ class EventScorePredictor(BaseEventScorePredictor):
         # internal vars
         self._q = None  # p[z | x, y]
 
-    def _likelihood(self, ev, sc):
+    def loss(self, ev, sc):
         """
-        likelihood
+        negative log-likelihood
 
         Parameters
         ----------
@@ -147,13 +147,37 @@ class EventScorePredictor(BaseEventScorePredictor):
         """
 
         l = np.sum(
-            self.pz_[np.newaxis, :] *
-            self.prgz_[sc, :] *
-            self.pxgz_[ev[:, 0], :] *
-            self.pygz_[ev[:, 1], :], axis=1)
+            self.pZ_[np.newaxis, :] *
+            self.pRgZ_[sc, :] *
+            self.pXgZ_[ev[:, 0], :] *
+            self.pYgZ_[ev[:, 1], :], axis=1)
         l = -np.sum(np.log(l)) / self.n_events_
 
         return l
+
+    def _init_params(self, ev, sc):
+        """
+        initialize latent variables
+
+        Parameters
+        ----------
+        ev : array, shape(n_events, 2)
+            event data
+        sc : array, shape(n_events,)
+            digitized scores corresponding to events
+        """
+
+        a = np.empty((self.n_score_levels_, self.k), dtype=float)
+        for r in xrange(self.n_score_levels_):
+            for k in xrange(self.k):
+                if (k % self.n_score_levels_) == r:
+                    a[r, k] = 1000.0
+                else:
+                    a[r, k] = 1.0
+
+        self._q = np.empty((self.n_events_, self.k), dtype=float)
+        for i in xrange(self.n_events_):
+            self._q[i, :] = self._rng.dirichlet(alpha=a[sc[i], :])
 
     def maximization_step(self, ev, sc):
         """
@@ -168,7 +192,7 @@ class EventScorePredictor(BaseEventScorePredictor):
         """
 
         # p[r | z]
-        self.prgz_ = (
+        self.pRgZ_ = (
             np.array([
                          np.bincount(
                              sc,
@@ -176,10 +200,10 @@ class EventScorePredictor(BaseEventScorePredictor):
                              minlength=self.n_score_levels_
                          ) for k in xrange(self.k)]).T +
             self.alpha)
-        self.prgz_ /= self.prgz_.sum(axis=1, keepdims=True)
+        self.pRgZ_ /= self.pRgZ_.sum(axis=0, keepdims=True)
 
         # p[x | z]
-        self.pxgz_ = (
+        self.pXgZ_ = (
             np.array([
                          np.bincount(
                              ev[:, 0],
@@ -187,10 +211,10 @@ class EventScorePredictor(BaseEventScorePredictor):
                              minlength=self.n_users_
                          ) for k in xrange(self.k)]).T +
             self.alpha)
-        self.pxgz_ /= self.pxgz_.sum(axis=1, keepdims=True)
+        self.pXgZ_ /= self.pXgZ_.sum(axis=0, keepdims=True)
 
         # p[y | z]
-        self.pygz_ = (
+        self.pYgZ_ = (
             np.array([
                          np.bincount(
                              ev[:, 1],
@@ -198,11 +222,11 @@ class EventScorePredictor(BaseEventScorePredictor):
                              minlength=self.n_items_
                          ) for k in xrange(self.k)]).T +
             self.alpha)
-        self.pygz_ /= self.pygz_.sum(axis=1, keepdims=True)
+        self.pYgZ_ /= self.pYgZ_.sum(axis=0, keepdims=True)
 
         # p[z]
-        self.pz_ = np.sum(self._q, axis=0) + self.alpha
-        self.pz_ /= np.sum(self.pz_)
+        self.pZ_ = np.sum(self._q, axis=0) + self.alpha
+        self.pZ_ /= np.sum(self.pZ_)
 
     def fit(self, data, user_index=0, item_index=1, score_index=0,
             random_state=None):
@@ -242,15 +266,12 @@ class EventScorePredictor(BaseEventScorePredictor):
             data.score_domain[0], data.score_domain[1], self.n_score_levels_)
         self.n_events_ = ev.shape[0]
         sc = data.digitize_score(sc)
-
-        # random init of responsibilities
-        self._q = self._rng.dirichlet(
-            alpha=np.ones(self.k), size=self.n_events_)
+        self._init_params(ev, sc)
 
         # first m-step
         self.maximization_step(ev, sc)
 
-        self.i_loss_ = self._likelihood(ev, sc)
+        self.i_loss_ = self.loss(ev, sc)
         logger.info("initial: {:.15g}".format(self.i_loss_))
         pre_loss = self.i_loss_
 
@@ -263,17 +284,17 @@ class EventScorePredictor(BaseEventScorePredictor):
 
             # p[z | r, y, z]
             self._q = (
-                self.pz_[np.newaxis, :] *
-                self.prgz_[sc, :] *
-                self.pxgz_[ev[:, 0], :] *
-                self.pygz_[ev[:, 1], :])
+                self.pZ_[np.newaxis, :] *
+                self.pRgZ_[sc, :] *
+                self.pXgZ_[ev[:, 0], :] *
+                self.pYgZ_[ev[:, 1], :])
             self._q /= (self._q.sum(axis=1, keepdims=True))
 
             # M-step
             self.maximization_step(ev, sc)
 
             # check loss
-            cur_loss = self._likelihood(ev, sc)
+            cur_loss = self.loss(ev, sc)
             logger.info("iter {:d}: {:.15g}".format(iter_no + 1, cur_loss))
             precision = np.abs((cur_loss - pre_loss) / cur_loss)
             if precision < self.tol:
@@ -327,32 +348,32 @@ class EventScorePredictor(BaseEventScorePredictor):
             if xi < missing_values[0] and yi < missing_values[1]:
                 # known user and item: Pr[R | x, y]
                 pRgXY[i, :] = np.sum(
-                    self.pz_[np.newaxis, :] *
-                    self.prgz_[:, :] *
-                    self.pxgz_[xi, :][np.newaxis, :] *
-                    self.pygz_[yi, :][np.newaxis, :], axis=1)
+                    self.pZ_[np.newaxis, :] *
+                    self.pRgZ_[:, :] *
+                    self.pXgZ_[xi, :][np.newaxis, :] *
+                    self.pYgZ_[yi, :][np.newaxis, :], axis=1)
                 pRgXY[i, :] /= pRgXY[i, :].sum()
             elif xi < missing_values[0]:
                 # known user and unknwon item
                 # marginal score over items: Pr[R | x]
                 pRgXY[i, :] = np.sum(
-                    self.pz_[np.newaxis, :] *
-                    self.prgz_[:, :] *
-                    self.pxgz_[xi, :][np.newaxis, :], axis=1)
+                    self.pZ_[np.newaxis, :] *
+                    self.pRgZ_[:, :] *
+                    self.pXgZ_[xi, :][np.newaxis, :], axis=1)
                 pRgXY[i, :] /= pRgXY[i, :].sum()
             elif yi < missing_values[1]:
                 # unknown user and knwon item
                 # marginal score over users: Pr[R | y]
                 pRgXY[i, :] = np.sum(
-                    self.pz_[np.newaxis, :] *
-                    self.prgz_[:, :] *
-                    self.pygz_[yi, :][np.newaxis, :], axis=1)
+                    self.pZ_[np.newaxis, :] *
+                    self.pRgZ_[:, :] *
+                    self.pYgZ_[yi, :][np.newaxis, :], axis=1)
                 pRgXY[i, :] /= pRgXY[i, :].sum()
             else:
                 # unknown user and item: P[R]
                 pRgXY[i, :] = np.sum(
-                    self.pz_[np.newaxis, :] *
-                    self.prgz_[:, :], axis=1)
+                    self.pZ_[np.newaxis, :] *
+                    self.pRgZ_[:, :], axis=1)
                 pRgXY[i, :] /= pRgXY[i, :].sum()
 
         if self.use_expectation:
