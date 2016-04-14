@@ -27,7 +27,7 @@ Options
     specify whether .event files has 'timestamp' information,
     default=true
 -f <FORMAT>, --format <FORMAT>
-    output format (default=tsv)
+    output format (default=json)
 
         * tsv: tab separated values
         * htsv: tsv with a header line
@@ -196,7 +196,7 @@ if __name__ == '__main__':
     apg.add_argument('--timestamp', dest='timestamp',
                      action='store_true')
     ap.add_argument('-f', '--format', type=str,
-                    default='tsv', choices=['tsv', 'htsv', 'json'])
+                    default='json', choices=['tsv', 'htsv', 'json'])
 
     # parsing
     opt = ap.parse_args()
