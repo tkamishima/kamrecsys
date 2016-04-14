@@ -191,27 +191,37 @@ class EventScorePredictor(BaseEventScorePredictor):
             digitized scores corresponding to events
         """
 
-        i = np.arange(self.n_events_, dtype=int)
-
         # p[r | z]
-        self.pRgZ_ = np.zeros((self.n_events_, self.n_score_levels_, self.k),
-                              dtype=float)
-        self.pRgZ_[i, sc, :] = self._q[i, :]
-        self.pRgZ_ = self.pRgZ_.sum(axis=0) + self.alpha
+        self.pRgZ_ = (
+            np.array([
+                         np.bincount(
+                             sc,
+                             weights=self._q[:, k],
+                             minlength=self.n_score_levels_
+                         ) for k in xrange(self.k)]).T +
+            self.alpha)
         self.pRgZ_ /= self.pRgZ_.sum(axis=0, keepdims=True)
 
         # p[x | z]
-        self.pXgZ_ = np.zeros((self.n_events_, self.n_users_, self.k),
-                              dtype=float)
-        self.pXgZ_[i, ev[:, 0], :] = self._q[i, :]
-        self.pXgZ_ = self.pXgZ_.sum(axis=0) + self.alpha
+        self.pXgZ_ = (
+            np.array([
+                         np.bincount(
+                             ev[:, 0],
+                             weights=self._q[:, k],
+                             minlength=self.n_users_
+                         ) for k in xrange(self.k)]).T +
+            self.alpha)
         self.pXgZ_ /= self.pXgZ_.sum(axis=0, keepdims=True)
 
         # p[y | z]
-        self.pYgZ_ = np.zeros((self.n_events_, self.n_items_, self.k),
-                              dtype=float)
-        self.pYgZ_[i, ev[:, 1], :] = self._q[i, :]
-        self.pYgZ_ = self.pYgZ_.sum(axis=0) + self.alpha
+        self.pYgZ_ = (
+            np.array([
+                         np.bincount(
+                             ev[:, 1],
+                             weights=self._q[:, k],
+                             minlength=self.n_items_
+                         ) for k in xrange(self.k)]).T +
+            self.alpha)
         self.pYgZ_ /= self.pYgZ_.sum(axis=0, keepdims=True)
 
         # p[z]
