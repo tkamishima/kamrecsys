@@ -21,6 +21,7 @@ from __future__ import (
 import logging
 import sys
 import numpy as np
+from scipy.sparse import lil_matrix
 
 from ..recommenders import BaseEventScorePredictor
 
@@ -191,37 +192,31 @@ class EventScorePredictor(BaseEventScorePredictor):
             digitized scores corresponding to events
         """
 
-        # p[r | z]
-        self.pRgZ_ = (
-            np.array([
-                         np.bincount(
-                             sc,
-                             weights=self._q[:, k],
-                             minlength=self.n_score_levels_
-                         ) for k in xrange(self.k)]).T +
-            self.alpha)
+        i = np.arange(self.n_events_, dtype=int)
+        self.pRgZ_ = np.empty((self.n_score_levels_, self.k), dtype=float)
+        self.pXgZ_ = np.empty((self.n_users_, self.k), dtype=float)
+        self.pYgZ_ = np.empty((self.n_items_, self.k), dtype=float)
+
+        for k in xrange(self.k):
+
+            # p[r | z]
+            pRgZ = lil_matrix((self.n_events_, self.n_score_levels_),
+                              dtype=float)
+            pRgZ[i, sc] = self._q[:, k]
+            self.pRgZ_[:, k] = pRgZ.sum(axis=0) + self.alpha
+
+            # p[x | z]
+            pXgZ = lil_matrix((self.n_events_, self.n_users_), dtype=float)
+            pXgZ[i, ev[:, 0]] = self._q[:, k]
+            self.pXgZ_[:, k] = pXgZ.sum(axis=0) + self.alpha
+
+            # p[y | z]
+            pYgZ = lil_matrix((self.n_events_, self.n_items_), dtype=float)
+            pYgZ[i, ev[:, 1]] = self._q[:, k]
+            self.pYgZ_[:, k] = pYgZ.sum(axis=0) + self.alpha
+
         self.pRgZ_ /= self.pRgZ_.sum(axis=0, keepdims=True)
-
-        # p[x | z]
-        self.pXgZ_ = (
-            np.array([
-                         np.bincount(
-                             ev[:, 0],
-                             weights=self._q[:, k],
-                             minlength=self.n_users_
-                         ) for k in xrange(self.k)]).T +
-            self.alpha)
         self.pXgZ_ /= self.pXgZ_.sum(axis=0, keepdims=True)
-
-        # p[y | z]
-        self.pYgZ_ = (
-            np.array([
-                         np.bincount(
-                             ev[:, 1],
-                             weights=self._q[:, k],
-                             minlength=self.n_items_
-                         ) for k in xrange(self.k)]).T +
-            self.alpha)
         self.pYgZ_ /= self.pYgZ_.sum(axis=0, keepdims=True)
 
         # p[z]
