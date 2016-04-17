@@ -9,7 +9,7 @@ with open('readme.md') as in_file:
     long_description = in_file.read()
 
 setup(
-    name='KamRecSys',
+    name='kamrecsys',
     version=__version__,
     download_url='https://github.com/tkamishima/kamrecsys/archive/master.zip',
     license=__license__,
