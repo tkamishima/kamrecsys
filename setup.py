@@ -1,7 +1,7 @@
+import re
 from setuptools import setup, find_packages
 from kamrecsys import (__version__, __license__, __author__)
 
-import re
 (author, author_email) = \
     re.search('([^\(\)]+)\s+\(\s+(.+)\s+\)', __author__).groups()
 
@@ -19,17 +19,12 @@ setup(
     description='kamrecsys: algorithms for recommender systems',
     long_description=long_description,
     keywords='recommender system',
-    packages=find_packages(),
+    packages=find_packages(
+        exclude=['*.event', '*.item', '*.user']
+    ),
     install_requires=[
         'numpy',
         'scipy',
         'sklearn'],
     test_suite='nose.collector',
-    package_data={
-        'kamrecsys.datasets':
-            ['samples/flixster*',
-             'samples/movielens*',
-             'samples/pci.*',
-             'samples/sushi*']
-    },
 )
