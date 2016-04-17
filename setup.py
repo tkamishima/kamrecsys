@@ -11,10 +11,9 @@ with open('readme.md') as in_file:
 setup(
     name='kamrecsys',
     version=__version__,
-    download_url='https://github.com/tkamishima/kamrecsys/archive/master.zip',
     license=__license__,
-    author=__author__,
-    author_email='http://www.kamishima.net/',
+    author=author,
+    author_email=author_email,
     url='https://github.com/tkamishima/kamrecsys',
     description='kamrecsys: algorithms for recommender systems',
     long_description=long_description,
