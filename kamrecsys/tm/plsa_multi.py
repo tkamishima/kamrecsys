@@ -30,7 +30,6 @@ from ..recommenders import BaseEventScorePredictor
 
 __all__ = ['EventScorePredictor']
 
-
 # =============================================================================
 # Constants
 # =============================================================================
@@ -59,7 +58,7 @@ class EventScorePredictor(BaseEventScorePredictor):
     tol : float
         tolerance parameter of conversion, default=1e-10
     use_expectation : bool, default=True
-        use expecation in prediction if True, use mode if False
+        use expectation in prediction if True, use mode if False
 
     Attributes
     ----------
@@ -324,7 +323,7 @@ class EventScorePredictor(BaseEventScorePredictor):
         Parameters
         ----------
         ev : array_like
-            a target user's and item's ids. unknwon objects assumed to be
+            a target user's and item's ids. unknown objects assumed to be
             represented by n_object[event_otype]
 
         Returns

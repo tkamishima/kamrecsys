@@ -46,7 +46,7 @@ Options
     output column information or not
     default=no-header
 -a <ALPHA>, --alpha <ALPHA>
-    smoothing parameter of multinomial pLSAI
+    smoothing parameter of multinomial pLSA
 -k <K>, --dim <K>
     the number of latent factors, default=2.
 --tol <TOL>

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """ 
-Convert Flixster data sets to KamRecSys Sample format
+Convert Flixster datasets to KamRecSys Sample format
 
 Instruction
 -----------

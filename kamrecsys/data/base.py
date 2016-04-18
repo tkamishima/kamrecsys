@@ -170,7 +170,7 @@ class BaseData(object):
         Returns
         -------
         n_objects : int
-            the numbeer of unique objects
+            the number of unique objects
         eid : array, shape=(variable,)
             map from internal id to external id
         iid : dict
