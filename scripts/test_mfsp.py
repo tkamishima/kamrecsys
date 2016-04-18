@@ -76,7 +76,7 @@ import sys
 import argparse
 import os
 import platform
-import commands
+import subprocess
 import logging
 import datetime
 import numpy as np
@@ -527,14 +527,24 @@ if __name__ == '__main__':
     opt.numpy_version = np.__version__
     opt.sys_uname = platform.uname()
     if platform.system() == 'Darwin':
-        opt.sys_info = commands.getoutput(
-            'system_profiler'
-            ' -detailLevel mini SPHardwareDataType').split('\n')[4:-1]
+        process_pipe = subprocess.Popen(
+            ['system_profiler', '-detailLevel', 'mini', 'SPHardwareDataType'],
+            stdout=subprocess.PIPE)
+        opt.sys_info, _ = process_pipe.communicate()
+        opt.sys_info = opt.sys_info.split('\n')[4:-2]
+        opt.sys_info = [i.lstrip(' ') for i in opt.sys_info]
     elif platform.system() == 'FreeBSD':
-        opt.sys_info = commands.getoutput('sysctl hw').split('\n')
+        process_pipe = subprocess.Popen(
+            ['sysctl', 'hw'], stdout=subprocess.PIPE)
+        opt.sys_info, _ = process_pipe.communicate()
+        opt.sys_info = opt.sys_info.split('\n')
     elif platform.system() == 'Linux':
-        opt.sys_info = commands.getoutput(
-            'cat /proc/cpuinfo').split('\n')
+        process_pipe = subprocess.Popen(
+            ['cat', '/proc/cpuinfo'], stdout=subprocess.PIPE)
+        opt.sys_info, _ = process_pipe.communicate()
+        opt.sys_info = opt.sys_info.split('\n')
+    else:
+        opt.sys_info = []
 
     # suppress warnings in numerical computation
     np.seterr(all='ignore')
