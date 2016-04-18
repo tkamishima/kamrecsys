@@ -41,7 +41,7 @@ class TestBaseData(unittest.TestCase):
 
         self.assertEqual(data.to_iid(0, 'Mick LaSalle'), 5)
         with self.assertRaises(ValueError):
-            x = data.to_iid(0, 'Dr. X')
+            data.to_iid(0, 'Dr. X')
         self.assertEqual(data.to_eid(1, 4), 'The Night Listener')
         with self.assertRaises(ValueError):
             data.to_eid(1, 100)

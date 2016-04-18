@@ -201,8 +201,8 @@ class BaseEventRecommender(BaseRecommender, EventUtilMixin):
         see attribute event_otypes. as default, a type of the i-th element of
         each event is the i-th object type.
     s_event : int
-        the size of event, which is the number of objects to reprent a rating
-        event
+        the size of event, which is the number of objects to represent a
+        rating event
     """
 
     __metaclass__ = ABCMeta

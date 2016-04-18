@@ -68,8 +68,8 @@ class TestDescriptiveStatistics(unittest.TestCase):
     def test_class(self):
         from kamrecsys.metrics import DescriptiveStatistics
 
-        metrics = DescriptiveStatistics(test_data, name="dummry")
-        self.assertEqual(metrics.name, "dummry")
+        metrics = DescriptiveStatistics(test_data, name="dummy")
+        self.assertEqual(metrics.name, "dummy")
 
         metrics = DescriptiveStatistics(test_data)
         self.assertEqual(metrics.name, "descriptive_statistics")
@@ -88,8 +88,8 @@ class TestHistogram(unittest.TestCase):
     def test_class(self):
         from kamrecsys.metrics import Histogram
 
-        m = Histogram(test_data, name="dummry")
-        self.assertEqual(m.name, "dummry")
+        m = Histogram(test_data, name="dummy")
+        self.assertEqual(m.name, "dummy")
         assert_allclose(m.metrics['count'], [0, 0, 2, 7, 1])
         assert_allclose(m.metrics['density'], [0.0, 0.0, 0.2, 0.7, 0.1])
 

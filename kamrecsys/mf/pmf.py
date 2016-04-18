@@ -87,8 +87,8 @@ class EventScorePredictor(BaseEventScorePredictor):
 
     .. math::
 
-       \hat{y} =
-        \sum_{(u,i)\in\mathcal{D}}
+        \hat{y} =
+        \sum_{(u,i) \in \mathcal{D}}
         \mu + b_u + c_i + \mathbf{p}_u^\top \mathbf{q}_i
         + \lambda (\|P_u\|_2^2 + \|Q_u\|_2^2
         + \|\mathbf{b}\|_2^2 + \|\mathbf{c}\|_2^2)
@@ -381,7 +381,7 @@ class EventScorePredictor(BaseEventScorePredictor):
         Parameters
         ----------
         (user, item) : array_like
-            a target user's and item's ids. unknwon objects assumed to be
+            a target user's and item's ids. unknown objects assumed to be
             represented by n_object[event_otype]
 
         Returns

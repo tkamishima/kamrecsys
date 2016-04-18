@@ -46,7 +46,7 @@ Options
     output column information or not
     default=no-header
 -a <ALPHA>, --alpha <ALPHA>
-    smoothing parameter of multinomial pLSAI
+    smoothing parameter of multinomial pLSA
 -k <K>, --dim <K>
     the number of latent factors, default=2.
 --tol <TOL>
@@ -77,7 +77,7 @@ import sys
 import argparse
 import os
 import platform
-import commands
+import subprocess
 import logging
 import datetime
 import numpy as np
@@ -326,8 +326,8 @@ def finalize(fp, opt):
     """
 
     # output option information
-    for key, key_val in vars(opt).iteritems():
-        print("#{0}={1}".format(key, str(key_val)), file=fp)
+    for (key_name, key_value) in vars(opt).items():
+        print("#{0}={1}".format(key_name, str(key_value)), file=fp)
 
     # post process
 
@@ -532,14 +532,24 @@ if __name__ == '__main__':
     opt.numpy_version = np.__version__
     opt.sys_uname = platform.uname()
     if platform.system() == 'Darwin':
-        opt.sys_info = commands.getoutput(
-            'system_profiler'
-            ' -detailLevel mini SPHardwareDataType').split('\n')[4:-1]
+        process_pipe = subprocess.Popen(
+            ['system_profiler', '-detailLevel', 'mini', 'SPHardwareDataType'],
+            stdout=subprocess.PIPE)
+        opt.sys_info, _ = process_pipe.communicate()
+        opt.sys_info = opt.sys_info.split('\n')[4:-2]
+        opt.sys_info = [i.lstrip(' ') for i in opt.sys_info]
     elif platform.system() == 'FreeBSD':
-        opt.sys_info = commands.getoutput('sysctl hw').split('\n')
+        process_pipe = subprocess.Popen(
+            ['sysctl', 'hw'], stdout=subprocess.PIPE)
+        opt.sys_info, _ = process_pipe.communicate()
+        opt.sys_info = opt.sys_info.split('\n')
     elif platform.system() == 'Linux':
-        opt.sys_info = commands.getoutput(
-            'cat /proc/cpuinfo').split('\n')
+        process_pipe = subprocess.Popen(
+            ['cat', '/proc/cpuinfo'], stdout=subprocess.PIPE)
+        opt.sys_info, _ = process_pipe.communicate()
+        opt.sys_info = opt.sys_info.split('\n')
+    else:
+        opt.sys_info = []
 
     # suppress warnings in numerical computation
     np.seterr(all='ignore')
@@ -553,8 +563,8 @@ if __name__ == '__main__':
 
     # output option information
     logger.info("list of options:")
-    for key, key_val in vars(opt).iteritems():
-        logger.info("{0}={1}".format(key, str(key_val)))
+    for key_name, key_value in vars(opt).items():
+        logger.info("{0}={1}".format(key_name, str(key_value)))
 
     # call main routine
     main(opt)
