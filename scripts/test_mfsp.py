@@ -321,8 +321,8 @@ def finalize(fp, opt):
     """
 
     # output option information
-    for key, key_val in vars(opt).iteritems():
-        print("#{0}={1}".format(key, str(key_val)), file=fp)
+    for (key_name, key_value) in vars(opt).items():
+        print("#{0}={1}".format(key_name, str(key_value)), file=fp)
 
     # post process
 
@@ -548,8 +548,8 @@ if __name__ == '__main__':
 
     # output option information
     logger.info("list of options:")
-    for key, key_val in vars(opt).iteritems():
-        logger.info("{0}={1}".format(key, str(key_val)))
+    for key_name, key_value in vars(opt).items():
+        logger.info("{0}={1}".format(key_name, str(key_value)))
 
     # call main routine
     main(opt)
