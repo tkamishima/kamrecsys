@@ -17,6 +17,7 @@ from six.moves import xrange
 
 import logging
 from abc import ABCMeta, abstractmethod
+from six import with_metaclass
 import numpy as np
 
 # =============================================================================
@@ -36,7 +37,7 @@ import numpy as np
 # =============================================================================
 
 
-class BaseData(object):
+class BaseData(with_metaclass(ABCMeta, object)):
     """ 
     Abstract class for data container
 
@@ -74,8 +75,6 @@ class BaseData(object):
     --------
     :ref:`glossary`
     """
-
-    __multiclass__ = ABCMeta
 
     def __init__(self, n_otypes=2):
         if n_otypes < 1:

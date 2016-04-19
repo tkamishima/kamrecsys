@@ -18,6 +18,7 @@ from six.moves import xrange
 import logging
 import numpy as np
 from abc import ABCMeta
+from six import with_metaclass
 
 from .base import BaseData
 
@@ -38,13 +39,11 @@ from .base import BaseData
 # =============================================================================
 
 
-class EventUtilMixin(object):
+class EventUtilMixin(with_metaclass(ABCMeta, object)):
     """
     Methods that are commonly used in data containers and recommenders for
     handling events..
     """
-
-    __multiclass__ = ABCMeta
 
     def to_eid_event(self, data):
         """
