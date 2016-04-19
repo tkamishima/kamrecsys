@@ -15,6 +15,7 @@ validation and performance evaluation.
 from __future__ import (
     print_function,
     division)
+from six.moves import xrange
 
 # =============================================================================
 # Imports
