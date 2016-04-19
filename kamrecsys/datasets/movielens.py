@@ -8,6 +8,8 @@ from __future__ import (
     print_function,
     division,
     absolute_import)
+from six.moves import xrange
+import six
 
 # =============================================================================
 # Imports
@@ -179,7 +181,10 @@ def load_movielens100k(infile=None,
                        ('imdb', 'S134')])
     dtype = np.dtype([('eid', np.int), ('feature', fdtype)])
     infile = codecs.open(infile, 'r', 'utf_8')
-    x = np.genfromtxt(fname=infile, delimiter='\t', dtype=dtype)
+    if six.PY3:
+        x = np.loadtxt(fname=infile, delimiter='\t', dtype=dtype)
+    else:
+        x = np.genfromtxt(fname=infile, delimiter='\t', dtype=dtype)
     data.set_features(1, x['eid'], x['feature'])
 
     del x
@@ -309,12 +314,19 @@ def load_movielens1m(infile=None,
 
     # load item's feature file
     infile = os.path.join(SAMPLE_PATH, 'movielens1m.item')
-    infile = codecs.open(infile, 'r', 'utf_8')
-    fdtype = np.dtype([('name', 'U82'),
-                       ('year', np.int),
-                       ('genre', 'i1', 18)])
-    dtype = np.dtype([('eid', np.int), ('feature', fdtype)])
-    x = np.genfromtxt(fname=infile, delimiter='\t', dtype=dtype)
+    if six.PY3:
+        fdtype = np.dtype([('name', 'S82'),
+                           ('year', np.int),
+                           ('genre', 'i1', 18)])
+        dtype = np.dtype([('eid', np.int), ('feature', fdtype)])
+        x = np.genfromtxt(fname=infile, delimiter='\t', dtype=dtype)
+    else:
+        infile = codecs.open(infile, 'r', 'utf_8')
+        fdtype = np.dtype([('name', 'U82'),
+                           ('year', np.int),
+                           ('genre', 'i1', 18)])
+        dtype = np.dtype([('eid', np.int), ('feature', fdtype)])
+        x = np.genfromtxt(fname=infile, delimiter='\t', dtype=dtype)
     data.set_features(1, x['eid'], x['feature'])
 
     del x

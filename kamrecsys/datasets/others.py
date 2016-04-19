@@ -8,6 +8,7 @@ from __future__ import (
     print_function,
     division,
     absolute_import)
+from six.moves import xrange
 
 # =============================================================================
 # Imports
@@ -74,7 +75,7 @@ def load_pci_sample(infile=None):
     # load event file
     if infile is None:
         infile = os.path.join(SAMPLE_PATH, 'pci.event')
-    dtype = np.dtype([('event', 'S18', 2), ('score', np.float)])
+    dtype = np.dtype([('event', 'U18', 2), ('score', np.float)])
     x = np.genfromtxt(fname=infile, delimiter='\t', dtype=dtype)
     data = EventWithScoreData(n_otypes=2, n_stypes=1,
                               event_otypes=np.array([0, 1]))

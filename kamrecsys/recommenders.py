@@ -9,6 +9,7 @@ from __future__ import (
     division,
     absolute_import,
     unicode_literals)
+from six.moves import xrange
 
 # =============================================================================
 # Imports
@@ -16,6 +17,7 @@ from __future__ import (
 
 import logging
 from abc import ABCMeta, abstractmethod
+from six import with_metaclass
 import numpy as np
 from sklearn.utils import check_random_state, check_array
 
@@ -47,7 +49,7 @@ __all__ = ['BaseRecommender',
 # =============================================================================
 
 
-class BaseRecommender(object):
+class BaseRecommender(with_metaclass(ABCMeta, object)):
     """
     Abstract class for all recommenders
 
@@ -70,8 +72,6 @@ class BaseRecommender(object):
     ValueError
         if n_otypes < 1
     """
-
-    __metaclass__ = ABCMeta
 
     def __init__(self, random_state=None):
         self.n_otypes = 0
@@ -191,7 +191,8 @@ class BaseRecommender(object):
         self.iid = data.iid
 
 
-class BaseEventRecommender(BaseRecommender, EventUtilMixin):
+class BaseEventRecommender(
+        with_metaclass(ABCMeta, BaseRecommender, EventUtilMixin)):
     """
     Recommenders using a data.EventData class or its subclasses
     
@@ -204,8 +205,6 @@ class BaseEventRecommender(BaseRecommender, EventUtilMixin):
         the size of event, which is the number of objects to represent a
         rating event
     """
-
-    __metaclass__ = ABCMeta
 
     def __init__(self, random_state=None):
         super(BaseEventRecommender, self).__init__(random_state=random_state)
@@ -241,12 +240,10 @@ class BaseEventRecommender(BaseRecommender, EventUtilMixin):
         pass
 
 
-class BaseEventItemFinder(BaseEventRecommender):
+class BaseEventItemFinder(with_metaclass(ABCMeta, BaseEventRecommender)):
     """
     Recommenders to find good items from event data
     """
-
-    __metaclass__ = ABCMeta
 
     def __init__(self, random_state=None):
         super(BaseEventItemFinder, self).\
@@ -263,12 +260,10 @@ class BaseEventItemFinder(BaseEventRecommender):
         pass
 
 
-class BaseEventScorePredictor(BaseEventRecommender):
+class BaseEventScorePredictor(with_metaclass(ABCMeta, BaseEventRecommender)):
     """
     Recommenders to predict preference scores from event data
     """
-
-    __metaclass__ = ABCMeta
 
     def __init__(self, random_state=None):
         super(BaseEventScorePredictor, self).\

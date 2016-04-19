@@ -6,6 +6,7 @@ from __future__ import (
     division,
     absolute_import,
     unicode_literals)
+from six.moves import xrange
 
 # =============================================================================
 # Imports
@@ -45,23 +46,23 @@ class TestKFold(unittest.TestCase):
                          "KFold(n=6, n_folds=3, interlace=True, "
                          "shuffle=False, random_state=None)")
         kf_iter = kf.__iter__()
-        train_index, test_index = kf_iter.next()
+        train_index, test_index = next(kf_iter)
         assert_array_equal(train_index, [1, 2, 4, 5])
         assert_array_equal(test_index, [0, 3])
-        train_index, test_index = kf_iter.next()
+        train_index, test_index = next(kf_iter)
         assert_array_equal(train_index, [0, 2, 3, 5])
         assert_array_equal(test_index, [1, 4])
-        train_index, test_index = kf_iter.next()
+        train_index, test_index = next(kf_iter)
         assert_array_equal(train_index, [0, 1, 3, 4])
         assert_array_equal(test_index, [2, 5])
 
         kf = KFold(5, n_folds=2, interlace=True)
         self.assertEqual(len(kf), 2)
         kf_iter = kf.__iter__()
-        train_index, test_index = kf_iter.next()
+        train_index, test_index = next(kf_iter)
         assert_array_equal(train_index, [1, 3])
         assert_array_equal(test_index, [0, 2, 4])
-        train_index, test_index = kf_iter.next()
+        train_index, test_index = next(kf_iter)
         assert_array_equal(train_index, [0, 2, 4])
         assert_array_equal(test_index, [1, 3])
 
