@@ -6,6 +6,7 @@ from __future__ import (
     division,
     absolute_import,
     unicode_literals)
+from six.moves import xrange
 
 # =============================================================================
 # Imports

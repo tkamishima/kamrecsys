@@ -24,6 +24,7 @@ setup(
     install_requires=[
         'numpy',
         'scipy',
-        'scikit-learn'],
+        'scikit-learn',
+        'six'],
     test_suite='nose.collector',
 )

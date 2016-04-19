@@ -18,10 +18,11 @@ Requirements
 
 We tested this module under the following packages:
 
-* Python 2.7.x (Python 3.x's are not supported)
+* Python 2.7.x (work on Python 3.x, but not tested)
 * NumPy
 * SciPy
 * scikit-learn
+* six
 
 Install
 -------
