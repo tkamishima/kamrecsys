@@ -21,6 +21,7 @@ from six.moves import xrange
 
 import logging
 from abc import ABCMeta, abstractmethod
+from six import with_metaclass
 import numpy as np
 from sklearn.utils import check_array
 
@@ -45,7 +46,7 @@ from sklearn.utils import check_array
 # =============================================================================
 
 
-class BaseMetrics(object):
+class BaseMetrics(with_metaclass(ABCMeta, object)):
     """
     Base class for metrics
 
@@ -61,8 +62,6 @@ class BaseMetrics(object):
     metrics : dict
         dictionary of metrics
     """
-
-    __metaclass__ = ABCMeta
 
     def __init__(self, name='metrics'):
         self.name = name

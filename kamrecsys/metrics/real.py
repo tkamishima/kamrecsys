@@ -21,6 +21,7 @@ from six.moves import xrange
 
 import logging
 from abc import ABCMeta, abstractmethod
+from six import with_metaclass
 import numpy as np
 from sklearn.utils import check_array
 
@@ -47,7 +48,7 @@ from . import BaseMetrics
 # =============================================================================
 
 
-class BaseRealMetrics(BaseMetrics):
+class BaseRealMetrics(with_metaclass(ABCMeta, BaseMetrics)):
     """
     Base class for metrics between real vectors
 
@@ -58,8 +59,6 @@ class BaseRealMetrics(BaseMetrics):
     y_pred : array, shape=(n_samples), dtype=float or int
         Predicted values
     """
-
-    __metaclass__ = ABCMeta
 
     def __init__(self, y_true, y_pred, name='real_metrics'):
         super(BaseRealMetrics, self).__init__(name=name)
