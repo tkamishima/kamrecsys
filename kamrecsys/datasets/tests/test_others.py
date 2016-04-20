@@ -85,6 +85,7 @@ class TestLoadPCISample(unittest.TestCase):
         self.assertEqual(data.s_event, 2)
         assert_array_equal(data.score_domain, [1., 5., 0.5])
 
+
 # =============================================================================
 # Main Routines
 # =============================================================================
