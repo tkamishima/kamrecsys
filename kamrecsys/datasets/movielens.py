@@ -173,17 +173,24 @@ def load_movielens100k(infile=None,
 
     # load item's feature file
     infile = os.path.join(SAMPLE_PATH, 'movielens100k.item')
-    fdtype = np.dtype([('name', 'U81'),
-                       ('day', np.int),
-                       ('month', np.int),
-                       ('year', np.int),
-                       ('genre', 'i1', 18),
-                       ('imdb', 'S134')])
-    dtype = np.dtype([('eid', np.int), ('feature', fdtype)])
-    infile = codecs.open(infile, 'r', 'utf_8')
     if six.PY3:
-        x = np.loadtxt(fname=infile, delimiter='\t', dtype=dtype)
+        fdtype = np.dtype([('name', 'S81'),
+                           ('day', np.int),
+                           ('month', np.int),
+                           ('year', np.int),
+                           ('genre', 'i1', 18),
+                           ('imdb', 'S134')])
+        dtype = np.dtype([('eid', np.int), ('feature', fdtype)])
+        x = np.genfromtxt(fname=infile, delimiter='\t', dtype=dtype)
     else:
+        infile = codecs.open(infile, 'r', 'utf_8')
+        fdtype = np.dtype([('name', 'U81'),
+                           ('day', np.int),
+                           ('month', np.int),
+                           ('year', np.int),
+                           ('genre', 'i1', 18),
+                           ('imdb', 'S134')])
+        dtype = np.dtype([('eid', np.int), ('feature', fdtype)])
         x = np.genfromtxt(fname=infile, delimiter='\t', dtype=dtype)
     data.set_features(1, x['eid'], x['feature'])
 

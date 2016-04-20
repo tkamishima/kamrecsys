@@ -111,12 +111,12 @@ class TestLoadMovielens100k(unittest.TestCase):
         if six.PY3:
             self.assertEqual(
                 str(data.feature[1][:1]),
-                "[ (\"b'Toy Story (1995)'\", 1, 1, 1995, "
+                "[ (b'Toy Story (1995)', 1, 1, 1995, "
                 "[0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "
                 "b'http://us.imdb.com/M/title-exact?Toy%20Story%20(1995)')]")
             self.assertEqual(
                 str(data.feature[1][-1:]),
-                "[ (\"b'Scream of Stone (Schrei aus Stein) (1991)'\", 8, 3, 1996, "
+                "[ (b'Scream of Stone (Schrei aus Stein) (1991)', 8, 3, 1996, "
                 "[0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "
                 "b'http://us.imdb.com/M/title-exact?Schrei%20aus%20Stein%20(1991)')]")
         else :
