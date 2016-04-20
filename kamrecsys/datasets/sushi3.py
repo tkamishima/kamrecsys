@@ -9,7 +9,6 @@ from __future__ import (
     division,
     absolute_import)
 from six.moves import xrange
-import six
 
 # =============================================================================
 # Imports
@@ -201,33 +200,19 @@ def load_sushi3b_score(infile=None, event_dtype=None):
     data.set_features(0, x['eid'], x['feature'])
 
     # load item's feature file
-    if six.PY3:
-        infile = os.path.join(SAMPLE_PATH, 'sushi3.item')
-        fdtype = np.dtype([
-            ('name', 'S20'),
-            ('maki', np.int),
-            ('seafood', np.int),
-            ('genre', np.int),
-            ('heaviness', np.float),
-            ('frequency', np.float),
-            ('price', np.float),
-            ('supply', np.float)])
-        dtype = np.dtype([('eid', np.int), ('feature', fdtype)])
-        x = np.genfromtxt(fname=infile, delimiter='\t', dtype=dtype)
-    else:
-        infile = io.open(os.path.join(SAMPLE_PATH, 'sushi3.item'), 'r',
-                         encoding='utf-8')
-        fdtype = np.dtype([
-            ('name', 'U20'),
-            ('maki', np.int),
-            ('seafood', np.int),
-            ('genre', np.int),
-            ('heaviness', np.float),
-            ('frequency', np.float),
-            ('price', np.float),
-            ('supply', np.float)])
-        dtype = np.dtype([('eid', np.int), ('feature', fdtype)])
-        x = np.genfromtxt(fname=infile, delimiter='\t', dtype=dtype)
+    infile = os.path.join(SAMPLE_PATH, 'sushi3.item')
+    fdtype = np.dtype([
+        ('name', 'U20'),
+        ('maki', np.int),
+        ('seafood', np.int),
+        ('genre', np.int),
+        ('heaviness', np.float),
+        ('frequency', np.float),
+        ('price', np.float),
+        ('supply', np.float)])
+    dtype = np.dtype([('eid', np.int), ('feature', fdtype)])
+    x = np.genfromtxt(fname=infile, delimiter='\t', dtype=dtype,
+                      converters={1:np.char.decode})
     data.set_features(1, x['eid'], x['feature'])
 
     return data

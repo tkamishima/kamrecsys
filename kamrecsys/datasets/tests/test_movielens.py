@@ -85,51 +85,41 @@ class TestLoadMovielens100k(unittest.TestCase):
         assert_array_equal(
             [data.iid[1][1682], data.iid[1][1681], data.iid[1][1000]],
             [1681, 1680, 999])
-        if six.PY3:
-            self.assertEqual(
-                str(data.feature[0][:3]),
-                "[(24, 0, 19, b'85711') "
-                "(53, 1, 1, b'94043') "
-                "(23, 0, 20, b'32067')]")
-            self.assertEqual(
-                str(data.feature[0][-3:]),
-                "[(20, 0, 18, b'97229') "
-                "(48, 1, 12, b'78209') "
-                "(22, 0, 18, b'77841')]")
-        else:
-            self.assertEqual(
-                str(data.feature[0][:3]),
-                "[(24, 0, 19, '85711') "
-                "(53, 1, 1, '94043') "
-                "(23, 0, 20, '32067')]")
-            self.assertEqual(
-                str(data.feature[0][-3:]),
-                "[(20, 0, 18, '97229') "
-                "(48, 1, 12, '78209') "
-                "(22, 0, 18, '77841')]")
+        assert_array_equal(data.feature[0]['age'][:3], [24, 53, 23])
+        assert_array_equal(data.feature[0]['gender'][:3], [0, 1, 0])
+        assert_array_equal(data.feature[0]['occupation'][:3], [19, 1, 20])
+        assert_array_equal(
+            data.feature[0]['zip'][:3],
+            [six.u('85711'), six.u('94043'), six.u('32067')])
+        assert_array_equal(data.feature[0]['age'][-3:], [20, 48, 22])
+        assert_array_equal(data.feature[0]['gender'][-3:], [0, 1, 0])
+        assert_array_equal(data.feature[0]['occupation'][-3:], [18, 12, 18])
+        assert_array_equal(
+            data.feature[0]['zip'][-3:],
+            [six.u('97229'), six.u('78209'), six.u('77841')])
+
         self.assertEqual(len(data.feature[0]), 943)
-        if six.PY3:
-            self.assertEqual(
-                str(data.feature[1][:1]),
-                "[ (b'Toy Story (1995)', 1, 1, 1995, "
-                "[0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "
-                "b'http://us.imdb.com/M/title-exact?Toy%20Story%20(1995)')]")
-            self.assertEqual(
-                str(data.feature[1][-1:]),
-                "[ (b'Scream of Stone (Schrei aus Stein) (1991)', 8, 3, 1996, "
-                "[0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "
-                "b'http://us.imdb.com/M/title-exact?Schrei%20aus%20Stein%20(1991)')]")
-        else :
-            self.assertEqual(
-                str(data.feature[1][:1]),
-                "[ (u'Toy Story (1995)', 1, 1, 1995, "
-                "[0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "
-                "'http://us.imdb.com/M/title-exact?Toy%20Story%20(1995)')]")
-            self.assertEqual(
-                str(data.feature[1][-1:]),
-                "[ (u'Scream of Stone (Schrei aus Stein) (1991)', 8, 3, 1996, "
-                "[0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "
-                "'http://us.imdb.com/M/title-exact?Schrei%20aus%20Stein%20(1991)')]")
+        self.assertEqual(data.feature[1][0][0], six.u('Toy Story (1995)'))
+        self.assertEqual(data.feature[1][0][1], 1)
+        self.assertEqual(data.feature[1][0][2], 1)
+        self.assertEqual(data.feature[1][0][3], 1995)
+        assert_array_equal(
+            data.feature[1][0][4],
+            [0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+        self.assertEqual(
+            data.feature[1][0][5],
+            six.u('http://us.imdb.com/M/title-exact?Toy%20Story%20(1995)'))
+        self.assertEqual(data.feature[1][-1][0],
+                         six.u('Scream of Stone (Schrei aus Stein) (1991)'))
+        self.assertEqual(data.feature[1][-1][1], 8)
+        self.assertEqual(data.feature[1][-1][2], 3)
+        self.assertEqual(data.feature[1][-1][3], 1996)
+        assert_array_equal(
+            data.feature[1][-1][4],
+            [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+        self.assertEqual(
+            data.feature[1][-1][5],
+            six.u('http://us.imdb.com/M/title-exact?Schrei%20aus%20Stein%20(1991)'))
         self.assertEqual(len(data.feature[1]), 1682)
 
     def test_MOVIELENS100K_INFO(self):
@@ -207,42 +197,31 @@ class TestLoadMovielens1m(unittest.TestCase):
         assert_array_equal(
             [data.iid[1][1682], data.iid[1][1681], data.iid[1][1000]],
             [1545, 1544, 936])
-        if six.PY3:
-            self.assertEqual(
-                str(data.feature[0][:3]),
-                "[(1, 0, 10, b'48067') (0, 6, 16, b'70072') "
-                "(0, 2, 15, b'55117')]")
-            self.assertEqual(
-                str(data.feature[0][-3:]),
-                "[(1, 6, 1, b'14706') (1, 4, 0, b'01060') "
-                "(0, 2, 6, b'11106')]")
-        else:
-            self.assertEqual(
-                str(data.feature[0][:3]),
-                "[(1, 0, 10, '48067') (0, 6, 16, '70072')"
-                " (0, 2, 15, '55117')]")
-            self.assertEqual(
-                str(data.feature[0][-3:]),
-                "[(1, 6, 1, '14706') (1, 4, 0, '01060') (0, 2, 6, '11106')]")
+
+        assert_array_equal(data.feature[0]['gender'][:3], [1, 0, 0])
+        assert_array_equal(data.feature[0]['age'][:3], [0, 6, 2])
+        assert_array_equal(data.feature[0]['occupation'][:3], [10, 16, 15])
+        assert_array_equal(data.feature[0]['zip'][:3],
+                           [six.u('48067'), six.u('70072'), six.u('55117')])
+        assert_array_equal(data.feature[0]['gender'][-3:], [1, 1, 0])
+        assert_array_equal(data.feature[0]['age'][-3:], [6, 4, 2])
+        assert_array_equal(data.feature[0]['occupation'][-3:], [1, 0, 6])
+        assert_array_equal(data.feature[0]['zip'][-3:],
+                           [six.u('14706'), six.u('01060'), six.u('11106')])
         self.assertEqual(len(data.feature[0]), 6040)
-        if six.PY3:
-            self.assertEqual(
-                str(data.feature[1][:1]),
-                "[ (b'Toy Story (1995)', 1995, "
-                "[0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])]")
-            self.assertEqual(
-                str(data.feature[1][-1:]),
-                "[ (b'Contender, The (2000)', 2000, "
-                "[0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0])]")
-        else:
-            self.assertEqual(
-                str(data.feature[1][:1]),
-                "[ (u'Toy Story (1995)', 1995, "
-                "[0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])]")
-            self.assertEqual(
-                str(data.feature[1][-1:]),
-                "[ (u'Contender, The (2000)', 2000, "
-                "[0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0])]")
+
+        self.assertEqual(data.feature[1][0][0],
+                         six.u('Toy Story (1995)'))
+        self.assertEqual(data.feature[1][0][1], 1995)
+        assert_array_equal(
+            data.feature[1][0][2],
+            [0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+        self.assertEqual(data.feature[1][-1][0],
+                         six.u('Contender, The (2000)'))
+        self.assertEqual(data.feature[1][-1][1], 2000)
+        assert_array_equal(
+            data.feature[1][-1][2],
+            [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0])
         self.assertEqual(len(data.feature[1]), 3706)
 
     def test_MOVIELENS1M_INFO(self):

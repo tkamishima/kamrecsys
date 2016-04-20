@@ -87,10 +87,7 @@ class TestSushi3Class(unittest.TestCase):
         self.assertEqual(data.feature[0][322]['moved'], 1)
 
         # items
-        if six.PY3:
-            self.assertEqual(data.feature[1][8]['name'], b'toro')
-        else:
-            self.assertEqual(data.feature[1][8]['name'], u'toro')
+        self.assertEqual(data.feature[1][8]['name'], six.u('toro'))
         self.assertEqual(data.feature[1][8]['maki'], 1)
         self.assertEqual(data.feature[1][8]['seafood'], 0)
         self.assertEqual(data.feature[1][8]['genre'], 1)

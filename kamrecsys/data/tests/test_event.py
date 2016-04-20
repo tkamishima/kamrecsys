@@ -36,7 +36,7 @@ def load_test_data():
     from kamrecsys.datasets import SAMPLE_PATH
 
     infile = os.path.join(SAMPLE_PATH, 'pci.event')
-    dtype = np.dtype([('event', 'S18', 2), ('score', np.float)])
+    dtype = np.dtype([('event', 'U18', 2), ('score', np.float)])
     x = np.genfromtxt(fname=infile, delimiter='\t', dtype=dtype)
     data = EventWithScoreData(n_otypes=2, n_stypes=1,
                               event_otypes=np.array([0, 1]))
