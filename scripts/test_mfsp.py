@@ -527,25 +527,29 @@ if __name__ == '__main__':
     opt.python_version = platform.python_version()
     opt.numpy_version = np.__version__
     opt.sys_uname = platform.uname()
-    if platform.system() == 'Darwin':
-        process_pipe = subprocess.Popen(
-            ['system_profiler', '-detailLevel', 'mini', 'SPHardwareDataType'],
-            stdout=subprocess.PIPE)
-        opt.sys_info, _ = process_pipe.communicate()
-        opt.sys_info = opt.sys_info.split('\n')[4:-2]
-        opt.sys_info = [i.lstrip(' ') for i in opt.sys_info]
-    elif platform.system() == 'FreeBSD':
-        process_pipe = subprocess.Popen(
-            ['sysctl', 'hw'], stdout=subprocess.PIPE)
-        opt.sys_info, _ = process_pipe.communicate()
-        opt.sys_info = opt.sys_info.split('\n')
-    elif platform.system() == 'Linux':
-        process_pipe = subprocess.Popen(
-            ['cat', '/proc/cpuinfo'], stdout=subprocess.PIPE)
-        opt.sys_info, _ = process_pipe.communicate()
-        opt.sys_info = opt.sys_info.split('\n')
-    else:
-        opt.sys_info = []
+    with open('/dev/null', 'w') as DEVNULL:
+        if platform.system() == 'Darwin':
+            process_pipe = subprocess.Popen(
+                ['/usr/sbin/system_profiler',
+                 '-detailLevel', 'mini', 'SPHardwareDataType'],
+                stdout=subprocess.PIPE, stderr=DEVNULL)
+            opt.sys_info, _ = process_pipe.communicate()
+            opt.sys_info = opt.sys_info.split('\n')[4:-2]
+            opt.sys_info = [i.lstrip(' ') for i in opt.sys_info]
+        elif platform.system() == 'FreeBSD':
+            process_pipe = subprocess.Popen(
+                ['/sbin/sysctl', 'hw'],
+                stdout=subprocess.PIPE, stderr=DEVNULL)
+            opt.sys_info, _ = process_pipe.communicate()
+            opt.sys_info = opt.sys_info.split('\n')
+        elif platform.system() == 'Linux':
+            process_pipe = subprocess.Popen(
+                ['/bin/cat', '/proc/cpuinfo'],
+                stdout=subprocess.PIPE, stderr=DEVNULL)
+            opt.sys_info, _ = process_pipe.communicate()
+            opt.sys_info = opt.sys_info.split('\n')
+        else:
+            opt.sys_info = []
 
     # suppress warnings in numerical computation
     np.seterr(all='ignore')
