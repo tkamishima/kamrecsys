@@ -13,22 +13,23 @@ Description
 This package targets experimental algorithm used for research purpose.
 We concentrate on the flexibility of data structure or easiness for implementing new algorithm rather than scalability or efficiency of algorithms.
 
+Installation
+------------
+
+First, generate sample data sets that you need. Read a `readme.md` file in a `data` directory.
+You then build and install by using a `setup.py` script.
+
 Requirements
 ------------
 
 We tested this module under the following packages:
 
-* Python 2.7.x (work on Python 3.x, but not tested)
+* Python 2.7.x
+    * work on Python 3, but not fully tested
 * NumPy
 * SciPy
 * scikit-learn
 * six
-
-Install
--------
-
-First, generate sample data sets that you need. Read a `readme.md` file in a `data` directory.
-You then build and install by using a `setup.py` script.
 
 Algorithms
 ----------
