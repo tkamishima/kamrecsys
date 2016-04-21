@@ -198,8 +198,8 @@ def training(opt, ev, tsc, event_feature=None, fold=0):
         opt.learning_i_loss = [np.inf] * opt.fold
     if 'learning_f_loss' not in opt:
         opt.learning_f_loss = [np.inf] * opt.fold
-    if 'learning_opt_outputs' not in opt:
-        opt.learning_opt_outputs = [None] * opt.fold
+    if 'learning_n_iter' not in opt:
+        opt.learning_n_iter = [0] * opt.fold
 
     # set starting time
     start_time = datetime.datetime.now()
@@ -239,6 +239,7 @@ def training(opt, ev, tsc, event_feature=None, fold=0):
     # preserve optimizer's outputs
     opt.learning_i_loss[fold] = rcmdr.i_loss_
     opt.learning_f_loss[fold] = rcmdr.f_loss_
+    opt.learning_n_iter[fold] = rcmdr.n_iter_
 
     return rcmdr
 
