@@ -1,4 +1,5 @@
 import re
+import os
 from setuptools import setup, find_packages
 from kamrecsys import (__version__, __license__, __author__)
 
@@ -18,9 +19,14 @@ setup(
     description='kamrecsys: algorithms for recommender systems',
     long_description=long_description,
     keywords='recommender system',
-    packages=find_packages(
-        exclude=['*.event', '*.item', '*.user']
-    ),
+    packages=find_packages(),
+    include_package_data=True,
+    package_data={
+        'kamrecsys': [
+            os.path.join('datasets', 'samples', '*.event'),
+            os.path.join('datasets', 'samples', '*.user'),
+            os.path.join('datasets', 'samples', '*.item')]
+    },
     install_requires=[
         'numpy',
         'scipy',
