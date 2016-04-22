@@ -23,9 +23,9 @@ setup(
     include_package_data=True,
     package_data={
         'kamrecsys': [
-            os.path.join('datasets', 'samples', '*.event'),
-            os.path.join('datasets', 'samples', '*.user'),
-            os.path.join('datasets', 'samples', '*.item')]
+            os.path.join('datasets', 'data', '*.event'),
+            os.path.join('datasets', 'data', '*.user'),
+            os.path.join('datasets', 'data', '*.item')]
     },
     install_requires=[
         'numpy',
