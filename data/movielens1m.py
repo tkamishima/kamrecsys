@@ -11,7 +11,7 @@ Instruction
 2. Unpack this ml-1m.zip, and place the following files at this directory:
    ratings.dat, users.dat, movies.dat
 3. Run this script. As default, converted files are generated at
-   ../kamrecsys/datasets/samples/ directory. If you want change the target
+   ../kamrecsys/datasets/data/ directory. If you want change the target
    directory, you need to specify it as the first argument of this script.
 4. Remove original files, if you do not need them.
 """
@@ -63,7 +63,7 @@ pwd = os.path.dirname(__file__)
 if len(sys.argv) >= 2:
     target = sys.argv[1]
 else:
-    target = os.path.join(pwd, '..', "kamrecsys", 'datasets', 'samples')
+    target = os.path.join(pwd, '..', "kamrecsys", 'datasets', 'data')
 
 # convert event files ---------------------------------------------------------
 

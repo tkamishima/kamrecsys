@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Summary of __THIS_MODULE__
+Common definitions of datasets
 """
 
 from __future__ import (
@@ -27,7 +27,7 @@ import os
 # =============================================================================
 
 # path to the directory containing sample files
-SAMPLE_PATH = os.path.join(os.path.dirname(__file__), 'samples')
+SAMPLE_PATH = os.path.join(os.path.dirname(__file__), 'data')
 
 # =============================================================================
 # Module variables
