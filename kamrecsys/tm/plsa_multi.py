@@ -314,6 +314,10 @@ class EventScorePredictor(BaseEventScorePredictor):
         self.n_iter_ = iter_no + 1
         logger.info("nos of iterations: {:d}".format(self.n_iter_))
 
+        # add parameters for unknown users and items
+        self.pXgZ_ = np.r_[self.pXgZ_, np.ones((1, self.k), dtype=float)]
+        self.pYgZ_ = np.r_[self.pYgZ_, np.ones((1, self.k), dtype=float)]
+
         # clean garbage variables
         del self._q
 
@@ -338,43 +342,12 @@ class EventScorePredictor(BaseEventScorePredictor):
             shape of an input array is illegal
         """
 
-        n_events = ev.shape[0]
-        missing_values = self.n_objects[self.event_otypes]
-        pRgXY = np.empty((n_events, self.n_score_levels_), dtype=float)
-
-        for i in xrange(n_events):
-            xi, yi = ev[i, :]
-
-            if xi < missing_values[0] and yi < missing_values[1]:
-                # known user and item: Pr[R | x, y]
-                pRgXY[i, :] = np.sum(
-                    self.pZ_[np.newaxis, :] *
-                    self.pRgZ_[:, :] *
-                    self.pXgZ_[xi, :][np.newaxis, :] *
-                    self.pYgZ_[yi, :][np.newaxis, :], axis=1)
-                pRgXY[i, :] /= pRgXY[i, :].sum()
-            elif xi < missing_values[0]:
-                # known user and unknown item
-                # marginal score over items: Pr[R | x]
-                pRgXY[i, :] = np.sum(
-                    self.pZ_[np.newaxis, :] *
-                    self.pRgZ_[:, :] *
-                    self.pXgZ_[xi, :][np.newaxis, :], axis=1)
-                pRgXY[i, :] /= pRgXY[i, :].sum()
-            elif yi < missing_values[1]:
-                # unknown user and known item
-                # marginal score over users: Pr[R | y]
-                pRgXY[i, :] = np.sum(
-                    self.pZ_[np.newaxis, :] *
-                    self.pRgZ_[:, :] *
-                    self.pYgZ_[yi, :][np.newaxis, :], axis=1)
-                pRgXY[i, :] /= pRgXY[i, :].sum()
-            else:
-                # unknown user and item: P[R]
-                pRgXY[i, :] = np.sum(
-                    self.pZ_[np.newaxis, :] *
-                    self.pRgZ_[:, :], axis=1)
-                pRgXY[i, :] /= pRgXY[i, :].sum()
+        pRgXY = np.sum(
+            self.pZ_[np.newaxis, np.newaxis, :] *
+            self.pRgZ_[np.newaxis, :, :] *
+            self.pXgZ_[ev[:, 0], np.newaxis, :] *
+            self.pYgZ_[ev[:, 1], np.newaxis, :], axis=2)
+        pRgXY /= pRgXY.sum(axis=1, keepdims=True)
 
         if self.use_expectation:
             sc = np.dot(pRgXY, self.score_levels_[:, np.newaxis])
