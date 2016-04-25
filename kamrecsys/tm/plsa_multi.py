@@ -315,7 +315,7 @@ class EventScorePredictor(BaseEventScorePredictor):
         logger.info("nos of iterations: {:d}".format(self.n_iter_))
 
         # clean garbage variables
-        del self.__dict__['_q']
+        del self._q
 
     def raw_predict(self, ev):
         """
