@@ -409,15 +409,10 @@ class EventScorePredictor(BaseEventScorePredictor):
             shape of an input array is illegal
         """
 
-        if ev.ndim == 1:
-            return (self.mu_[0] + self.bu_[ev[0]] + self.bi_[ev[1]] +
-                    np.dot(self.p_[ev[0]], self.q_[ev[1]]))
-        elif ev.ndim == 2:
-            return (self.mu_[0] + self.bu_[ev[:, 0]] + self.bi_[ev[:, 1]] +
-                    np.sum(self.p_[ev[:, 0], :] * self.q_[ev[:, 1], :],
-                           axis=1))
-        else:
-            raise TypeError('argument has illegal shape')
+        return (self.mu_[0] + self.bu_[ev[:, 0]] + self.bi_[ev[:, 1]] +
+                np.sum(self.p_[ev[:, 0], :] * self.q_[ev[:, 1], :],
+                       axis=1))
+
 
 # =============================================================================
 # Functions
