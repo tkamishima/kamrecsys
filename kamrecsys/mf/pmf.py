@@ -148,16 +148,16 @@ class EventScorePredictor(BaseEventScorePredictor):
         # define dtype for parameters
         self._dt = np.dtype([
             ('mu', np.float, (1,)),
-            ('bu', np.float, n_users + 1),
-            ('bi', np.float, n_items + 1),
-            ('p', np.float, (n_users + 1, k)),
-            ('q', np.float, (n_items + 1, k))
+            ('bu', np.float, n_users),
+            ('bi', np.float, n_items),
+            ('p', np.float, (n_users, k)),
+            ('q', np.float, (n_items, k))
         ])
 
         # memory allocation
-        self._coef = np.zeros(1 + (n_users + 1) + (n_items + 1) +
-                              (n_users + 1) * k + (n_items + 1) * k,
-                              dtype=np.float)
+        self._coef = np.zeros(1 + n_users + n_items +
+                              n_users * k + n_items * k,
+                              dtype=float)
 
         # set array's view
         self.mu_ = self._coef.view(self._dt)['mu'][0]
@@ -175,20 +175,21 @@ class EventScorePredictor(BaseEventScorePredictor):
         for i in xrange(n_items):
             j = np.nonzero(ev[:, 1] == i)[0]
             if len(j) > 0:
-                self.bi_[i] = \
-                    np.sum(sc[j] - (self.mu_[0] + self.bu_[ev[j, 0]])) / len(j)
+                self.bi_[i] = (
+                    np.sum(sc[j] - (self.mu_[0] + self.bu_[ev[j, 0]])) /
+                    len(j))
 
         # fill cross terms by normal randoms whose s.d.'s are mean residuals
         var = 0.0
         for i in xrange(n_events):
-            var += \
+            var += (
                 (sc[i] -
-                 (self.mu_[0] + self.bu_[ev[i, 0]] + self.bi_[ev[i, 1]])) ** 2
-        var = var / n_events
-        self.p_[0:n_users, :] = \
-            self._rng.normal(0.0, np.sqrt(var), (n_users, k))
-        self.q_[0:n_items, :] = \
-            self._rng.normal(0.0, np.sqrt(var), (n_items, k))
+                 (self.mu_[0] + self.bu_[ev[i, 0]] + self.bi_[ev[i, 1]])) ** 2)
+        var /= n_events
+        self.p_[0:n_users, :] = (
+            self._rng.normal(0.0, np.sqrt(var), (n_users, k)))
+        self.q_[0:n_items, :] = (
+            self._rng.normal(0.0, np.sqrt(var), (n_items, k)))
 
         # scale a regularization term by the number of parameters
         self._reg = self.C / (1 + (k + 1) * (n_users + n_items))
@@ -279,17 +280,17 @@ class EventScorePredictor(BaseEventScorePredictor):
                           np.sum(p[ev[:, 0], :] * q[ev[:, 1], :], axis=1)))
         grad_mu[0] = np.sum(neg_res)
         grad_bu[:] = np.bincount(ev[:, 0], weights=neg_res,
-                                 minlength=n_users + 1)
+                                 minlength=n_users)
         grad_bi[:] = np.bincount(ev[:, 1], weights=neg_res,
-                                 minlength=n_items + 1)
+                                 minlength=n_items)
         weights = neg_res[:, np.newaxis] * q[ev[:, 1], :]
         for i in xrange(self.k):
             grad_p[:, i] = np.bincount(ev[:, 0], weights=weights[:, i],
-                                       minlength=n_users + 1)
+                                       minlength=n_users)
         weights = neg_res[:, np.newaxis] * p[ev[:, 0], :]
         for i in xrange(self.k):
             grad_q[:, i] = np.bincount(ev[:, 1], weights=weights[:, i],
-                                       minlength=n_items + 1)
+                                       minlength=n_items)
 
         # re-scale gradients
         grad[:] = grad[:] / n_events
@@ -372,8 +373,20 @@ class EventScorePredictor(BaseEventScorePredictor):
         self.f_loss_ = res[1]
         self.opt_outputs_ = res[2:]
 
+        # add parameters for unknown users and items
+        self.mu_ = self._coef.view(self._dt)['mu'][0].copy()
+        self.bu_ = np.r_[self._coef.view(self._dt)['bu'][0], 0.0]
+        self.bi_ = np.r_[self._coef.view(self._dt)['bi'][0], 0.0]
+        self.p_ = np.r_[self._coef.view(self._dt)['p'][0],
+                        np.zeros((1, self.k), dtype=np.float)]
+        self.q_ = np.r_[self._coef.view(self._dt)['q'][0],
+                        np.zeros((1, self.k), dtype=np.float)]
+
         # clean up temporary instance variables
+        del self._coef
         del self._reg
+        del self._dt
+        del self._rng
 
     def raw_predict(self, ev):
         """
@@ -396,15 +409,10 @@ class EventScorePredictor(BaseEventScorePredictor):
             shape of an input array is illegal
         """
 
-        if ev.ndim == 1:
-            return (self.mu_[0] + self.bu_[ev[0]] + self.bi_[ev[1]] +
-                    np.dot(self.p_[ev[0]], self.q_[ev[1]]))
-        elif ev.ndim == 2:
-            return (self.mu_[0] + self.bu_[ev[:, 0]] + self.bi_[ev[:, 1]] +
-                    np.sum(self.p_[ev[:, 0], :] * self.q_[ev[:, 1], :],
-                           axis=1))
-        else:
-            raise TypeError('argument has illegal shape')
+        return (self.mu_[0] + self.bu_[ev[:, 0]] + self.bi_[ev[:, 1]] +
+                np.sum(self.p_[ev[:, 0], :] * self.q_[ev[:, 1], :],
+                       axis=1))
+
 
 # =============================================================================
 # Functions
