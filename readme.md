@@ -58,6 +58,6 @@ DataSets
 
     * Sushi3b Score Data Set
 
-* [Flixster Data Sets](http://www.sfu.ca/~sja25/datasets/)
+* [Flixster Data Sets](http://www.cs.ubc.ca/~jamalim/datasets/)
 
     * Flixster Rating Data Set

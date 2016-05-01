@@ -7,7 +7,7 @@ Instruction
 -----------
 
 1. Download original file, ``flixster.zip``, from `Mohsen Jamali
-   <http://www.sfu.ca/~sja25/datasets/>`_ 's homepage.
+   <http://www.cs.ubc.ca/~jamalim/datasets/>`_ 's homepage.
 2. Unpack this ``flixster.zip``, and place the following files at
    this directory:
    ratings.txt
@@ -75,7 +75,7 @@ print(
     "# Flixster data set\n"
     "#\n"
     "# Original files are distributed by Mohsen Jamali at the site:\n"
-    "# http://www.sfu.ca/~sja25/datasets/\n"
+    "# http://www.cs.ubc.ca/~jamalim/datasets/\n"
     "# To use this data, follow the license permitted by the original "
     "distributor.\n"
     "#\n"
