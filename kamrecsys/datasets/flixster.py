@@ -48,7 +48,7 @@ def load_flixster_rating(infile=None, event_dtype=None):
     """ load the sushi3b score data set
 
     An original data set is distributed at:
-    `Mohsen Jamali <http://www.sfu.ca/~sja25/datasets/>`_.
+    `Mohsen Jamali <http://www.cs.ubc.ca/~jamalim/datasets/>`_.
 
     Parameters
     ----------
