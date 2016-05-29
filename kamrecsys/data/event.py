@@ -172,7 +172,7 @@ class EventData(BaseData, EventUtilMixin):
 
         Parameters
         ----------
-        event : array_like, shape=(n_events, s_event) 
+        event : array_like, shape=(n_events, s_event)
             each row corresponds to an event represented by a vector of object
             with external ids
         event_feature : optional, array_like, shape=(n_events, variable)
@@ -203,7 +203,7 @@ class EventWithScoreData(EventData):
     ----------
     n_otypes : optional, int
         see attribute n_otypes (default=2)
-    event_otypes : array_like, shape=(variable,), optional 
+    event_otypes : array_like, shape=(variable,), optional
         see attribute event_otypes. as default, a type of the i-th element of
         each event is the i-th object type.
     n_stypes : optional, int
@@ -249,13 +249,13 @@ class EventWithScoreData(EventData):
 
         Parameters
         ----------
-        event : array_like, shape=(n_events, s_event) 
+        event : array_like, shape=(n_events, s_event)
             each row corresponds to an event represented by a vector of object
             with external ids
-        score : array_like, shape=(n_events) or (n_stypes, 
-            i-th ele
+        score : array_like, shape=(n_events) or (n_stypes, n_events)
+            raiting scores for the i-th elemnt
         score_domain : optional, tuple or 1d-array of tuple
-            min and max of scores. as 
+            min and max of scores, and the interval between scores
         event_feature : optional, array_like, shape=(n_events, variable)
             feature of events
 
@@ -297,11 +297,11 @@ class EventWithScoreData(EventData):
         return digitized_scores
 
 # =============================================================================
-# Functions 
+# Functions
 # =============================================================================
 
 # =============================================================================
-# Module initialization 
+# Module initialization
 # =============================================================================
 
 # init logging system ---------------------------------------------------------

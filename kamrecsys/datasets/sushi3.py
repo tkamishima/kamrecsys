@@ -80,7 +80,7 @@ SUSHI3_INFO = {
 # =============================================================================
 
 # =============================================================================
-# Functions 
+# Functions
 # =============================================================================
 
 
@@ -212,13 +212,13 @@ def load_sushi3b_score(infile=None, event_dtype=None):
         ('supply', np.float)])
     dtype = np.dtype([('eid', np.int), ('feature', fdtype)])
     x = np.genfromtxt(fname=infile, delimiter='\t', dtype=dtype,
-                      converters={1:np.char.decode})
+                      converters={1: np.char.decode})
     data.set_features(1, x['eid'], x['feature'])
 
     return data
 
 # =============================================================================
-# Module initialization 
+# Module initialization
 # =============================================================================
 
 # init logging system ---------------------------------------------------------

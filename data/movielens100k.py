@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-""" 
+"""
 Convert MovieLens 100k data sets to KamRecSys Sample format
 
 Instruction

@@ -78,7 +78,7 @@ class MeanAbsoluteError(BaseRealMetrics):
     Mean Absolute Error
 
     * mean : mean absolute error
-    * stdev : standard deviation of absolute errors 
+    * stdev : standard deviation of absolute errors
     """
 
     def __init__(self, y_true, y_pred, name='mean_absolute_error'):

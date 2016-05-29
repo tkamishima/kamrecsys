@@ -41,8 +41,9 @@ class TestFlixsterClass(unittest.TestCase):
         self.assertListEqual(
             sorted(data.__dict__.keys()),
             sorted(['event_otypes', 'n_otypes', 'n_events', 'n_score_levels',
-             'n_scores', 'feature', 'event', 'iid', 'event_feature', 'score',
-             'eid', 'n_objects', 'n_stypes', 's_event', 'score_domain']))
+                    'n_scores', 'feature', 'event', 'iid', 'event_feature',
+                    'score', 'eid', 'n_objects', 'n_stypes', 's_event',
+                    'score_domain']))
         assert_array_equal(data.event_otypes, [0, 1])
         self.assertEqual(data.n_otypes, 2)
         self.assertEqual(data.n_events, 8196077)
