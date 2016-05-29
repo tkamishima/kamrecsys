@@ -119,7 +119,8 @@ class TestLoadMovielens100k(unittest.TestCase):
             [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
         self.assertEqual(
             data.feature[1][-1][5],
-            six.u('http://us.imdb.com/M/title-exact?Schrei%20aus%20Stein%20(1991)'))
+            six.u('http://us.imdb.com/M/title-exact'
+                  '?Schrei%20aus%20Stein%20(1991)'))
         self.assertEqual(len(data.feature[1]), 1682)
 
     def test_MOVIELENS100K_INFO(self):

@@ -38,7 +38,7 @@ import numpy as np
 
 
 class BaseData(with_metaclass(ABCMeta, object)):
-    """ 
+    """
     Abstract class for data container
 
     Instances of this class contain only information about objects.
@@ -183,11 +183,11 @@ class BaseData(with_metaclass(ABCMeta, object)):
         return len(eid), eid, iid
 
 # =============================================================================
-# Functions 
+# Functions
 # =============================================================================
 
 # =============================================================================
-# Module initialization 
+# Module initialization
 # =============================================================================
 
 # init logging system ---------------------------------------------------------

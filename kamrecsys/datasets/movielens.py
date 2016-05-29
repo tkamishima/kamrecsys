@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Load sample Movielens data sets 
+Load sample Movielens data sets
 """
 
 from __future__ import (
@@ -73,7 +73,7 @@ MOVIELENS1M_INFO = {
 # =============================================================================
 
 # =============================================================================
-# Functions 
+# Functions
 # =============================================================================
 
 
@@ -180,7 +180,7 @@ def load_movielens100k(infile=None,
                        ('imdb', 'U134')])
     dtype = np.dtype([('eid', np.int), ('feature', fdtype)])
     x = np.genfromtxt(fname=infile, delimiter='\t', dtype=dtype,
-                      converters={1:np.char.decode})
+                      converters={1: np.char.decode})
     data.set_features(1, x['eid'], x['feature'])
 
     return data
@@ -283,7 +283,7 @@ def load_movielens1m(infile=None,
         corresponds to the following genres:
         0:Action, 1:Adventure, 2:Animation, 3:Children's, 4:Comedy, 5:Crime,
         6:Documentary, 7:Drama, 8:Fantasy, 9:Film-Noir, 10:Horror, 11:Musical,
-        12:Mystery, 13:Romance, 14:Sci-Fi, 15:Thriller, 16:War, 17:Western 
+        12:Mystery, 13:Romance, 14:Sci-Fi, 15:Thriller, 16:War, 17:Western
     """
 
     # load event file
@@ -313,13 +313,13 @@ def load_movielens1m(infile=None,
                        ('genre', 'i1', 18)])
     dtype = np.dtype([('eid', np.int), ('feature', fdtype)])
     x = np.genfromtxt(fname=infile, delimiter='\t', dtype=dtype,
-                      converters={1:np.char.decode})
+                      converters={1: np.char.decode})
     data.set_features(1, x['eid'], x['feature'])
 
     return data
 
 # =============================================================================
-# Module initialization 
+# Module initialization
 # =============================================================================
 
 # init logging system ---------------------------------------------------------

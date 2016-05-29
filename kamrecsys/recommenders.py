@@ -126,7 +126,7 @@ class BaseRecommender(with_metaclass(ABCMeta, BaseEstimator)):
             object type
         iid : int
             an internal id
-        
+
         Returns
         -------
         eid : int
@@ -367,11 +367,11 @@ class BaseEventScorePredictor(with_metaclass(ABCMeta, BaseEventRecommender)):
         return np.squeeze(self.raw_predict(self.to_iid_event(eev)))
 
 # =============================================================================
-# Functions 
+# Functions
 # =============================================================================
 
 # =============================================================================
-# Module initialization 
+# Module initialization
 # =============================================================================
 
 # init logging system ---------------------------------------------------------

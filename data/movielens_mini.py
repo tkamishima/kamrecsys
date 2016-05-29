@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-""" 
+"""
 Shrunk movielens100k.event data set
 
 This data set is the subset of the data in the `movielens100k` data set.
