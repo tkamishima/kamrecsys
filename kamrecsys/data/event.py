@@ -100,11 +100,9 @@ class EventUtilMixin(with_metaclass(ABCMeta, object)):
         if missing_values is None:
             missing_values = self.n_objects[self.event_otypes]
         if ev.ndim == 1 and ev.shape[0] == self.s_event:
-            new_ev = \
-                np.array(
-                    [self.iid[self.event_otypes[e]].get(ev[e],
-                                                        missing_values[e])
-                     for e in xrange(self.s_event)], dtype=np.int)
+            new_ev = np.array(
+                [self.iid[self.event_otypes[e]].get(ev[e], missing_values[e])
+                 for e in xrange(self.s_event)], dtype=np.int)
         elif ev.ndim == 2 and ev.shape[1] == self.s_event:
             new_ev = np.empty_like(ev, dtype=np.int)
             for e in xrange(self.s_event):
@@ -157,9 +155,9 @@ class EventData(BaseData, EventUtilMixin):
             self.s_event = n_otypes
             self.event_otypes = np.arange(self.s_event, dtype=int)
         else:
-            if event_otypes.ndim != 1 or\
-               np.min(event_otypes) < 0 or\
-               np.max(event_otypes) >= n_otypes:
+            if (event_otypes.ndim != 1 or
+                np.min(event_otypes) < 0 or
+                np.max(event_otypes) >= n_otypes):
                 raise ValueError("Illegal event_otypes specification")
             self.s_event = event_otypes.shape[0]
             self.event_otypes = np.asarray(event_otypes)
@@ -179,8 +177,8 @@ class EventData(BaseData, EventUtilMixin):
             feature of events
         """
         for otype in xrange(self.n_otypes):
-            self.n_objects[otype], self.eid[otype], self.iid[otype] =\
-                self._gen_id(event[:, self.event_otypes == otype])
+            self.n_objects[otype], self.eid[otype], self.iid[otype] = (
+                self._gen_id(event[:, self.event_otypes == otype]))
 
         self.event = np.empty_like(event, dtype=np.int)
         for e in xrange(self.s_event):
