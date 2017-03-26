@@ -288,7 +288,7 @@ class BaseEventItemFinder(with_metaclass(ABCMeta, BaseEventRecommender)):
         """
 
         # varidity of arguments
-        if sparse_tyope not in ['csr', 'csc', 'lil', 'dense']:
+        if sparse_type not in ['csr', 'csc', 'lil', 'dense']:
             raise TypeError("illigal type of sparse matrices")
 
         if not isinstance(data, EventData):
@@ -296,6 +296,7 @@ class BaseEventItemFinder(with_metaclass(ABCMeta, BaseEventRecommender)):
 
         # import meta information of objects and events to this recommender
         self._set_object_info(data)
+        self._set_event_info(data)
         event_index = np.asarray(event_index)
 
         # get number of objects
