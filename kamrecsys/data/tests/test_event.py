@@ -22,6 +22,8 @@ import unittest
 import os
 import numpy as np
 
+from kamrecsys.datasets import load_movielens_mini
+
 # =============================================================================
 # Module variables
 # =============================================================================
@@ -78,6 +80,25 @@ class TestEventUtilMixin(unittest.TestCase):
         assert_array_equal(data.event, check)
 
 
+class TestEventData(unittest.TestCase):
+
+    def test_filter_event(self):
+        data = load_movielens_mini()
+
+        data.filter_event(np.arange(data.n_events) % 3 == 0)
+        assert_array_equal(
+            data.event_feature, np.array(
+            [(875636053,), (877889130,), (891351328,), (879362287,),
+             (878543541,), (875072484,), (889751712,), (883599478,),
+             (883599205,), (878542960,)], dtype=[('timestamp', '<i8')]))
+        assert_array_equal(
+            data.to_eid(0, data.event[:, 0]),
+            [5, 10, 7, 8, 1, 1, 1, 6, 6, 1])
+        assert_array_equal(
+            data.to_eid(1, data.event[:, 1]),
+            [2, 4, 8, 7, 9, 8, 5, 1, 9, 3])
+
+
 class TestEventWithScoreData(unittest.TestCase):
 
     def test_set_events(self):
@@ -98,6 +119,21 @@ class TestEventWithScoreData(unittest.TestCase):
 
         digitized_scores = data.digitize_score(np.linspace(1.0, 5.0, 9))
         assert_array_equal(digitized_scores, np.arange(9))
+
+    def test_filter_event(self):
+        data = load_movielens_mini()
+
+        data.filter_event(data.score > 3)
+        assert_allclose(
+            data.score,
+            [4., 4., 4., 5., 4., 5., 5., 5., 4., 5.,
+             4., 5., 5., 4., 5., 4., 4., 4., 4., 4., 4.])
+
+        assert_allclose(
+            data.to_eid(0, data.event[:, 0]),
+            [10, 5, 10, 1, 7, 7, 9, 7, 10, 1,
+             2, 1, 7, 6, 7, 6, 1, 9, 1, 6, 10])
+
 
 # =============================================================================
 # Main Routines

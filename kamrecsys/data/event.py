@@ -191,6 +191,29 @@ class EventData(BaseData, EventUtilMixin):
         else:
             self.event_feature = None
 
+    def filter_event(self, filter_cond):
+        """
+        replace event data with those consisting of events whose corresponding
+        `filter_cond` is `True`.   
+
+        Parameters
+        ----------
+        filter_cond : array, dtype=bool, shape=(n_events,)
+            Boolean array that specifies whether each event should be included
+            in a new event array.
+        """
+
+        # check whether event info is available
+        if self.event is None:
+            return
+
+        # filter out event data
+        self.event = self.event[filter_cond, :]
+
+        # filter out event features
+        if self.event_feature is not None:
+            self.event_feature = self.event_feature[filter_cond]
+
 
 class EventWithScoreData(EventData):
     """ Container of rating events, rating scores, and features.
@@ -293,6 +316,30 @@ class EventWithScoreData(EventData):
             digitized_scores = np.digitize(score, bins) - 1
 
         return digitized_scores
+
+    def filter_event(self, filter_cond):
+        """
+        replace event data with those consisting of events whose corresponding
+        `filter_cond` is `True`.   
+
+        Parameters
+        ----------
+        filter_cond : array, dtype=bool, shape=(n_events,)
+            Boolean array that specifies whether each event should be included
+            in a new event array.
+        """
+
+        # check whether event info is available
+        if self.event is None:
+            return
+
+        # filter out event related information
+        super(EventWithScoreData, self).filter_event(filter_cond)
+
+        # filter out event data
+        if self.score is not None:
+            self.score = self.score[filter_cond]
+
 
 # =============================================================================
 # Functions
