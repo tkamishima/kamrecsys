@@ -39,12 +39,11 @@ import numpy as np
 class TestEventItemFinder(unittest.TestCase):
 
     def test_loss(self):
-        from kamrecsys.datasets import load_movielens100k
+        from kamrecsys.datasets import load_movielens_mini
         from kamrecsys.mf.lpmf import EventItemFinder
 
         # setup
-        data = load_movielens100k(
-            os.path.join(os.path.dirname(__file__), 'mlmini_t.event'))
+        data = load_movielens_mini()
         rec = EventItemFinder(C=0.1, k=2, tol=1e-03, random_state=1234)
 
         # tev, tsc, n_objects = \
@@ -95,12 +94,11 @@ class TestEventItemFinder(unittest.TestCase):
         #                        186.54355756518166)
 
     def test_grad_loss(self):
-        from kamrecsys.datasets import load_movielens100k
+        from kamrecsys.datasets import load_movielens_mini
         from kamrecsys.mf.lpmf import EventItemFinder
 
         # setup
-        data = load_movielens100k(
-            os.path.join(os.path.dirname(__file__), 'mlmini_t.event'))
+        data = load_movielens_mini()
         rec = EventItemFinder(C=0.1, k=2, tol=1e-03, random_state=1234)
 
         # tev, tsc, n_objects = \
