@@ -329,10 +329,8 @@ class EventScorePredictor(BaseEventScorePredictor):
             keyword arguments passed to optimizers
         """
 
-        # set random state
-        if random_state is None:
-            random_state = self.random_state
-        self._rng = check_random_state(random_state)
+        # call super class
+        super(EventScorePredictor, self).fit(random_state=random_state)
 
         # get input data
         ev, sc, n_objects = \
