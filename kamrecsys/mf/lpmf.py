@@ -126,7 +126,7 @@ class EventItemFinder(BaseEventItemFinder):
         self._coef = None
         self._dt = None
 
-    def _init_coef(self, ev, sc, n_objects):
+    def _init_coef(self, ev, n_objects):
         """
         Initialize model parameters
 
@@ -134,13 +134,11 @@ class EventItemFinder(BaseEventItemFinder):
         ----------
         ev : array, shape(n_events, 2)
             event data
-        sc : array, shape(n_events,)
-            scores attached to events
         n_objects : array, shape(2,)
             vector of numbers of objects
         """
         # constants
-        n_events = ev.shape[0]
+        n_positives = ev.count_nonzero()
         n_users = n_objects[0]
         n_items = n_objects[1]
         k = self.k
@@ -167,34 +165,18 @@ class EventItemFinder(BaseEventItemFinder):
         self.q_ = self._coef.view(self._dt)['q'][0]
 
         # set bias term
-        self.mu_[0] = np.sum(sc) / n_events
-        for i in xrange(n_users):
-            j = np.nonzero(ev[:, 0] == i)[0]
-            if len(j) > 0:
-                self.bu_[i] = np.sum(sc[j] - self.mu_[0]) / len(j)
-        for i in xrange(n_items):
-            j = np.nonzero(ev[:, 1] == i)[0]
-            if len(j) > 0:
-                self.bi_[i] = (
-                    np.sum(sc[j] - (self.mu_[0] + self.bu_[ev[j, 0]])) /
-                    len(j))
+        self.mu_[0] = n_positives / (n_users * n_items)
+        self.bu_[:] = ev.sum(axis=1).ravel() / n_items
+        self.bi_[:] = ev.sum(axis=0).ravel() / n_users
 
         # fill cross terms by normal randoms whose s.d.'s are mean residuals
-        var = 0.0
-        for i in xrange(n_events):
-            var += (
-                (sc[i] -
-                 (self.mu_[0] + self.bu_[ev[i, 0]] + self.bi_[ev[i, 1]])) ** 2)
-        var /= n_events
-        self.p_[0:n_users, :] = (
-            self._rng.normal(0.0, np.sqrt(var), (n_users, k)))
-        self.q_[0:n_items, :] = (
-            self._rng.normal(0.0, np.sqrt(var), (n_items, k)))
+        self.p_[0:n_users, :] = (self._rng.normal(0.0, 1.0, (n_users, k)))
+        self.q_[0:n_items, :] = (self._rng.normal(0.0, 1.0, (n_items, k)))
 
         # scale a regularization term by the number of parameters
         self._reg = self.C / (1 + (k + 1) * (n_users + n_items))
 
-    def loss(self, coef, ev, sc, n_objects):
+    def loss(self, coef, ev, n_objects):
         """
         loss function to optimize
 
@@ -204,8 +186,6 @@ class EventItemFinder(BaseEventItemFinder):
             coefficients of this model
         ev : array_like, shape(n_events, 2), dtype=int
             user and item indexes
-        sc : array_like, shape(n_events,), dtype=float
-            target scores
         n_objects : array_like, shape(2,), dtype=int
             numbers of users and items
 
@@ -235,7 +215,7 @@ class EventItemFinder(BaseEventItemFinder):
 
         return loss / n_events + self._reg * reg
 
-    def grad_loss(self, coef, ev, sc, n_objects):
+    def grad_loss(self, coef, ev, n_objects):
         """
         gradient of loss function
 
@@ -245,8 +225,6 @@ class EventItemFinder(BaseEventItemFinder):
             coefficients of this model
         ev : array_like, shape(n_events, 2), dtype=int
             user and item indexes
-        sc : array_like, shape(n_events,), dtype=float
-            target scores
         n_objects : array_like, shape(2,), dtype=int
             numbers of users and items
 
@@ -329,19 +307,15 @@ class EventItemFinder(BaseEventItemFinder):
             keyword arguments passed to optimizers
         """
 
-        # set random state
-        if random_state is None:
-            random_state = self.random_state
-        self._rng = check_random_state(random_state)
+        # call super class
+        super(EventItemFinder, self).fit(random_state=random_state)
 
         # get input data
-        ev, sc, n_objects = \
-            self._get_event_and_score(data,
-                                      (user_index, item_index),
-                                      score_index)
+        ev, n_objects = self._get_event_array(
+            data, (user_index, item_index), sparse_type='csr')
 
         # initialize coefficients
-        self._init_coef(ev, sc, n_objects)
+        self._init_coef(ev, n_objects)
 
         # check optimization parameters
         if 'disp' not in kwargs:
@@ -356,7 +330,7 @@ class EventItemFinder(BaseEventItemFinder):
             kwargs['maxiter'] = int(maxiter * self._coef.shape[0])
 
         # get final loss
-        self.i_loss_ = self.loss(self._coef, ev, sc, n_objects)
+        self.i_loss_ = self.loss(self._coef, ev, n_objects)
 
         # optimize model
         # fmin_bfgs is slow for large data, maybe because due to the
@@ -364,7 +338,7 @@ class EventItemFinder(BaseEventItemFinder):
         res = fmin_cg(self.loss,
                       self._coef,
                       fprime=self.grad_loss,
-                      args=(ev, sc, n_objects),
+                      args=(ev, n_objects),
                       full_output=True,
                       **kwargs)
 
