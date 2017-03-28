@@ -218,7 +218,8 @@ class EventItemFinder(BaseEventItemFinder):
             value of loss function
         """
         # constants
-        n_events = ev.shape[0]
+        n_users = n_objects[0]
+        n_events = n_objects[0] * n_objects[1]
 
         # set array's view
         mu = coef.view(self._dt)['mu'][0]
@@ -228,15 +229,19 @@ class EventItemFinder(BaseEventItemFinder):
         q = coef.view(self._dt)['q'][0]
 
         # loss term
-        esc = (mu[0] + bu[ev[:, 0]] + bi[ev[:, 1]] +
-               np.sum(p[ev[:, 0], :] * q[ev[:, 1], :], axis=1))
-        loss = np.sum((sc - esc) ** 2)
+        loss = 0.0
+        for i in xrange(n_users):
+            esc = self.sigmoid(
+                mu[0] + bu[i] + bi[:] +
+                np.sum(p[i, :][np.newaxis, :] * q, axis=1))
+            loss = loss + np.sum((ev[i, :] - esc).getA() ** 2)
+        loss = loss / n_events
 
         # regularization term
         reg = (np.sum(bu ** 2) + np.sum(bi ** 2) +
-               np.sum(p ** 2) + np.sum(q ** 2))
+              np.sum(p ** 2) + np.sum(q ** 2))
 
-        return loss / n_events + self._reg * reg
+        return loss + self._reg * reg
 
     def grad_loss(self, coef, ev, n_objects):
         """

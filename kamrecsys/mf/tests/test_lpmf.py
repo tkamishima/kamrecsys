@@ -68,14 +68,18 @@ class TestEventItemFinder(unittest.TestCase):
         p = rec._coef.view(rec._dt)['p']
         q = rec._coef.view(rec._dt)['q']
 
+        # initial parameters
+        self.assertAlmostEqual(rec.loss(rec._coef, ev, n_objects),
+                               0.48692872837196544)
+
         # all zero
         mu[0] = 0.0
         bu[0][:] = 0.0
         bi[0][:] = 0.0
         p[0][:, :] = 0.0
         q[0][:, :] = 0.0
-        # self.assertAlmostEqual(rec.loss(rec._coef, tev, tsc, n_objects),
-        #                        15.811193562306155)
+        self.assertAlmostEqual(rec.loss(rec._coef, ev, n_objects),
+                               0.25)
 
         # all one
         mu[0] = 1.0
@@ -83,8 +87,8 @@ class TestEventItemFinder(unittest.TestCase):
         bi[0][:] = 1.0
         p[0][:, :] = 1.0
         q[0][:, :] = 1.0
-        # self.assertAlmostEqual(rec.loss(rec._coef, tev, tsc, n_objects),
-        #                        2.4876784107910042)
+        self.assertAlmostEqual(rec.loss(rec._coef, ev, n_objects),
+                               0.71486054877995686)
 
         mu[0] = 1.0
         bu[0][:] = np.arange(0.0, 0.8, 0.1)
@@ -93,8 +97,18 @@ class TestEventItemFinder(unittest.TestCase):
         p[0][:, 1] = 1.0
         q[0][:, 0] = 0.2
         q[0][:, 1] = 1.0
-        # self.assertAlmostEqual(rec.loss(rec._coef, tev, tsc, n_objects),
-        #                        186.54355756518166)
+        self.assertAlmostEqual(rec.loss(rec._coef, ev, n_objects),
+                               0.67952160620227464)
+
+        mu[0] = 2.0
+        bu[0][:] = np.arange(0.8, 0.0, -0.1)
+        bi[0][:] = np.arange(0.0, 1.0, 0.1) * 1.5 + 1.0
+        p[0][:, 0] = np.arange(0.0, 0.8, 0.1) * 0.8 + 3
+        p[0][:, 1] = 1.0
+        q[0][:, 0] = np.arange(1.0, 0.0, -0.1) * 0.3 + 2
+        q[0][:, 1] = np.arange(0.0, 1.0, 0.1)
+        self.assertAlmostEqual(rec.loss(rec._coef, ev, n_objects),
+                               0.94514307182100432)
 
     def test_grad_loss(self):
         from kamrecsys.datasets import load_movielens_mini
