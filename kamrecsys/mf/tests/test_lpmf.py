@@ -39,6 +39,16 @@ from sklearn.utils import check_random_state
 
 class TestEventItemFinder(unittest.TestCase):
 
+    def test_logistic(self):
+        from kamrecsys.mf.lpmf import EventItemFinder
+
+        rec = EventItemFinder()
+        self.assertAlmostEqual(rec.sigmoid(0.), 0.5)
+        self.assertAlmostEqual(rec.sigmoid(1.), 1 / (1 + 1 / np.e))
+        self.assertAlmostEqual(rec.sigmoid(-1.), 1 / (1 + np.e))
+        self.assertAlmostEqual(rec.sigmoid(1000.), 1. - 1e-15)
+        self.assertAlmostEqual(rec.sigmoid(-1000.), 1e-15)
+
     def test_loss(self):
         from kamrecsys.datasets import load_movielens_mini
         from kamrecsys.mf.lpmf import EventItemFinder

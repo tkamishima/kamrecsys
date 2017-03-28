@@ -106,6 +106,9 @@ class EventItemFinder(BaseEventItemFinder):
         Collaborative Filtering Model", KDD2008
     """
 
+    # constant for clipping inputs in a logistic function
+    sigmoid_range = 34.538776394910684
+
     def __init__(self, C=1.0, k=1, tol=None, maxiter=200, random_state=None):
         super(EventItemFinder, self).__init__(random_state=random_state)
 
@@ -175,6 +178,26 @@ class EventItemFinder(BaseEventItemFinder):
 
         # scale a regularization term by the number of parameters
         self._reg = self.C / (1 + (k + 1) * (n_users + n_items))
+
+    def sigmoid(self, x):
+        """
+        sigmoid function
+
+        Parameters
+        ----------
+        x : array_like, shape=(n_data), dtype=float
+            arguments of function
+
+        Returns
+        -------
+        sig : array, shape=(n_data), dtype=float
+            1.0 / (1.0 + exp(- x))
+        """
+
+        # restrict domain of sigmoid function within [1e-15, 1 - 1e-15]
+        x = np.clip(x, -self.sigmoid_range, self.sigmoid_range)
+
+        return 1.0 / (1.0 + np.exp(-x))
 
     def loss(self, coef, ev, n_objects):
         """
