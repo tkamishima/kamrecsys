@@ -304,7 +304,7 @@ class BaseEventItemFinder(with_metaclass(ABCMeta, BaseEventRecommender)):
             a set of indexes to specify the elements in events that are used
             in a recommendation model
         sparse_type: str
-            type of sparse matrix: 'csr', 'csc', 'lil', or 'dense'
+            type of sparse matrix: 'csr', 'csc', 'lil', or 'array'
             default='csr'
 
         Returns
@@ -318,7 +318,7 @@ class BaseEventItemFinder(with_metaclass(ABCMeta, BaseEventRecommender)):
         """
 
         # varidity of arguments
-        if sparse_type not in ['csr', 'csc', 'lil', 'dense']:
+        if sparse_type not in ['csr', 'csc', 'lil', 'array']:
             raise TypeError("illigal type of sparse matrices")
 
         if not isinstance(data, EventData):
