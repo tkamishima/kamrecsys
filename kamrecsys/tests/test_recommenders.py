@@ -57,7 +57,7 @@ class TestBaseEventItemFinder(unittest.TestCase):
         data.filter_event(
             np.logical_and(data.event[:, 0] < 5, data.event[:, 1] < 5))
 
-        event, n_objects = self.rec._get_event_array(data, sparse_type='dense')
+        event, n_objects = self.rec._get_event_array(data, sparse_type='array')
         assert_array_equal(
             event[:5, :5],
             [[1, 1, 1, 1, 1],
