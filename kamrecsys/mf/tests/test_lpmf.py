@@ -267,12 +267,12 @@ class TestEventItemFinder(unittest.TestCase):
              'n_objects': None, '_dt': None, 'mu_': None, 'opt_outputs_': None,
              'maxiter': 200, 'random_state': 1234, '_rng': None})
 
-        # recommender.fit(data, disp=False)
-        # self.assertAlmostEqual(recommender.i_loss_,
-        #                        0.74652578358324106, delta=1e-5)
-        # self.assertAlmostEqual(recommender.f_loss_,
-        #                        0.025638738121075231, delta=1e-5)
-        #
+        rec.fit(data, disp=False)
+        self.assertAlmostEqual(rec.i_loss_,
+                               0.486928728372, delta=1e-5)
+        self.assertAlmostEqual(rec.f_loss_,
+                               0.12337278276141388, delta=1e-5)
+
         # self.assertAlmostEqual(recommender.predict((1, 7)),
         #                        3.9873641434545979, delta=1e-5)
         # self.assertAlmostEqual(recommender.predict((1, 9)),
