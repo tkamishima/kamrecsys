@@ -34,6 +34,14 @@ We tested this module under the following packages:
 Algorithms
 ----------
 
+### Item Finder
+
+* Matrix Factorization
+
+    * Logistic Probabilistic Matrix Factorization
+
+### Score Predictor
+
 * Matrix Factorization
 
     * Probabilistic Matrix Factorization
