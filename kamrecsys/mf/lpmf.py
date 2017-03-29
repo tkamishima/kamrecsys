@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Matrix Factorization: probabilistic matrix factorization model
+Matrix Factorization: logistic probabilistic matrix factorization model
 """
 
 from __future__ import (
@@ -24,13 +24,13 @@ import numpy as np
 from scipy.optimize import fmin_cg
 from sklearn.utils import check_random_state
 
-from ..recommenders import BaseEventScorePredictor
+from ..recommenders import BaseEventItemFinder
 
 # =============================================================================
 # Public symbols
 # =============================================================================
 
-__all__ = ['EventScorePredictor']
+__all__ = ['EventItemFinder']
 
 # =============================================================================
 # Constants
@@ -45,7 +45,7 @@ __all__ = ['EventScorePredictor']
 # =============================================================================
 
 
-class EventScorePredictor(BaseEventScorePredictor):
+class EventItemFinder(BaseEventItemFinder):
     """
     A probabilistic matrix factorization model proposed in [1]_.
     A method of handling bias terms is defined by equation (5) in [2]_.
@@ -106,8 +106,11 @@ class EventScorePredictor(BaseEventScorePredictor):
         Collaborative Filtering Model", KDD2008
     """
 
+    # constant for clipping inputs in a logistic function
+    sigmoid_range = 34.538776394910684
+
     def __init__(self, C=1.0, k=1, tol=None, maxiter=200, random_state=None):
-        super(EventScorePredictor, self).__init__(random_state=random_state)
+        super(EventItemFinder, self).__init__(random_state=random_state)
 
         self.C = np.float(C)
         self.k = np.int(k)
@@ -126,7 +129,7 @@ class EventScorePredictor(BaseEventScorePredictor):
         self._coef = None
         self._dt = None
 
-    def _init_coef(self, ev, sc, n_objects):
+    def _init_coef(self, ev, n_objects):
         """
         Initialize model parameters
 
@@ -134,13 +137,11 @@ class EventScorePredictor(BaseEventScorePredictor):
         ----------
         ev : array, shape(n_events, 2)
             event data
-        sc : array, shape(n_events,)
-            scores attached to events
         n_objects : array, shape(2,)
             vector of numbers of objects
         """
         # constants
-        n_events = ev.shape[0]
+        n_positives = ev.count_nonzero()
         n_users = n_objects[0]
         n_items = n_objects[1]
         k = self.k
@@ -167,34 +168,38 @@ class EventScorePredictor(BaseEventScorePredictor):
         self.q_ = self._coef.view(self._dt)['q'][0]
 
         # set bias term
-        self.mu_[0] = np.sum(sc) / n_events
-        for i in xrange(n_users):
-            j = np.nonzero(ev[:, 0] == i)[0]
-            if len(j) > 0:
-                self.bu_[i] = np.sum(sc[j] - self.mu_[0]) / len(j)
-        for i in xrange(n_items):
-            j = np.nonzero(ev[:, 1] == i)[0]
-            if len(j) > 0:
-                self.bi_[i] = (
-                    np.sum(sc[j] - (self.mu_[0] + self.bu_[ev[j, 0]])) /
-                    len(j))
+        self.mu_[0] = n_positives / (n_users * n_items)
+        self.bu_[:] = ev.sum(axis=1).ravel() / n_items
+        self.bi_[:] = ev.sum(axis=0).ravel() / n_users
 
         # fill cross terms by normal randoms whose s.d.'s are mean residuals
-        var = 0.0
-        for i in xrange(n_events):
-            var += (
-                (sc[i] -
-                 (self.mu_[0] + self.bu_[ev[i, 0]] + self.bi_[ev[i, 1]])) ** 2)
-        var /= n_events
-        self.p_[0:n_users, :] = (
-            self._rng.normal(0.0, np.sqrt(var), (n_users, k)))
-        self.q_[0:n_items, :] = (
-            self._rng.normal(0.0, np.sqrt(var), (n_items, k)))
+        self.p_[0:n_users, :] = (self._rng.normal(0.0, 1.0, (n_users, k)))
+        self.q_[0:n_items, :] = (self._rng.normal(0.0, 1.0, (n_items, k)))
 
         # scale a regularization term by the number of parameters
         self._reg = self.C / (1 + (k + 1) * (n_users + n_items))
 
-    def loss(self, coef, ev, sc, n_objects):
+    def sigmoid(self, x):
+        """
+        sigmoid function
+
+        Parameters
+        ----------
+        x : array_like, shape=(n_data), dtype=float
+            arguments of function
+
+        Returns
+        -------
+        sig : array, shape=(n_data), dtype=float
+            1.0 / (1.0 + exp(- x))
+        """
+
+        # restrict domain of sigmoid function within [1e-15, 1 - 1e-15]
+        x = np.clip(x, -self.sigmoid_range, self.sigmoid_range)
+
+        return 1.0 / (1.0 + np.exp(-x))
+
+    def loss(self, coef, ev, n_objects):
         """
         loss function to optimize
 
@@ -204,8 +209,6 @@ class EventScorePredictor(BaseEventScorePredictor):
             coefficients of this model
         ev : array_like, shape(n_events, 2), dtype=int
             user and item indexes
-        sc : array_like, shape(n_events,), dtype=float
-            target scores
         n_objects : array_like, shape(2,), dtype=int
             numbers of users and items
 
@@ -215,7 +218,8 @@ class EventScorePredictor(BaseEventScorePredictor):
             value of loss function
         """
         # constants
-        n_events = ev.shape[0]
+        n_users = n_objects[0]
+        n_events = n_objects[0] * n_objects[1]
 
         # set array's view
         mu = coef.view(self._dt)['mu'][0]
@@ -225,17 +229,21 @@ class EventScorePredictor(BaseEventScorePredictor):
         q = coef.view(self._dt)['q'][0]
 
         # loss term
-        esc = (mu[0] + bu[ev[:, 0]] + bi[ev[:, 1]] +
-               np.sum(p[ev[:, 0], :] * q[ev[:, 1], :], axis=1))
-        loss = np.sum((sc - esc) ** 2)
+        loss = 0.0
+        for i in xrange(n_users):
+            esc = self.sigmoid(
+                mu[0] + bu[i] + bi[:] +
+                np.sum(p[i, :][np.newaxis, :] * q, axis=1))
+            loss = loss + np.sum((ev[i, :] - esc).getA() ** 2)
+        loss = loss / n_events
 
         # regularization term
         reg = (np.sum(bu ** 2) + np.sum(bi ** 2) +
-               np.sum(p ** 2) + np.sum(q ** 2))
+              np.sum(p ** 2) + np.sum(q ** 2))
 
-        return loss / n_events + self._reg * reg
+        return loss + self._reg * reg
 
-    def grad_loss(self, coef, ev, sc, n_objects):
+    def grad_loss(self, coef, ev, n_objects):
         """
         gradient of loss function
 
@@ -245,8 +253,6 @@ class EventScorePredictor(BaseEventScorePredictor):
             coefficients of this model
         ev : array_like, shape(n_events, 2), dtype=int
             user and item indexes
-        sc : array_like, shape(n_events,), dtype=float
-            target scores
         n_objects : array_like, shape(2,), dtype=int
             numbers of users and items
 
@@ -256,9 +262,8 @@ class EventScorePredictor(BaseEventScorePredictor):
             the first gradient of loss function by coef
         """
         # constants
-        n_events = ev.shape[0]
         n_users = n_objects[0]
-        n_items = n_objects[1]
+        n_events = n_objects[0] * n_objects[1]
 
         # set input array's view
         mu = coef.view(self._dt)['mu'][0]
@@ -276,23 +281,19 @@ class EventScorePredictor(BaseEventScorePredictor):
         grad_q = grad.view(self._dt)['q'][0]
 
         # gradient of loss term
-        neg_res = -(sc - (mu[0] + bu[ev[:, 0]] + bi[ev[:, 1]] +
-                          np.sum(p[ev[:, 0], :] * q[ev[:, 1], :], axis=1)))
-        grad_mu[0] = np.sum(neg_res)
-        grad_bu[:] = np.bincount(ev[:, 0], weights=neg_res,
-                                 minlength=n_users)
-        grad_bi[:] = np.bincount(ev[:, 1], weights=neg_res,
-                                 minlength=n_items)
-        weights = neg_res[:, np.newaxis] * q[ev[:, 1], :]
-        for i in xrange(self.k):
-            grad_p[:, i] = np.bincount(ev[:, 0], weights=weights[:, i],
-                                       minlength=n_users)
-        weights = neg_res[:, np.newaxis] * p[ev[:, 0], :]
-        for i in xrange(self.k):
-            grad_q[:, i] = np.bincount(ev[:, 1], weights=weights[:, i],
-                                       minlength=n_items)
+        for i in xrange(n_users):
+            evi = ev.getrow(i).toarray().reshape(-1)
+            esc = self.sigmoid(
+                mu[0] + bu[i] + bi[:] +
+                np.sum(p[i, :][np.newaxis, :] * q, axis=1))
+            common_term = - (evi - esc) * esc * (1 - esc)
 
-        # re-scale gradients
+            grad_mu[0] += np.sum(common_term)
+            grad_bu[i] = np.sum(common_term)
+            grad_bi[:] += common_term
+            grad_p[i, :] = np.sum(common_term[:, np.newaxis] * q, axis=0)
+            grad_q[:, :] += common_term[:, np.newaxis] * p[i, :][np.newaxis, :]
+
         grad[:] = grad[:] / n_events
 
         # gradient of regularization term
@@ -330,16 +331,14 @@ class EventScorePredictor(BaseEventScorePredictor):
         """
 
         # call super class
-        super(EventScorePredictor, self).fit(random_state=random_state)
+        super(EventItemFinder, self).fit(random_state=random_state)
 
         # get input data
-        ev, sc, n_objects = \
-            self._get_event_and_score(data,
-                                      (user_index, item_index),
-                                      score_index)
+        ev, n_objects = self._get_event_array(
+            data, (user_index, item_index), sparse_type='csr')
 
         # initialize coefficients
-        self._init_coef(ev, sc, n_objects)
+        self._init_coef(ev, n_objects)
 
         # check optimization parameters
         if 'disp' not in kwargs:
@@ -354,7 +353,7 @@ class EventScorePredictor(BaseEventScorePredictor):
             kwargs['maxiter'] = int(maxiter * self._coef.shape[0])
 
         # get final loss
-        self.i_loss_ = self.loss(self._coef, ev, sc, n_objects)
+        self.i_loss_ = self.loss(self._coef, ev, n_objects)
 
         # optimize model
         # fmin_bfgs is slow for large data, maybe because due to the
@@ -362,7 +361,7 @@ class EventScorePredictor(BaseEventScorePredictor):
         res = fmin_cg(self.loss,
                       self._coef,
                       fprime=self.grad_loss,
-                      args=(ev, sc, n_objects),
+                      args=(ev, n_objects),
                       full_output=True,
                       **kwargs)
 
@@ -407,10 +406,11 @@ class EventScorePredictor(BaseEventScorePredictor):
             shape of an input array is illegal
         """
 
-        return (self.mu_[0] + self.bu_[ev[:, 0]] + self.bi_[ev[:, 1]] +
-                np.sum(self.p_[ev[:, 0], :] * self.q_[ev[:, 1], :],
-                       axis=1))
+        sc = self.sigmoid(
+            self.mu_[0] + self.bu_[ev[:, 0]] + self.bi_[ev[:, 1]] +
+            np.sum(self.p_[ev[:, 0], :] * self.q_[ev[:, 1], :], axis=1))
 
+        return sc
 
 # =============================================================================
 # Functions

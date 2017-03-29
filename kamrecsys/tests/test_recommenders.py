@@ -38,7 +38,7 @@ class EventItemFinder(BaseEventItemFinder):
     def __init__(self):
         super(EventItemFinder, self).__init__(random_state=1234)
 
-    def predict(self):
+    def raw_predict(self):
         pass
 
 # =============================================================================
@@ -57,7 +57,7 @@ class TestBaseEventItemFinder(unittest.TestCase):
         data.filter_event(
             np.logical_and(data.event[:, 0] < 5, data.event[:, 1] < 5))
 
-        event, n_objects = self.rec._get_event_array(data, sparse_type='dense')
+        event, n_objects = self.rec._get_event_array(data, sparse_type='array')
         assert_array_equal(
             event[:5, :5],
             [[1, 1, 1, 1, 1],
