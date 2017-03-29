@@ -262,9 +262,8 @@ class EventItemFinder(BaseEventItemFinder):
             the first gradient of loss function by coef
         """
         # constants
-        n_events = ev.shape[0]
         n_users = n_objects[0]
-        n_items = n_objects[1]
+        n_events = n_objects[0] * n_objects[1]
 
         # set input array's view
         mu = coef.view(self._dt)['mu'][0]
@@ -282,23 +281,19 @@ class EventItemFinder(BaseEventItemFinder):
         grad_q = grad.view(self._dt)['q'][0]
 
         # gradient of loss term
-        neg_res = -(sc - (mu[0] + bu[ev[:, 0]] + bi[ev[:, 1]] +
-                          np.sum(p[ev[:, 0], :] * q[ev[:, 1], :], axis=1)))
-        grad_mu[0] = np.sum(neg_res)
-        grad_bu[:] = np.bincount(ev[:, 0], weights=neg_res,
-                                 minlength=n_users)
-        grad_bi[:] = np.bincount(ev[:, 1], weights=neg_res,
-                                 minlength=n_items)
-        weights = neg_res[:, np.newaxis] * q[ev[:, 1], :]
-        for i in xrange(self.k):
-            grad_p[:, i] = np.bincount(ev[:, 0], weights=weights[:, i],
-                                       minlength=n_users)
-        weights = neg_res[:, np.newaxis] * p[ev[:, 0], :]
-        for i in xrange(self.k):
-            grad_q[:, i] = np.bincount(ev[:, 1], weights=weights[:, i],
-                                       minlength=n_items)
+        for i in xrange(n_users):
+            evi = ev.getrow(i).toarray().reshape(-1)
+            esc = self.sigmoid(
+                mu[0] + bu[i] + bi[:] +
+                np.sum(p[i, :][np.newaxis, :] * q, axis=1))
+            common_term = - (evi - esc) * esc * (1 - esc)
 
-        # re-scale gradients
+            grad_mu[0] += np.sum(common_term)
+            grad_bu[i] = np.sum(common_term)
+            grad_bi[:] += common_term
+            grad_p[i, :] = np.sum(common_term[:, np.newaxis] * q, axis=0)
+            grad_q[:, :] += common_term[:, np.newaxis] * p[i, :][np.newaxis, :]
+
         grad[:] = grad[:] / n_events
 
         # gradient of regularization term
