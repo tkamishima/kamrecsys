@@ -19,6 +19,7 @@ import logging
 from abc import ABCMeta, abstractmethod
 from six import with_metaclass
 import numpy as np
+import scipy.sparse as sparse
 from sklearn.base import BaseEstimator
 from sklearn.utils import check_random_state, check_array
 
@@ -237,8 +238,42 @@ class BaseEventRecommender(
         super(BaseEventRecommender, self).fit(random_state=random_state)
 
     @abstractmethod
-    def predict(self, eev, **kwargs):
-        pass
+    def raw_predict(self, ev, **kwargs):
+        """
+        abstract method: predict score of given one event represented by
+        internal ids
+
+        Parameters
+        ----------
+        ev : array_like, shape=(n_events, s_event)
+            events represented by internal id
+
+        Returns
+        -------
+        sc : float or array_like, shape=(n_events,), dtype=float
+            predicted scores for given inputs
+        """
+
+    def predict(self, eev):
+        """
+        predict score of given event represented by external ids
+
+        Parameters
+        ----------
+        eev : array_like, shape=(s_event,) or (n_events, s_event)
+            events represented by external id
+
+        Returns
+        -------
+        sc : float or array_like, shape=(n_events,), dtype=float
+            predicted scores for given inputs
+        """
+
+        eev = check_array(np.atleast_2d(eev), dtype=int)
+        if eev.shape[1] != self.s_event:
+            raise TypeError("unmatched sized of events")
+
+        return np.squeeze(self.raw_predict(self.to_iid_event(eev)))
 
 
 class BaseEventItemFinder(with_metaclass(ABCMeta, BaseEventRecommender)):
@@ -256,9 +291,64 @@ class BaseEventItemFinder(with_metaclass(ABCMeta, BaseEventRecommender)):
         """
         super(BaseEventItemFinder, self).fit(random_state=random_state)
 
-    @abstractmethod
-    def predict(self, eev, **kwargs):
-        pass
+    def _get_event_array(self, data, event_index=(0,1), sparse_type='csr'):
+        """
+        Set statistics of input dataset, and generate a matrix representing
+        implicit feedbacks.
+
+        Parameters
+        ----------
+        data : :class:`kamrecsys.data.EventData`
+            data to fit
+        event_index : array_like, shape=(variable,)
+            a set of indexes to specify the elements in events that are used
+            in a recommendation model
+        sparse_type: str
+            type of sparse matrix: 'csr', 'csc', 'lil', or 'array'
+            default='csr'
+
+        Returns
+        -------
+        event_array: array, shape=(n_users, n_items), dtype=int
+            return rating matrix that takes 1 if it is consumed, 0 otherwise.
+            if event data are not available, return None
+        n_objects : array_like, shape=(event_index.shape[0],), dtype=int
+            the number of objects corresponding to elements tof an extracted
+            events
+        """
+
+        # varidity of arguments
+        if sparse_type not in ['csr', 'csc', 'lil', 'array']:
+            raise TypeError("illigal type of sparse matrices")
+
+        if not isinstance(data, EventData):
+            raise TypeError("input data must data.EventData class")
+
+        # import meta information of objects and events to this recommender
+        self._set_object_info(data)
+        self._set_event_info(data)
+        event_index = np.asarray(event_index)
+
+        # get number of objects
+        n_objects = self.n_objects[self.event_otypes[event_index]]
+
+        # get event data
+        users = data.event[:, event_index[0]]
+        items = data.event[:, event_index[1]]
+        scores = np.ones_like(users, dtype=int)
+
+        # generate array
+        event = sparse.coo_matrix((scores, (users, items)), shape=n_objects)
+        if sparse_type == 'csc':
+            event = event.tocsc()
+        elif sparse_type == 'csr':
+            event = event.tocsr()
+        elif sparse_type == 'lil':
+            event = event.tolil()
+        else:
+            event = event.toarray()
+
+        return event, n_objects
 
 
 class BaseEventScorePredictor(with_metaclass(ABCMeta, BaseEventRecommender)):
@@ -275,23 +365,6 @@ class BaseEventScorePredictor(with_metaclass(ABCMeta, BaseEventRecommender)):
         fitting model
         """
         super(BaseEventScorePredictor, self).fit(random_state=random_state)
-
-    @abstractmethod
-    def raw_predict(self, ev, **kwargs):
-        """
-        abstract method: predict score of given one event represented by
-        internal ids
-
-        Parameters
-        ----------
-        ev : array_like, shape=(n_events, s_event)
-            events represented by internal id
-
-        Returns
-        -------
-        sc : float or array_like, shape=(n_events,), dtype=float
-            predicted scores for given inputs
-        """
 
     def _get_event_and_score(self, data, event_index, score_index):
         """
@@ -344,27 +417,6 @@ class BaseEventScorePredictor(with_metaclass(ABCMeta, BaseEventRecommender)):
         n_objects = self.n_objects[self.event_otypes[event_index]]
 
         return event, score, n_objects
-
-    def predict(self, eev):
-        """
-        predict score of given event represented by external ids
-
-        Parameters
-        ----------
-        eev : array_like, shape=(s_event,) or (n_events, s_event)
-            events represented by external id
-
-        Returns
-        -------
-        sc : float or array_like, shape=(n_events,), dtype=float
-            predicted scores for given inputs
-        """
-
-        eev = check_array(np.atleast_2d(eev), dtype=int)
-        if eev.shape[1] != self.s_event:
-            raise TypeError("unmatched sized of events")
-
-        return np.squeeze(self.raw_predict(self.to_iid_event(eev)))
 
 # =============================================================================
 # Functions

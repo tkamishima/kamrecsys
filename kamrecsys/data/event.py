@@ -100,11 +100,9 @@ class EventUtilMixin(with_metaclass(ABCMeta, object)):
         if missing_values is None:
             missing_values = self.n_objects[self.event_otypes]
         if ev.ndim == 1 and ev.shape[0] == self.s_event:
-            new_ev = \
-                np.array(
-                    [self.iid[self.event_otypes[e]].get(ev[e],
-                                                        missing_values[e])
-                     for e in xrange(self.s_event)], dtype=np.int)
+            new_ev = np.array(
+                [self.iid[self.event_otypes[e]].get(ev[e], missing_values[e])
+                 for e in xrange(self.s_event)], dtype=np.int)
         elif ev.ndim == 2 and ev.shape[1] == self.s_event:
             new_ev = np.empty_like(ev, dtype=np.int)
             for e in xrange(self.s_event):
@@ -157,9 +155,9 @@ class EventData(BaseData, EventUtilMixin):
             self.s_event = n_otypes
             self.event_otypes = np.arange(self.s_event, dtype=int)
         else:
-            if event_otypes.ndim != 1 or\
-               np.min(event_otypes) < 0 or\
-               np.max(event_otypes) >= n_otypes:
+            if (event_otypes.ndim != 1 or
+                np.min(event_otypes) < 0 or
+                np.max(event_otypes) >= n_otypes):
                 raise ValueError("Illegal event_otypes specification")
             self.s_event = event_otypes.shape[0]
             self.event_otypes = np.asarray(event_otypes)
@@ -179,8 +177,8 @@ class EventData(BaseData, EventUtilMixin):
             feature of events
         """
         for otype in xrange(self.n_otypes):
-            self.n_objects[otype], self.eid[otype], self.iid[otype] =\
-                self._gen_id(event[:, self.event_otypes == otype])
+            self.n_objects[otype], self.eid[otype], self.iid[otype] = (
+                self._gen_id(event[:, self.event_otypes == otype]))
 
         self.event = np.empty_like(event, dtype=np.int)
         for e in xrange(self.s_event):
@@ -192,6 +190,29 @@ class EventData(BaseData, EventUtilMixin):
             self.event_feature = np.asarray(event_feature).copy()
         else:
             self.event_feature = None
+
+    def filter_event(self, filter_cond):
+        """
+        replace event data with those consisting of events whose corresponding
+        `filter_cond` is `True`.   
+
+        Parameters
+        ----------
+        filter_cond : array, dtype=bool, shape=(n_events,)
+            Boolean array that specifies whether each event should be included
+            in a new event array.
+        """
+
+        # check whether event info is available
+        if self.event is None:
+            return
+
+        # filter out event data
+        self.event = self.event[filter_cond, :]
+
+        # filter out event features
+        if self.event_feature is not None:
+            self.event_feature = self.event_feature[filter_cond]
 
 
 class EventWithScoreData(EventData):
@@ -295,6 +316,30 @@ class EventWithScoreData(EventData):
             digitized_scores = np.digitize(score, bins) - 1
 
         return digitized_scores
+
+    def filter_event(self, filter_cond):
+        """
+        replace event data with those consisting of events whose corresponding
+        `filter_cond` is `True`.   
+
+        Parameters
+        ----------
+        filter_cond : array, dtype=bool, shape=(n_events,)
+            Boolean array that specifies whether each event should be included
+            in a new event array.
+        """
+
+        # check whether event info is available
+        if self.event is None:
+            return
+
+        # filter out event related information
+        super(EventWithScoreData, self).filter_event(filter_cond)
+
+        # filter out event data
+        if self.score is not None:
+            self.score = self.score[filter_cond]
+
 
 # =============================================================================
 # Functions
