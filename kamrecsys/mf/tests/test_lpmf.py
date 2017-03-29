@@ -273,33 +273,37 @@ class TestEventItemFinder(unittest.TestCase):
         self.assertAlmostEqual(rec.f_loss_,
                                0.12337278276141388, delta=1e-5)
 
-        # self.assertAlmostEqual(recommender.predict((1, 7)),
-        #                        3.9873641434545979, delta=1e-5)
-        # self.assertAlmostEqual(recommender.predict((1, 9)),
-        #                        4.9892118821609106, delta=1e-5)
-        # self.assertAlmostEqual(recommender.predict((1, 11)),
-        #                        3.6480799850368273, delta=1e-5)
-        # self.assertAlmostEqual(recommender.predict((3, 7)),
-        #                        3.6336318795279228, delta=1e-5)
-        # self.assertAlmostEqual(recommender.predict((3, 9)),
-        #                        4.2482001235634943, delta=1e-5)
-        # self.assertAlmostEqual(recommender.predict((3, 11)),
-        #                        3.7236984083417841, delta=1e-5)
-        # self.assertAlmostEqual(recommender.predict((5, 7)),
-        #                        3.4141968145802597, delta=1e-5)
-        # self.assertAlmostEqual(recommender.predict((5, 9)),
-        #                        3.9818882049478654, delta=1e-5)
-        # self.assertAlmostEqual(recommender.predict((5, 11)),
-        #                        3.4710520150321895, delta=1e-5)
-        # x = np.array([
-        #     [1, 7], [1, 9], [1, 11],
-        #     [3, 7], [3, 9], [3, 11],
-        #     [5, 7], [5, 9], [5, 11]])
-        # assert_allclose(
-        #     recommender.predict(x),
-        #     [3.98736414, 4.98921188, 3.64807999, 3.63363188, 4.24820012,
-        #      3.72369841, 3.41419681, 3.9818882, 3.47105202],
-        #     rtol=1e-5)
+        # single prediction
+        self.assertAlmostEqual(rec.predict((1, 7)),
+                               0.930058873211098, delta=1e-5)
+        self.assertAlmostEqual(rec.predict((1, 9)),
+                               0.831029324679303, delta=1e-5)
+        self.assertAlmostEqual(rec.predict((1, 11)),
+                               0.824764768339243, delta=1e-5)
+        self.assertAlmostEqual(rec.predict((3, 7)),
+                               0.64254771029356, delta=1e-5)
+        self.assertAlmostEqual(rec.predict((3, 9)),
+                               0.410188315714424, delta=1e-5)
+        self.assertAlmostEqual(rec.predict((3, 11)),
+                               0.371479413131516, delta=1e-5)
+        self.assertAlmostEqual(rec.predict((5, 7)),
+                               0.167964943725211, delta=1e-5)
+        self.assertAlmostEqual(rec.predict((5, 9)),
+                               0.162465161919407, delta=1e-5)
+        self.assertAlmostEqual(rec.predict((5, 11)),
+                               0.277304214332779, delta=1e-5)
+
+        # multiple prediction
+        x = np.array([
+            [1, 7], [1, 9], [1, 11],
+            [3, 7], [3, 9], [3, 11],
+            [5, 7], [5, 9], [5, 11]])
+        assert_allclose(
+            rec.predict(x),
+            [0.930058873211098, 0.831029324679303, 0.824764768339243,
+             0.64254771029356, 0.410188315714424, 0.371479413131516,
+             0.167964943725211, 0.162465161919407, 0.277304214332779],
+            rtol=1e-5)
 
 # =============================================================================
 # Main Routines

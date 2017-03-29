@@ -406,10 +406,11 @@ class EventItemFinder(BaseEventItemFinder):
             shape of an input array is illegal
         """
 
-        return (self.mu_[0] + self.bu_[ev[:, 0]] + self.bi_[ev[:, 1]] +
-                np.sum(self.p_[ev[:, 0], :] * self.q_[ev[:, 1], :],
-                       axis=1))
+        sc = self.sigmoid(
+            self.mu_[0] + self.bu_[ev[:, 0]] + self.bi_[ev[:, 1]] +
+            np.sum(self.p_[ev[:, 0], :] * self.q_[ev[:, 1], :], axis=1))
 
+        return sc
 
 # =============================================================================
 # Functions
