@@ -304,7 +304,7 @@ class EventItemFinder(BaseEventItemFinder):
             esc = self.sigmoid(
                 mu[0] + bu[i] + bi[:] +
                 np.sum(p[i, :][np.newaxis, :] * q, axis=1))
-            common_term = - (evi - esc) * esc * (1 - esc)
+            common_term = esc - evi
 
             grad_mu[0] += np.sum(common_term)
             grad_bu[i] = np.sum(common_term)
