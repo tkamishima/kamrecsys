@@ -310,6 +310,13 @@ class EventScorePredictor(BaseEventScorePredictor):
         grad_p[:, :] += self._reg * p
         grad_q[:, :] += self._reg * q
 
+        np.set_printoptions(precision=10)
+        print(grad_mu[0])
+        print(grad_bu[:4])
+        print(grad_bi[-4:])
+        print(grad_p[:2, :])
+        print(grad_q[-2:, :])
+
         return grad
 
     def fit(self, data, user_index=0, item_index=1, score_index=0, tol=None,
@@ -342,10 +349,8 @@ class EventScorePredictor(BaseEventScorePredictor):
         super(EventScorePredictor, self).fit(random_state=random_state)
 
         # get input data
-        ev, sc, n_objects = \
-            self._get_event_and_score(data,
-                                      (user_index, item_index),
-                                      score_index)
+        ev, sc, n_objects = self._get_event_and_score(
+            data, (user_index, item_index), score_index)
 
         # initialize coefficients
         self._init_coef(ev, sc, n_objects)
