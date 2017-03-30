@@ -247,10 +247,12 @@ class EventItemFinder(BaseEventItemFinder):
         # loss term
         loss = 0.0
         for i in xrange(n_users):
+            evi = ev.getrow(i).toarray().reshape(-1)
             esc = self.sigmoid(
                 mu[0] + bu[i] + bi[:] +
                 np.sum(p[i, :][np.newaxis, :] * q, axis=1))
-            loss = loss + np.sum((ev[i, :] - esc).getA() ** 2)
+            loss = loss - np.sum(
+                evi * np.log(esc) + (1 - evi) * np.log(1. - esc))
         loss = loss / n_events
 
         # regularization term

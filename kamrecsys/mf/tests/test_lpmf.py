@@ -70,7 +70,7 @@ class TestEventItemFinder(unittest.TestCase):
 
         # initial parameters
         self.assertAlmostEqual(rec.loss(rec._coef, ev, n_objects),
-                               0.48692872837196544)
+                               1.3445493746024519, delta=1e-5)
 
         # all zero
         mu[0] = 0.0
@@ -79,7 +79,7 @@ class TestEventItemFinder(unittest.TestCase):
         p[0][:, :] = 0.0
         q[0][:, :] = 0.0
         self.assertAlmostEqual(rec.loss(rec._coef, ev, n_objects),
-                               0.25)
+                               0.69314718055994518, delta=1e-5)
 
         # all one
         mu[0] = 1.0
@@ -88,7 +88,7 @@ class TestEventItemFinder(unittest.TestCase):
         p[0][:, :] = 1.0
         q[0][:, :] = 1.0
         self.assertAlmostEqual(rec.loss(rec._coef, ev, n_objects),
-                               0.71486054877995686)
+                               3.2298971666709479, delta=1e-5)
 
         mu[0] = 1.0
         bu[0][:] = np.arange(0.0, 0.8, 0.1)
@@ -98,7 +98,7 @@ class TestEventItemFinder(unittest.TestCase):
         q[0][:, 0] = 0.2
         q[0][:, 1] = 1.0
         self.assertAlmostEqual(rec.loss(rec._coef, ev, n_objects),
-                               0.67952160620227464)
+                               2.5557470027227374, delta=1e-5)
 
         mu[0] = 2.0
         bu[0][:] = np.arange(0.8, 0.0, -0.1)
@@ -108,7 +108,7 @@ class TestEventItemFinder(unittest.TestCase):
         q[0][:, 0] = np.arange(1.0, 0.0, -0.1) * 0.3 + 2
         q[0][:, 1] = np.arange(0.0, 1.0, 0.1)
         self.assertAlmostEqual(rec.loss(rec._coef, ev, n_objects),
-                               0.94514307182100432)
+                               7.6233440104662717, delta=1e-5)
 
     def test_grad_loss(self):
         from kamrecsys.datasets import load_movielens_mini
