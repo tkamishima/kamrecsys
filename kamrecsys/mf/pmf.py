@@ -83,16 +83,25 @@ class EventScorePredictor(BaseEventScorePredictor):
 
     Notes
     -----
-    Preference scores are modeled by the sum of bias terms and the cross
-    product of users' and items' latent factors with L2 regularizers.
+    Rating scores are modeled by the sum of bias terms and the cross
+    product of users' and items' latent factors
+    
+    .. math::
+    
+        \hat{r}_{xy} =  \mu + b_x + c_y + \mathbf{p}_x^\top \mathbf{q}_y
+       
+    Parameters of this model is estimated by optimizing a squared loss function
+    with L2 regularizer
 
     .. math::
 
-        \hat{y} =
-        \sum_{(u,i) \in \mathcal{D}}
-        \mu + b_u + c_i + \mathbf{p}_u^\top \mathbf{q}_i
-        + \lambda (\|P_u\|_2^2 + \|Q_u\|_2^2
-        + \|\mathbf{b}\|_2^2 + \|\mathbf{c}\|_2^2)
+        \sum_{(x, y) \in \mathcal{D}}
+        \frac{1}{|\mathcal{D}|}
+        \Big( r_{xy} - \hat{r}_{xy} \Big) 
+        + \lambda \Big(
+        \|\mathbf{b}\|_2^2 + \|\mathbf{c}\|_2^2 +
+        \|\mathbf{P}\|_2^2 + \|\mathbf{Q}\|_2^2
+        \Big)
 
     For computational reasons, a loss term is scaled by the number of
     events, and a regularization term is scaled by the number of model
