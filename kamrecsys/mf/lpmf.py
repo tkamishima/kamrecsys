@@ -49,6 +49,8 @@ class EventItemFinder(BaseEventItemFinder):
     """
     A probabilistic matrix factorization model proposed in [1]_.
     A method of handling bias terms is defined by equation (5) in [2]_.
+    However, to deal with implicit ratings, a sigmoid function is additionally
+    used.
 
     Parameters
     ----------
@@ -83,16 +85,30 @@ class EventItemFinder(BaseEventItemFinder):
 
     Notes
     -----
-    Preference scores are modeled by the sum of bias terms and the cross
-    product of users' and items' latent factors with L2 regularizers.
+    Rating scores are modeled by the sum of bias terms and the cross
+    product of users' and items' latent factors.
+    To constrain that ratings so as to lie between zero to one, a sigmoid
+    function is applied.
+    
+    .. math::
+    
+        \hat{r}_{xy} =  \sigma(
+        \mu + b_x + c_y + \mathbf{p}_x^\top \mathbf{q}_y
+        )
+       
+    Parameters of this model is estimated by optimizing a cross-entropy loss
+    function with L2 regularizer
 
     .. math::
 
-        \hat{y} =
-        \sum_{(u,i) \in \mathcal{D}}
-        \mu + b_u + c_i + \mathbf{p}_u^\top \mathbf{q}_i
-        + \lambda (\|P_u\|_2^2 + \|Q_u\|_2^2
-        + \|\mathbf{b}\|_2^2 + \|\mathbf{c}\|_2^2)
+        \sum_{(x,y)}
+        \frac{1}{N_x N_y}
+        - \Big( r_{xy} \log \hat{r}_{xy} + 
+                (1 - r_{xy}) \log(1 - \hat{r}_{xy})\Big) 
+        + \lambda \Big(
+        \|\mathbf{b}\|_2^2 + \|\mathbf{c}\|_2^2 +
+        \|\mathbf{P}\|_2^2 + \|\mathbf{Q}\|_2^2
+        \Big)
 
     For computational reasons, a loss term is scaled by the number of
     events, and a regularization term is scaled by the number of model
@@ -231,10 +247,12 @@ class EventItemFinder(BaseEventItemFinder):
         # loss term
         loss = 0.0
         for i in xrange(n_users):
+            evi = ev.getrow(i).toarray().reshape(-1)
             esc = self.sigmoid(
                 mu[0] + bu[i] + bi[:] +
                 np.sum(p[i, :][np.newaxis, :] * q, axis=1))
-            loss = loss + np.sum((ev[i, :] - esc).getA() ** 2)
+            loss = loss - np.sum(
+                evi * np.log(esc) + (1 - evi) * np.log(1. - esc))
         loss = loss / n_events
 
         # regularization term
@@ -286,7 +304,7 @@ class EventItemFinder(BaseEventItemFinder):
             esc = self.sigmoid(
                 mu[0] + bu[i] + bi[:] +
                 np.sum(p[i, :][np.newaxis, :] * q, axis=1))
-            common_term = - (evi - esc) * esc * (1 - esc)
+            common_term = esc - evi
 
             grad_mu[0] += np.sum(common_term)
             grad_bu[i] = np.sum(common_term)
