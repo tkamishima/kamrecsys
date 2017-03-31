@@ -21,14 +21,6 @@ from ._score import (
 from ._score_predictor import (
     score_predictor_report,
     score_predictor_statistics)
-from .base import (
-    BaseMetrics,
-    DescriptiveStatistics,
-    Histogram)
-from .real import (
-    BaseRealMetrics,
-    MeanAbsoluteError,
-    MeanSquaredError)
 
 # =============================================================================
 # Public symbols
@@ -38,10 +30,4 @@ __all__ = [
     'mean_absolute_error',
     'mean_squared_error',
     'score_predictor_report',
-    'score_predictor_statistics'
-    'BaseMetrics',
-    'DescriptiveStatistics',
-    'Histogram',
-    'BaseRealMetrics',
-    'MeanAbsoluteError',
-    'MeanSquaredError']
+    'score_predictor_statistics']
