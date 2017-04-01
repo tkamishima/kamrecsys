@@ -81,6 +81,8 @@ import subprocess
 import logging
 import datetime
 import numpy as np
+import scipy as sp
+import sklearn
 
 from kamrecsys.data import EventWithScoreData
 from kamrecsys.cross_validation import KFold
@@ -463,6 +465,32 @@ def get_system_info():
 
     return info
 
+def get_version_info():
+    """
+    Get version numbers of a Python interpreter and packages.  
+    
+    Returns
+    -------
+    info : dict
+        Version numbers of a Python interpreter and packages. 
+    """
+    # import platform
+    # import numpy as np
+    # import scipy as sp
+    # import sklearn
+
+    info = {}
+
+    info['python_compiler'] = platform.python_compiler()
+    info['python_implementation'] = platform.python_implementation()
+    info['python'] = platform.python_version()
+
+    info['numpy'] = np.__version__
+    info['scipy'] = sp.__version__
+    info['sklearn'] = sklearn.__version__
+
+    return info
+
 # =============================================================================
 # Classes
 # =============================================================================
@@ -570,12 +598,6 @@ if __name__ == '__main__':
     if opt.outfile is None:
         opt.outfile = opt.outfilep
     del vars(opt)['outfilep']
-
-    # set meta-data of script and machine
-    opt.script_name = script_name
-    opt.script_version = __version__
-    opt.python_version = platform.python_version()
-    opt.numpy_version = np.__version__
 
     # suppress warnings in numerical computation
     np.seterr(all='ignore')
