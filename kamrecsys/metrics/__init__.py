@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-evaluation metrics
+Evaluation Metrics
 """
 
 from __future__ import (
@@ -15,22 +15,21 @@ from six.moves import xrange
 # Imports
 # =============================================================================
 
-from .base import (
-    BaseMetrics,
-    DescriptiveStatistics,
-    Histogram)
-from .real import (
-    BaseRealMetrics,
-    MeanAbsoluteError,
-    MeanSquaredError)
+from ._score import (
+    mean_absolute_error,
+    mean_squared_error,
+    score_histogram)
+from ._score_predictor import (
+    score_predictor_report,
+    score_predictor_statistics)
 
 # =============================================================================
 # Public symbols
 # =============================================================================
 
-__all__ = ['BaseMetrics',
-           'DescriptiveStatistics',
-           'Histogram',
-           'BaseRealMetrics',
-           'MeanAbsoluteError',
-           'MeanSquaredError']
+__all__ = [
+    'mean_absolute_error',
+    'mean_squared_error',
+    'score_histogram',
+    'score_predictor_report',
+    'score_predictor_statistics']

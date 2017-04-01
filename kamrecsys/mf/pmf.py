@@ -310,13 +310,6 @@ class EventScorePredictor(BaseEventScorePredictor):
         grad_p[:, :] += self._reg * p
         grad_q[:, :] += self._reg * q
 
-        np.set_printoptions(precision=10)
-        print(grad_mu[0])
-        print(grad_bu[:4])
-        print(grad_bi[-4:])
-        print(grad_p[:2, :])
-        print(grad_q[-2:, :])
-
         return grad
 
     def fit(self, data, user_index=0, item_index=1, score_index=0, tol=None,
