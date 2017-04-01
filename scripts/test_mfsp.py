@@ -134,14 +134,14 @@ def load_data(fp, ts):
     # have timestamp?
     if ts:
         dt = np.dtype([
-            ('event', np.int, 2),
-            ('score', np.float),
-            ('event_feature', np.dtype([('timestamp', np.int)]))
+            ('event', int, 2),
+            ('score', float),
+            ('event_feature', np.dtype([('timestamp', int)]))
         ])
     else:
         dt = np.dtype([
-            ('event', np.int, 2),
-            ('score', np.float)
+            ('event', int, 2),
+            ('score', float)
         ])
 
     # load training data
@@ -162,9 +162,9 @@ def training(opt, ev, tsc, event_feature=None, fold=0):
     ----------
     opt : dict
         parsed command line options
-    ev : array, size=(n_events, 2), dtype=np.int
+    ev : array, size=(n_events, 2), dtype=int
         array of events in external ids
-    tsc : array, size=(n_events,), dtype=np.float
+    tsc : array, size=(n_events,), dtype=float
         true scores
     event_feature : optional, structured array
         structured array of event features
@@ -250,11 +250,11 @@ def testing(rcmdr, fp, opt, ev, tsc, ts=None, fold=0):
         output file pointer
     opt : Options
         parsed command line options
-    ev : array, size=(n_events, 2), dtype=np.int
+    ev : array, size=(n_events, 2), dtype=int
         array of events in external ids
-    tsc : array, size=(n_events,), dtype=np.float
+    tsc : array, size=(n_events,), dtype=float
         true scores
-    ts : optional, array, size=(n_events,), dtype=np.int
+    ts : optional, array, size=(n_events,), dtype=int
         timestamps if available
     fold : int, default=0
         fold No.
