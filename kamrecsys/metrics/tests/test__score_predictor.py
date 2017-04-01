@@ -67,9 +67,11 @@ class TestScorePredictorStatistics(TestCase):
     def test_class(self):
         from kamrecsys.metrics import score_predictor_statistics
 
-        stats = score_predictor_statistics(y_true, y_pred)
+        stats = score_predictor_statistics(
+            y_true, y_pred, scores=(1, 2, 3, 4, 5))
 
         self.assertEqual(stats['n_samples'], 10)
+        assert_array_equal(stats['scores'], (1, 2, 3, 4, 5))
 
         sub_stats = stats['mean_absolute_error']
         self.assertAlmostEqual(
@@ -90,12 +92,28 @@ class TestScorePredictorStatistics(TestCase):
             sub_stats['mean'], 4.1, delta=1e-5)
         self.assertAlmostEqual(
             sub_stats['stdev'], 1.04403065089, delta=1e-5)
+        assert_array_equal(sub_stats['histogram'], (0, 1, 2, 2, 5))
+        assert_allclose(
+            sub_stats['histogram_density'],
+            [0.0, 0.1, 0.2, 0.2, 0.5],
+            rtol=1e-5)
 
         sub_stats = stats['predicted']
         self.assertAlmostEqual(
             sub_stats['mean'], 3.99361964567, delta=1e-5)
         self.assertAlmostEqual(
             sub_stats['stdev'], 0.383771468193, delta=1e-5)
+        assert_array_equal(sub_stats['histogram'], (0, 0, 2, 7, 1))
+        assert_allclose(
+            sub_stats['histogram_density'],
+            [0.0, 0.0, 0.2, 0.7, 0.1],
+            rtol=1e-5)
+
+        # check predicted scores
+        stats = score_predictor_statistics(y_true, y_pred)
+        assert_allclose(stats['scores'], [2.75, 4.25], rtol=1e-5)
+        assert_array_equal(stats['true']['histogram'], (3, 7))
+        assert_array_equal(stats['predicted']['histogram'], (2, 8))
 
 # =============================================================================
 # Main Routine

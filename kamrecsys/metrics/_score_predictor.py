@@ -25,7 +25,7 @@ from sklearn.utils import (
 
 import sklearn.metrics as skm
 
-from . import mean_absolute_error, mean_squared_error
+from . import mean_absolute_error, mean_squared_error, score_histogram
 
 # =============================================================================
 # Metadata variables
@@ -100,7 +100,7 @@ def score_predictor_report(y_true, y_pred, disp=True):
 
     return stats
 
-def score_predictor_statistics(y_true, y_pred):
+def score_predictor_statistics(y_true, y_pred, scores=2):
     """
     Full Statistics of prediction performance
     
@@ -116,8 +116,10 @@ def score_predictor_statistics(y_true, y_pred):
         Ground truth scores
     y_pred : array, shape(n_samples,)
         Predicted scores
-    disp : bool, optional, default=True
-        if Ture, print report
+    scores : array, shape=(n_scores,) OR int; optional, default=2
+        A sorted sequence of possible rating scores, if array-like.
+        The range between the minimum and the maximum are divided into the
+        specified number of bins, if it is integer.
 
     Returns
     -------
@@ -135,26 +137,42 @@ def score_predictor_statistics(y_true, y_pred):
     # calc statistics
     stats = {}
 
+    # dataset size
     stats['n_samples'] = y_true.size
 
+    # mean absolute error
     mean, stdev = mean_absolute_error(y_true, y_pred)
     stats['mean_absolute_error'] = {}
     stats['mean_absolute_error']['mean'] = mean
     stats['mean_absolute_error']['stdev'] = stdev
 
+    # root mean squared error
     rmse, mean, stdev = mean_squared_error(y_true, y_pred)
     stats['mean_squared_error'] = {}
     stats['mean_squared_error']['rmse'] = rmse
     stats['mean_squared_error']['mean'] = mean
     stats['mean_squared_error']['stdev'] = stdev
 
+    # descriptive statistics of ground truth scores
     stats['true'] = {}
     stats['true']['mean'] = np.mean(y_true)
     stats['true']['stdev'] = np.std(y_true)
 
+    hist, scores = score_histogram(y_true, scores=scores)
+    # NOTE: if scores is int, it is replaced with estimated scores
+    stats['scores'] = list(scores)
+    stats['true']['histogram'] = list(hist)
+    stats['true']['histogram_density'] = list(hist / hist.sum())
+
+    # descriptive statistics of ground predicted scores
     stats['predicted'] = {}
     stats['predicted']['mean'] = np.mean(y_pred)
     stats['predicted']['stdev'] = np.std(y_pred)
+
+    # NOTE: the same bin boundaries are used for predicted scores
+    hist, scores = score_histogram(y_pred, scores=scores)
+    stats['predicted']['histogram'] = list(hist)
+    stats['predicted']['histogram_density'] = list(hist / hist.sum())
 
     return stats
 
