@@ -117,6 +117,50 @@ def mean_squared_error(y_true, y_pred):
 
     return rmse, mean, stdev
 
+
+def score_histogram(x, scores=(1, 2, 3, 4, 5)):
+    """
+    Histogram of scores 
+
+    Parameters
+    ----------
+    x : array, shape=(n_samples), dtype=float or int
+        A set of scores
+    scores : array, shape=(n_scores,) OR int; optional, default=(1, 2, 3, 4, 5)
+        A sorted sequence of possible rating scores, if array-like.
+        The range between the minimum and the maximum are divided into the
+        specified number of bins, if int.
+
+    Returns
+    -------
+    hist : array_like, shape=(n_scores,)
+        The number of data in each bin
+    scores : array_like, shape=(n_scores + 1,)
+        If a sequence of scores is explicitly specified return a list of
+        scores.
+        If the number of bins is specified as `scores`, a list of centers of
+        bins.        
+    """
+
+    # check inputs
+    assert_all_finite(x)
+    if isinstance(scores, int):
+        bins=scores
+    else:
+        assert_all_finite(scores)
+        scores = as_float_array(scores)
+        bins = np.r_[-np.inf, (scores[1:] + scores[:-1]) / 2, np.inf]
+
+    # making histogram
+    hist, bins = np.histogram(x, bins=bins)
+
+    #
+    if isinstance(scores, int):
+        scores = (bins[1:] + bins[:-1]) / 2
+
+    # return statistics
+    return hist, scores
+
 # =============================================================================
 # Classes
 # =============================================================================

@@ -23,6 +23,8 @@ from numpy.testing import (
     assert_array_almost_equal_nulp)
 import unittest
 
+import numpy as np
+
 # =============================================================================
 # Variables
 # =============================================================================
@@ -60,6 +62,24 @@ class TestMeanSquaredError(TestCase):
         self.assertAlmostEqual(rmse, 1.1597394143516166, delta=1e-5)
         self.assertAlmostEqual(mean, 1.3449955092006309, delta=1e-5)
         self.assertAlmostEqual(stdev, 1.4418716080648177, delta=1e-5)
+
+class TestScoreHistogram(unittest.TestCase):
+
+    def test_class(self):
+        from kamrecsys.metrics import score_histogram
+
+        hist, scores = score_histogram(y_pred)
+        assert_array_equal(hist, [0, 0, 2, 7, 1])
+        assert_array_equal(scores, [1, 2, 3, 4, 5])
+
+        hist, scores = score_histogram(y_pred, scores=[3, 5])
+        assert_array_equal(hist, [3, 7])
+        assert_array_equal(scores, [3, 5])
+
+        hist, scores = score_histogram(
+            np.linspace(0.0, 1.0, 21),scores=[0.2, 0.4])
+        assert_array_equal(hist, [6, 15])
+        assert_array_equal(scores, [0.2, 0.4])
 
 # =============================================================================
 # Main Routine

@@ -17,7 +17,8 @@ from six.moves import xrange
 
 from ._score import (
     mean_absolute_error,
-    mean_squared_error)
+    mean_squared_error,
+    score_histogram)
 from ._score_predictor import (
     score_predictor_report,
     score_predictor_statistics)
@@ -29,5 +30,6 @@ from ._score_predictor import (
 __all__ = [
     'mean_absolute_error',
     'mean_squared_error',
+    'score_histogram',
     'score_predictor_report',
     'score_predictor_statistics']
