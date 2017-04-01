@@ -101,7 +101,9 @@ def main(opt):
     x = np.genfromtxt(fname=opt.infile, delimiter='\t', dtype=dt)
 
     # calculate statistics
-    stats = score_predictor_statistics(x['t_score'], x['p_score'])
+    stats = score_predictor_statistics(
+        x['t_score'], x['p_score'],
+        scores=np.arange(opt.domain[0], opt.domain[1], opt.domain[2]))
 
     # output statistics
     json.dump(stats, opt.outfile)
