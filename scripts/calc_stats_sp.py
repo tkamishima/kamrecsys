@@ -1,20 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Calculate evaluation metrics for predicted scores
+Calculate evaluation metrics
 
-Description
-===========
-
-errors between true and predicted scores in a tsv or json format
-
-Output
-------
-
-1. Descriptive Statistics of True Scores
-2. Descriptive Statistics of Predicted Scores
-3. Mean Absolute Error
-4. Mean Squared Error
+See a description of :func:`kamrecsys.metrics.score_predictor_statistics`
+to the detail of metrices 
 
 Options
 =======
@@ -26,13 +16,6 @@ Options
 -n, --no-timestamp or --timestamp
     specify whether .event files has 'timestamp' information,
     default=true
--f <FORMAT>, --format <FORMAT>
-    output format (default=json)
-
-        * tsv: tab separated values
-        * htsv: tsv with a header line
-        * json: json
-
 -d <DOMAIN>, --domain <DOMAIN>
     The domain of scores specified by three floats: min, max, increment
     (default=1.0, 5,0, 1.0)
@@ -58,10 +41,7 @@ import os
 import json
 import numpy as np
 
-from kamrecsys.metrics import (
-    DescriptiveStatistics,
-    MeanAbsoluteError,
-    MeanSquaredError)
+from kamrecsys.metrics import score_predictor_statistics
 
 # =============================================================================
 # Module metadata variables
@@ -105,7 +85,6 @@ def main(opt):
     """
 
     # load data
-
     if opt.timestamp:
         dt = np.dtype([
             ('event', np.int, 2),
@@ -121,41 +100,13 @@ def main(opt):
         ])
     x = np.genfromtxt(fname=opt.infile, delimiter='\t', dtype=dt)
 
+    # calculate statistics
+    stats = score_predictor_statistics(
+        x['t_score'], x['p_score'],
+        scores=np.arange(opt.domain[0], opt.domain[1], opt.domain[2]))
+
     # output statistics
-    stats = {}
-    y_true = x['t_score']
-    y_pred = x['p_score']
-
-    # descriptive statistics
-    metrics = DescriptiveStatistics(y_true, name='true')
-    stats[metrics.name] = metrics
-    metrics = DescriptiveStatistics(y_pred, name='predicted')
-    stats[metrics.name] = metrics
-
-    # mean absolute error
-    metrics = MeanAbsoluteError(y_true, y_pred)
-    stats[metrics.name] = metrics
-
-    # mean squared error
-    metrics = MeanSquaredError(y_true, y_pred)
-    stats[metrics.name] = metrics
-
-    # output errors
-    if opt.format == 'json':
-        res = {}
-        for key in stats.keys():
-            res[key] = stats[key].metrics
-        json.dump(res, opt.outfile)
-    else:
-        if opt.format == 'htsv':
-            res = []
-            for key in sorted(stats.keys()):
-                res.extend(stats[key].fullnames())
-            print(*res, sep='\t', end='\n', file=opt.outfile)
-        res = []
-        for key in sorted(stats.keys()):
-            res.extend(stats[key].values())
-        print(*res, sep='\t', end='\n', file=opt.outfile)
+    json.dump(stats, opt.outfile)
 
     # close file
     if opt.infile is not sys.stdin:
@@ -196,8 +147,6 @@ if __name__ == '__main__':
                      action='store_false')
     apg.add_argument('--timestamp', dest='timestamp',
                      action='store_true')
-    ap.add_argument('-f', '--format', type=str,
-                    default='json', choices=['tsv', 'htsv', 'json'])
 
     # parsing
     opt = ap.parse_args()
