@@ -154,7 +154,7 @@ def score_histogram(x, scores=(1, 2, 3, 4, 5)):
     # making histogram
     hist, bins = np.histogram(x, bins=bins)
 
-    #
+    # candidates of possible scores  
     if isinstance(scores, int):
         scores = (bins[1:] + bins[:-1]) / 2
 
