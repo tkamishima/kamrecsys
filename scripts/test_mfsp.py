@@ -413,6 +413,56 @@ def cv_test(opt):
     finalize(opt.outfile, opt)
 
 
+def get_system_info():
+    """
+    Get System hardware information
+
+    Returns
+    -------
+    info : dict
+        Information about an operating system and a hardware.
+    """
+    # import subprocess
+    # import platform
+
+    info = {}
+
+    # information collected by a platform package
+    info['system'] = platform.system()
+    info['node'] = platform.node()
+    info['release'] = platform.release()
+    info['version'] = platform.version()
+    info['machine'] = platform.machine()
+    info['processor'] = platform.processor()
+
+    # obtain hardware information
+    with open('/dev/null', 'w') as DEVNULL:
+        if platform.system() == 'Darwin':
+            process_pipe = subprocess.Popen(
+                ['/usr/sbin/system_profiler',
+                 '-detailLevel', 'mini', 'SPHardwareDataType'],
+                stdout=subprocess.PIPE, stderr=DEVNULL)
+            hard_info, _ = process_pipe.communicate()
+            hard_info = hard_info.decode('utf-8').split('\n')[4:-2]
+            hard_info = [i.lstrip(' ') for i in hard_info]
+        elif platform.system() == 'FreeBSD':
+            process_pipe = subprocess.Popen(
+                ['/sbin/sysctl', 'hw'],
+                stdout=subprocess.PIPE, stderr=DEVNULL)
+            hard_info, _ = process_pipe.communicate()
+            hard_info = hard_info.decode('utf-8').split('\n')
+        elif platform.system() == 'Linux':
+            process_pipe = subprocess.Popen(
+                ['/bin/cat', '/proc/cpuinfo'],
+                stdout=subprocess.PIPE, stderr=DEVNULL)
+            hard_info, _ = process_pipe.communicate()
+            hard_info = hard_info.decode('utf-8').split('\n')
+        else:
+            hard_info = []
+    info['hardware'] = hard_info
+
+    return info
+
 # =============================================================================
 # Classes
 # =============================================================================
@@ -526,30 +576,6 @@ if __name__ == '__main__':
     opt.script_version = __version__
     opt.python_version = platform.python_version()
     opt.numpy_version = np.__version__
-    opt.sys_uname = platform.uname()
-    with open('/dev/null', 'w') as DEVNULL:
-        if platform.system() == 'Darwin':
-            process_pipe = subprocess.Popen(
-                ['/usr/sbin/system_profiler',
-                 '-detailLevel', 'mini', 'SPHardwareDataType'],
-                stdout=subprocess.PIPE, stderr=DEVNULL)
-            opt.sys_info, _ = process_pipe.communicate()
-            opt.sys_info = opt.sys_info.split('\n')[4:-2]
-            opt.sys_info = [i.lstrip(' ') for i in opt.sys_info]
-        elif platform.system() == 'FreeBSD':
-            process_pipe = subprocess.Popen(
-                ['/sbin/sysctl', 'hw'],
-                stdout=subprocess.PIPE, stderr=DEVNULL)
-            opt.sys_info, _ = process_pipe.communicate()
-            opt.sys_info = opt.sys_info.split('\n')
-        elif platform.system() == 'Linux':
-            process_pipe = subprocess.Popen(
-                ['/bin/cat', '/proc/cpuinfo'],
-                stdout=subprocess.PIPE, stderr=DEVNULL)
-            opt.sys_info, _ = process_pipe.communicate()
-            opt.sys_info = opt.sys_info.split('\n')
-        else:
-            opt.sys_info = []
 
     # suppress warnings in numerical computation
     np.seterr(all='ignore')
