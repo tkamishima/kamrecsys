@@ -471,7 +471,7 @@ if __name__ == '__main__':
 
     # basic file i/o
     ap.add_argument('-i', '--in', dest='infile', default=None,
-                    type=argparse.FileType('r'))
+                    type=argparse.FileType('rb'))
     ap.add_argument('infilep', nargs='?', metavar='INFILE', default=sys.stdin,
                     type=argparse.FileType('r'))
     ap.add_argument('-o', '--out', dest='outfile', default=None,
@@ -479,7 +479,7 @@ if __name__ == '__main__':
     ap.add_argument('outfilep', nargs='?', metavar='OUTFILE',
                     default=sys.stdout, type=argparse.FileType('w'))
     ap.add_argument('-t', '--test', dest='testfile', default=None,
-                    type=argparse.FileType('r'))
+                    type=argparse.FileType('rb'))
 
     # script specific options
     ap.add_argument('-m', '--method', type=str, default='pmf',
