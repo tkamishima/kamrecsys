@@ -175,7 +175,7 @@ def training(opt, ev, tsc, event_feature=None, fold=0):
 
     Returns
     -------
-    rcmdr : EventScorePredictor
+    rec : EventScorePredictor
         trained recommender
     """
 
@@ -209,10 +209,10 @@ def training(opt, ev, tsc, event_feature=None, fold=0):
     logger.info("training_start_time = " + start_time.isoformat())
 
     # create and learning model
-    rcmdr = EventScorePredictor(
+    rec = EventScorePredictor(
         C=opt.C, k=opt.k, tol=opt.tol, maxiter=opt.maxiter,
         random_state=opt.rseed)
-    rcmdr.fit(data)
+    rec.fit(data)
 
     # set end and elapsed time
     end_time = datetime.datetime.now()
@@ -233,20 +233,20 @@ def training(opt, ev, tsc, event_feature=None, fold=0):
     logger.info("training_elapsed_utime = " + str(opt.training_elapsed_utime))
 
     # preserve optimizer's outputs
-    opt.learning_i_loss[fold] = rcmdr.i_loss_
-    opt.learning_f_loss[fold] = rcmdr.f_loss_
-    opt.learning_opt_outputs[fold] = rcmdr.opt_outputs_
+    opt.learning_i_loss[fold] = rec.i_loss_
+    opt.learning_f_loss[fold] = rec.f_loss_
+    opt.learning_opt_outputs[fold] = rec.opt_outputs_
 
-    return rcmdr
+    return rec
 
 
-def testing(rcmdr, fp, opt, ev, tsc, ts=None, fold=0):
+def testing(rec, fp, opt, ev, tsc, ts=None, fold=0):
     """
     test and output results
 
     Parameters
     ----------
-    rcmdr : EventScorePredictor
+    rec : EventScorePredictor
         trained recommender
     fp : file
         output file pointer
@@ -271,7 +271,7 @@ def testing(rcmdr, fp, opt, ev, tsc, ts=None, fold=0):
     logger.info("test_start_time = " + start_time.isoformat())
 
     # prediction
-    esc = rcmdr.predict(ev)
+    esc = rec.predict(ev)
 
     # output evaluation results
     if ts is None:
@@ -357,7 +357,7 @@ def holdout_test(opt):
         ef = None
 
     # training
-    rcmdr = training(opt, train_x['event'], train_x['score'], event_feature=ef)
+    rec = training(opt, train_x['event'], train_x['score'], event_feature=ef)
 
     # test
     if opt.timestamp:
@@ -365,7 +365,7 @@ def holdout_test(opt):
     else:
         ef = None
 
-    testing(rcmdr, opt.outfile, opt,
+    testing(rec, opt.outfile, opt,
             test_x['event'], test_x['score'], ts=ef)
 
     # output tailing information
@@ -395,18 +395,18 @@ def cv_test(opt):
 
         # training
         if opt.timestamp:
-            rcmdr = training(opt, ev[train_i], tsc[train_i],
+            rec = training(opt, ev[train_i], tsc[train_i],
                              event_feature=ef[train_i], fold=fold)
         else:
-            rcmdr = training(opt, ev[train_i], tsc[train_i], fold=fold)
+            rec = training(opt, ev[train_i], tsc[train_i], fold=fold)
 
         # test
         if opt.timestamp:
-            testing(rcmdr, opt.outfile, opt,
+            testing(rec, opt.outfile, opt,
                     ev[test_i], tsc[test_i],
                     ef[test_i]['timestamp'], fold=fold)
         else:
-            testing(rcmdr, opt.outfile, opt,
+            testing(rec, opt.outfile, opt,
                     ev[test_i], tsc[test_i], fold=fold)
 
         fold += 1
