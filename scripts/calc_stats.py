@@ -3,8 +3,9 @@
 """
 Calculate evaluation metrics
 
-See a description of :func:`kamrecsys.metrics.score_predictor_statistics`
-to the detail of metrices 
+the details are in the descriptions of statistics functions:
+
+* :func:`kamrecsys.metrics.score_predictor_statistics`
 
 Options
 =======
@@ -13,12 +14,9 @@ Options
     score predictor .result file
 -o <OUTPUT>, --out <OUTPUT>
     statistics
--n, --no-timestamp or --timestamp
-    specify whether .event files has 'timestamp' information,
-    default=true
--d <DOMAIN>, --domain <DOMAIN>
-    The domain of scores specified by three floats: min, max, increment
-    (default=1.0, 5,0, 1.0)
+--no-keepdata or --keepdata
+    specify whether to keep the input whole data or not.
+    default=no-keepdata
 -h, --help
     show this help message and exit
 --version
@@ -39,6 +37,7 @@ import sys
 import argparse
 import os
 import json
+
 import numpy as np
 
 from kamrecsys.metrics import score_predictor_statistics
@@ -49,7 +48,7 @@ from kamrecsys.metrics import score_predictor_statistics
 
 __author__ = "Toshihiro Kamishima ( http://www.kamishima.net/ )"
 __date__ = "2014/06/17"
-__version__ = "1.0.0"
+__version__ = "2.0.0"
 __copyright__ = "Copyright (c) 2014 Toshihiro Kamishima all rights reserved."
 __license__ = "MIT License: http://www.opensource.org/licenses/mit-license.php"
 
@@ -71,6 +70,49 @@ __all__ = []
 # Functions
 # =============================================================================
 
+
+def do_task(opt):
+    """
+    Main task
+
+    Parameters
+    ----------
+    opt : argparse.Namespace
+        Parsed command-line arguments
+    """
+
+    # suppress warnings in numerical computation
+    np.seterr(all='ignore')
+
+    # load data
+    info = json.load(opt.infile, encoding='utf-8')
+
+    # calculate statistics
+    if info['model']['type'] == 'event_score_predictor':
+        scores = info['data']['score_domain']
+        scores = np.r_[np.arange(scores[0], scores[1], scores[2]), scores[1]]
+        stats = score_predictor_statistics(
+            info['prediction']['true'],
+            info['prediction']['predicted'],
+            scores=scores)
+    else:
+        raise TypeError('Unsupported type of recommendation models')
+    info['statistics'] = stats
+
+    # remove input data
+    if not opt.keepdata:
+        del info['prediction']
+
+    # output statistics
+    opt.outfile.write(json.dumps(info))
+
+    # close file
+    if opt.infile is not sys.stdin:
+        opt.infile.close()
+
+    if opt.outfile is not sys.stdout:
+        opt.outfile.close()
+
 # =============================================================================
 # Classes
 # =============================================================================
@@ -80,45 +122,18 @@ __all__ = []
 # =============================================================================
 
 
-def main(opt):
-    """ Main routine that exits with status code 0
+def command_line_parser():
     """
+    Parsing Command-Line Options
 
-    # load data
-    if opt.timestamp:
-        dt = np.dtype([
-            ('event', np.int, 2),
-            ('t_score', np.float),
-            ('p_score', np.float),
-            ('timestamp', np.int)
-        ])
-    else:
-        dt = np.dtype([
-            ('event', np.int, 2),
-            ('t_score', np.float),
-            ('p_score', np.float)
-        ])
-    x = np.genfromtxt(fname=opt.infile, delimiter='\t', dtype=dt)
+    Returns
+    -------
+    opt : argparse.Namespace
+        Parsed command-line arguments
+    """
+    # import argparse
+    # import sys
 
-    # calculate statistics
-    stats = score_predictor_statistics(
-        x['t_score'], x['p_score'],
-        scores=np.arange(opt.domain[0], opt.domain[1], opt.domain[2]))
-
-    # output statistics
-    json.dump(stats, opt.outfile)
-
-    # close file
-    if opt.infile is not sys.stdin:
-        opt.infile.close()
-
-    if opt.outfile is not sys.stdout:
-        opt.outfile.close()
-
-    sys.exit(0)
-
-
-if __name__ == '__main__':
     ap = argparse.ArgumentParser(
         formatter_class=argparse.RawDescriptionHelpFormatter,
         description=__doc__)
@@ -140,12 +155,11 @@ if __name__ == '__main__':
                     default=sys.stdout, type=argparse.FileType('w'))
 
     # script specific options
-    ap.add_argument('-d', '--domain', nargs=3, default=[1, 5, 1], type=float)
     apg = ap.add_mutually_exclusive_group()
-    apg.set_defaults(timestamp=True)
-    apg.add_argument('-n', '--no-timestamp', dest='timestamp',
+    apg.set_defaults(keepdata=False)
+    apg.add_argument('--no-keepdata', dest='keepdata',
                      action='store_false')
-    apg.add_argument('--timestamp', dest='timestamp',
+    apg.add_argument('--keepdata', dest='keepdata',
                      action='store_true')
 
     # parsing
@@ -161,6 +175,22 @@ if __name__ == '__main__':
         opt.outfile = opt.outfilep
     del vars(opt)['outfilep']
 
-    np.seterr(all='ignore')
+    return opt
 
-    main(opt)
+
+def main():
+    """ Main routine
+    """
+    # command-line arguments
+    opt = command_line_parser()
+
+    # do main task
+    do_task(opt)
+
+# top level -------------------------------------------------------------------
+# Call main routine if this is invoked as a top-level script environment.
+if __name__ == '__main__':
+
+    main()
+
+    sys.exit(0)
