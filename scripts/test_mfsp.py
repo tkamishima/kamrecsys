@@ -252,7 +252,7 @@ def training(info, ev, tsc, event_feature=None, fold=0):
     return rec
 
 
-def testing(rec, fp, info, ev, tsc, ts=None, fold=0):
+def testing(rec, info, ev, fold=0):
     """
     test and output results
 
@@ -260,18 +260,17 @@ def testing(rec, fp, info, ev, tsc, ts=None, fold=0):
     ----------
     rec : EventScorePredictor
         trained recommender
-    fp : file
-        output file pointer
     info : dict
         Information about the target task
     ev : array, size=(n_events, 2), dtype=int
         array of events in external ids
-    tsc : array, size=(n_events,), dtype=float
-        true scores
-    ts : optional, array, size=(n_events,), dtype=int
-        timestamps if available
     fold : int, default=0
         fold No.
+    
+    Returns
+    -------
+    esc : array, shape=(n_events,), dtype=float
+        estimated scores
     """
 
     # set starting time
@@ -284,16 +283,6 @@ def testing(rec, fp, info, ev, tsc, ts=None, fold=0):
 
     # prediction
     esc = rec.predict(ev)
-
-    # output evaluation results
-    if ts is None:
-        for i in xrange(ev.shape[0]):
-            print(ev[i, 0], ev[i, 1], tsc[i], esc[i],
-                  file=fp, sep='\t')
-    else:
-        for i in xrange(ev.shape[0]):
-            print(ev[i, 0], ev[i, 1], tsc[i], esc[i], ts[i],
-                  file=fp, sep='\t')
 
     # set end and elapsed time
     end_time = datetime.datetime.now()
@@ -315,6 +304,8 @@ def testing(rec, fp, info, ev, tsc, ts=None, fold=0):
     else:
         info['test']['elapsed_utime'] += elapsed_utime
     logger.info("test_elapsed_utime = " + str(info['test']['elapsed_utime']))
+
+    return esc
 
 
 def holdout_test(info):
@@ -355,22 +346,18 @@ def holdout_test(info):
     info['training']['elapsed_utime'] = str(info['training']['elapsed_utime'])
 
     # test
-    if info['data']['has_timestamp']:
-        ef = test_x['event_feature']['timestamp']
-    else:
-        ef = None
-
-    testing(rec, info['assets']['outfile'], info,
-            test_x['event'], test_x['score'], ts=ef)
+    esc = testing(rec, info, test_x['event'])
     info['test']['elapsed_time'] = str(info['training']['elapsed_time'])
     info['test']['elapsed_utime'] = str(info['training']['elapsed_utime'])
 
-    # output information
-    outfile = info['assets']['outfile']
-    del info['assets']
-    outfile.write(json.dumps(info))
-    if outfile is not sys.stdout:
-        outfile.close()
+    # set predicted result
+    info['prediction'] = {
+        'event': test_x['event'].tolist(),
+        'true': test_x['score'].tolist(),
+        'predicted': esc.tolist()}
+    if info['data']['has_timestamp']:
+        info['prediction']['event_feature'] = (
+            {'timestamp': test_x['event_feature']['timestamp'].tolist()})
 
 
 def cv_test(info):
@@ -396,32 +383,23 @@ def cv_test(info):
     n_events = x.shape[0]
     ev = x['event']
     tsc = x['score']
-    if info['data']['has_timestamp']:
-        ef = x['event_feature']
 
     fold = 0
+    esc = np.empty(n_events, dtype=float)
     for train_i, test_i in KFold(
             n_events, n_folds=info['test']['n_folds'], interlace=True):
 
         # training
         if info['data']['has_timestamp']:
             rec = training(
-                info, ev[train_i], tsc[train_i],
-                fold=fold, event_feature=ef[train_i])
+                info, ev[train_i], tsc[train_i], fold=fold,
+                event_feature=x['event_feature'][train_i])
         else:
             rec = training(
-                info, ev[train_i], tsc[train_i],
-                fold=fold)
+                info, ev[train_i], tsc[train_i], fold=fold)
 
         # test
-        if info['data']['has_timestamp']:
-            testing(rec, info['assets']['outfile'], info,
-                    ev[test_i], tsc[test_i],
-                    fold=fold, ts=ef[test_i]['timestamp'])
-        else:
-            testing(rec, info['assets']['outfile'], info,
-                ev[test_i], tsc[test_i],
-                fold=fold)
+        esc[test_i] = testing(rec, info, ev[test_i], fold=fold)
 
         fold += 1
 
@@ -430,12 +408,12 @@ def cv_test(info):
     info['test']['elapsed_time'] = str(info['training']['elapsed_time'])
     info['test']['elapsed_utime'] = str(info['training']['elapsed_utime'])
 
-    # output information
-    outfile = info['assets']['outfile']
-    del info['assets']
-    outfile.write(json.dumps(info))
-    if outfile is not sys.stdout:
-        outfile.close()
+    # set predicted result
+    info['prediction'] = {
+        'event': ev.tolist(), 'true': tsc.tolist(), 'predicted': esc.tolist()}
+    if info['data']['has_timestamp']:
+        info['prediction']['event_feature'] = {
+            'timestamp': x['event_feature']['timestamp'].tolist()}
 
 
 def get_system_info():
@@ -536,6 +514,12 @@ def do_task(info):
     else:
         raise TypeError("Invalid validation scheme: {0:s}".format(opt.method))
 
+    # output information
+    outfile = info['assets']['outfile']
+    del info['assets']
+    outfile.write(json.dumps(info))
+    if outfile is not sys.stdout:
+        outfile.close()
 
 # =============================================================================
 # Classes
