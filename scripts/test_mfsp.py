@@ -491,18 +491,71 @@ def get_version_info():
     return version_info
 
 
-def do_task(info):
+def init_info(opt):
     """
-    Main task
-    
+    Initialize infomation dictionary
+
     Parameters
     ----------
+    opt : argparse.Namespace
+        Parsed command-line options
+
+    Returns
+    -------
     info : dict
         Information about the target task
     """
 
+    info = {'script': {}, 'data': {}, 'training': {}, 'test': {},
+        'model': {'options': {}}, 'assets': {}}
+
+    # this script
+    info['script']['name'] = os.path.basename(sys.argv[0])
+    info['script']['version'] = __version__
+
+    # random seed
+    info['training']['random_seed'] = opt.rseed
+    info['test']['random_seed'] = opt.rseed
+    info['model']['options']['random_state'] = opt.rseed
+
+    # files
+    info['assets']['infile'] = opt.infile
+    info['assets']['outfile'] = opt.outfile
+    info['assets']['testfile'] = opt.testfile
+
+    # model
+    info['model']['method'] = opt.method
+    info['model']['options']['C'] = opt.C
+    info['model']['options']['k'] = opt.k
+    info['model']['options']['tol'] = opt.tol
+    info['model']['options']['maxiter'] = opt.maxiter
+
+    # test
+    info['test']['scheme'] = opt.validation
+    info['test']['n_folds'] = opt.fold
+
+    # data
+    info['data']['score_domain'] = list(opt.domain)
+    info['data']['has_timestamp'] = opt.timestamp
+
+    return info
+
+
+def do_task(opt):
+    """
+    Main task
+
+    Parameters
+    ----------
+    opt : argparse.Namespace
+        Parsed command-line arguments
+    """
+
     # suppress warnings in numerical computation
     np.seterr(all='ignore')
+
+    # collect assets and information
+    info = init_info(opt)
 
     # select validation scheme
     if info['test']['scheme'] == 'holdout':
@@ -615,72 +668,14 @@ def command_line_parser():
     return opt
 
 
-def init_info(opt):
-    """
-    Initialize infomation dictionary
-    
-    Parameters
-    ----------
-    opt : argparse.Namespace
-        Parsed command-line options
-
-    Returns
-    -------
-    info : dict
-        Information about the target task
-    """
-
-    info = {
-        'script': {},
-        'data': {},
-        'training': {},
-        'test': {},
-        'model': {'options': {}},
-        'assets': {}}
-
-    # this script
-    info['script']['name'] = os.path.basename(sys.argv[0])
-    info['script']['version'] = __version__
-
-    # random seed
-    info['training']['random_seed'] = opt.rseed
-    info['test']['random_seed'] = opt.rseed
-    info['model']['options']['random_state'] = opt.rseed
-
-    # files
-    info['assets']['infile'] = opt.infile
-    info['assets']['outfile'] = opt.outfile
-    info['assets']['testfile'] = opt.testfile
-
-    # model
-    info['model']['method'] = opt.method
-    info['model']['options']['C'] = opt.C
-    info['model']['options']['k'] = opt.k
-    info['model']['options']['tol'] = opt.tol
-    info['model']['options']['maxiter'] = opt.maxiter
-
-    # test
-    info['test']['scheme'] = opt.validation
-    info['test']['n_folds'] = opt.fold
-
-    # data
-    info['data']['score_domain'] = list(opt.domain)
-    info['data']['has_timestamp'] = opt.timestamp
-
-    return info
-
-
 def main():
     """ Main routine
     """
     # command-line arguments
     opt = command_line_parser()
 
-    # collect assets and information
-    info = init_info(opt)
-
     # do main task
-    do_task(info)
+    do_task(opt)
 
 # top level -------------------------------------------------------------------
 # init logging system
