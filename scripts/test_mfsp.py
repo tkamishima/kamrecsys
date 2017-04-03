@@ -1,18 +1,6 @@
 """
 test "matrix factorization score predictors"
 
-Description
-===========
-
-Output
-------
-
-1. user ID
-2. item ID
-3. original score
-4. predicted score
-5. timestamp (if timestamp option is true)
-
 Options
 =======
 
