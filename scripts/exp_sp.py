@@ -1,5 +1,5 @@
 """
-test "matrix factorization score predictors"
+Experimentation script for Score Predictors
 
 Options
 =======
@@ -199,16 +199,8 @@ def training(info, ev, tsc, event_feature=None, fold=0):
     info['training']['start_time'][fold] = start_time.isoformat()
     logger.info("training_start_time = " + start_time.isoformat())
 
-    # select algorithm
-    if info['model']['method'] == 'pmf':
-        from kamrecsys.mf.pmf import EventScorePredictor
-    else:
-        raise TypeError(
-            "Invalid method name: {0:s}".format(info['model']['method']))
-
     # create and learning model
-    info['model']['type'] = 'event_score_predictor'
-    rec = EventScorePredictor(**info['model']['options'])
+    rec = info['assets']['recommender'](**info['model']['options'])
     rec.fit(data)
 
     # set end and elapsed time
@@ -313,6 +305,7 @@ def holdout_test(info):
     info['training']['file'] = str(info['assets']['infile'])
     info['training']['version'] = get_version_info()
     info['training']['system'] = get_system_info()
+    info['training']['random_seed'] = info['model']['options']['random_state']
 
     # prepare test data
     if info['assets']['testfile'] is None:
@@ -323,6 +316,7 @@ def holdout_test(info):
     info['test']['file'] = str(info['assets']['testfile'])
     info['test']['version'] = get_version_info()
     info['test']['system'] = get_system_info()
+    info['test']['random_seed'] = info['model']['options']['random_state']
     if info['data']['has_timestamp']:
         ef = train_x['event_feature']
     else:
@@ -365,9 +359,11 @@ def cv_test(info):
     info['training']['file'] = str(info['assets']['infile'])
     info['training']['version'] = get_version_info()
     info['training']['system'] = get_system_info()
+    info['training']['random_seed'] = info['model']['options']['random_state']
     info['test']['file'] = str(info['assets']['infile'])
     info['test']['version'] = get_version_info()
     info['test']['system'] = get_system_info()
+    info['test']['random_seed'] = info['model']['options']['random_state']
     n_events = x.shape[0]
     ev = x['event']
     tsc = x['score']
@@ -479,71 +475,24 @@ def get_version_info():
     return version_info
 
 
-def init_info(opt):
-    """
-    Initialize infomation dictionary
-
-    Parameters
-    ----------
-    opt : argparse.Namespace
-        Parsed command-line options
-
-    Returns
-    -------
-    info : dict
-        Information about the target task
-    """
-
-    info = {'script': {}, 'data': {}, 'training': {}, 'test': {},
-        'model': {'options': {}}, 'assets': {}}
-
-    # this script
-    info['script']['name'] = os.path.basename(sys.argv[0])
-    info['script']['version'] = __version__
-
-    # random seed
-    info['training']['random_seed'] = opt.rseed
-    info['test']['random_seed'] = opt.rseed
-    info['model']['options']['random_state'] = opt.rseed
-
-    # files
-    info['assets']['infile'] = opt.infile
-    info['assets']['outfile'] = opt.outfile
-    info['assets']['testfile'] = opt.testfile
-
-    # model
-    info['model']['method'] = opt.method
-    info['model']['options']['C'] = opt.C
-    info['model']['options']['k'] = opt.k
-    info['model']['options']['tol'] = opt.tol
-    info['model']['options']['maxiter'] = opt.maxiter
-
-    # test
-    info['test']['scheme'] = opt.validation
-    info['test']['n_folds'] = opt.fold
-
-    # data
-    info['data']['score_domain'] = list(opt.domain)
-    info['data']['has_timestamp'] = opt.timestamp
-
-    return info
-
-
-def do_task(opt):
+def do_task(info):
     """
     Main task
 
     Parameters
     ----------
-    opt : argparse.Namespace
-        Parsed command-line arguments
+    info : dict
+        Information about the target task
     """
 
     # suppress warnings in numerical computation
     np.seterr(all='ignore')
 
-    # collect assets and information
-    info = init_info(opt)
+    # update information dictionary
+    info['script']['name'] = os.path.basename(sys.argv[0])
+    info['script']['version'] = __version__
+    info['model']['type'] = 'event_score_predictor'
+    info['model']['module'] = info['assets']['recommender'].__module__
 
     # select validation scheme
     if info['test']['scheme'] == 'holdout':
@@ -557,6 +506,7 @@ def do_task(opt):
 
     # output information
     outfile = info['assets']['outfile']
+    info['prediction']['file'] = str(outfile)
     del info['assets']
     outfile.write(json.dumps(info))
     if outfile is not sys.stdout:
@@ -656,14 +606,67 @@ def command_line_parser():
     return opt
 
 
+def init_info(opt):
+    """
+    Initialize information dictionary
+
+    Parameters
+    ----------
+    opt : argparse.Namespace
+        Parsed command-line options
+
+    Returns
+    -------
+    info : dict
+        Information about the target task
+    """
+
+    info = {'script': {}, 'data': {}, 'training': {}, 'test': {},
+            'model': {'options': {}}, 'assets': {}}
+
+    # files
+    info['assets']['infile'] = opt.infile
+    info['assets']['outfile'] = opt.outfile
+    info['assets']['testfile'] = opt.testfile
+
+    # model
+
+    # model
+    info['model']['options']['random_state'] = opt.rseed
+    if opt.method == 'pmf':
+        from kamrecsys.mf.pmf import EventScorePredictor
+        info['model']['method'] = 'probabilistic matrix factorization'
+        info['model']['options']['C'] = opt.C
+        info['model']['options']['k'] = opt.k
+        info['model']['options']['tol'] = opt.tol
+        info['model']['options']['maxiter'] = opt.maxiter
+        info['assets']['recommender'] = EventScorePredictor
+    else:
+        raise TypeError(
+            "Invalid method name: {0:s}".format(info['model']['method']))
+
+    # test
+    info['test']['scheme'] = opt.validation
+    info['test']['n_folds'] = opt.fold
+
+    # data
+    info['data']['score_domain'] = list(opt.domain)
+    info['data']['has_timestamp'] = opt.timestamp
+
+    return info
+
+
 def main():
     """ Main routine
     """
     # command-line arguments
     opt = command_line_parser()
 
+    # collect assets and information
+    info = init_info(opt)
+
     # do main task
-    do_task(opt)
+    do_task(info)
 
 # top level -------------------------------------------------------------------
 # init logging system
