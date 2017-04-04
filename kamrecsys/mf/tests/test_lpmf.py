@@ -261,14 +261,16 @@ class TestEventItemFinder(unittest.TestCase):
         self.assertDictEqual(
             vars(rec),
             {'C': 0.1, 'n_otypes': 0, 'bu_': None, 'bi_': None, 'k': 2,
-             'p_': None, 'q_': None, '_coef': None, 'f_loss_': np.inf,
-             'iid': None, 'i_loss_': np.inf, 'eid': None, 'tol': 1e-03,
-             'n_objects': None, '_dt': None, 'mu_': None, 'opt_outputs_': None,
+             'p_': None, 'q_': None, '_coef': None, 'mu_': None, '_dt': None,
+             'fit_results_': {'initial_loss': np.inf, 'final_loss': np.inf},
+             'iid': None, 'eid': None, 'tol': 1e-03, 'n_objects': None,
              'maxiter': 200, 'random_state': 1234, '_rng': None})
 
         rec.fit(data, disp=False)
-        self.assertAlmostEqual(rec.i_loss_, 1.3445493746, delta=1e-5)
-        self.assertAlmostEqual(rec.f_loss_, 0.30760976439390564, delta=1e-5)
+        self.assertAlmostEqual(rec.fit_results_['initial_loss'],
+                               1.3445493746, delta=1e-5)
+        self.assertAlmostEqual(rec.fit_results_['final_loss'],
+                               0.30760976439390564, delta=1e-5)
 
         # single prediction
         self.assertAlmostEqual(rec.predict((1, 7)),

@@ -71,8 +71,6 @@ class EventScorePredictor(BaseEventScorePredictor):
         Item distribution: Pr[Y | Z]
     pRgZ_ : array_like
         Raring distribution: Pr[R | Z]
-    n_iter_ : int
-        nos of iteration after convergence
     n_users_ : int
         nos of users
     n_items_ : int
@@ -113,9 +111,6 @@ class EventScorePredictor(BaseEventScorePredictor):
         self.use_expectation = use_expectation
 
         # attributes
-        self.i_loss_ = np.inf
-        self.f_loss_ = np.inf
-        self.n_iter_ = 0
         self.pZ_ = None
         self.pXgZ_ = None
         self.pYgZ_ = None
@@ -125,6 +120,11 @@ class EventScorePredictor(BaseEventScorePredictor):
         self.score_levels_ = None
         self.n_score_levels_ = 0
         self.n_events_ = 0
+        self.fit_results_ ={
+            'initial_loss': np.inf,
+            'final_loss': np.inf,
+            'n_iterations': 0
+        }
 
         # internal vars
         self._q = None  # p[z | x, y]
@@ -271,9 +271,11 @@ class EventScorePredictor(BaseEventScorePredictor):
         # first m-step
         self.maximization_step(ev, sc)
 
-        self.i_loss_ = self.loss(ev, sc)
-        logger.info("initial: {:.15g}".format(self.i_loss_))
-        pre_loss = self.i_loss_
+        self.fit_results_['initial_loss'] = self.loss(ev, sc)
+        self.fit_results_['warnflag'] = 0
+        logger.info("initial: {:.15g}".format(
+            self.fit_results_['initial_loss']))
+        pre_loss = self.fit_results_['initial_loss']
 
         # main loop
         iter_no = 0
@@ -304,15 +306,22 @@ class EventScorePredictor(BaseEventScorePredictor):
                 break
             pre_loss = cur_loss
 
+
         if iter_no >= self.maxiter - 1:
             logger.warning(
                 "Exceeded the maximum number of iterations".format(
                     self.maxiter))
+            self.fit_results_['warnflag'] = 1
 
-        self.f_loss_ = cur_loss
-        logger.info("final: {:.15g}".format(self.f_loss_))
-        self.n_iter_ = iter_no + 1
-        logger.info("nos of iterations: {:d}".format(self.n_iter_))
+        logger.info("final: {:.15g}".format(cur_loss))
+        logger.info("nos of iterations: {:d}".format(iter_no + 1))
+
+        # store fitting results
+        self.fit_results_['final_loss'] = cur_loss
+        self.fit_results_['n_iterations'] = iter_no + 1
+        self.fit_results_['n_users'] = n_objects[0]
+        self.fit_results_['n_items'] = n_objects[1]
+        self.fit_results_['n_events'] = ev.shape[0]
 
         # add parameters for unknown users and items
         self.pXgZ_ = np.r_[self.pXgZ_, np.ones((1, self.k), dtype=float)]
