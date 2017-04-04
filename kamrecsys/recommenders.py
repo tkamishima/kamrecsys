@@ -66,7 +66,9 @@ class BaseRecommender(with_metaclass(ABCMeta, BaseEstimator)):
         conversion table to external ids, succeed from training data sets
     iid : dictionary
         conversion table to internal ids, succeed from training data sets
-    random_state: RandomState or an int seed (None by default)
+    fit_results_ : dict
+        Side information about results of fitting
+    random_state : RandomState or an int seed (None by default)
         A random number generator instance
 
     Raises
@@ -82,6 +84,7 @@ class BaseRecommender(with_metaclass(ABCMeta, BaseEstimator)):
         self.iid = None
         self.random_state = random_state
         self._rng = None
+        self.fit_results_ = {}
 
     def fit(self, random_state=None):
         """

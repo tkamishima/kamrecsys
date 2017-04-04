@@ -252,15 +252,15 @@ class TestEventScorePredictor(unittest.TestCase):
         self.assertDictEqual(
             vars(rec),
             {'C': 0.1, 'n_otypes': 0, 'bu_': None, 'bi_': None, 'k': 2,
-             'p_': None, 'q_': None, '_coef': None, 'f_loss_': np.inf,
-             'iid': None, 'i_loss_': np.inf, 'eid': None, 'tol': 1e-03,
-             'n_objects': None, '_dt': None, 'mu_': None, 'opt_outputs_': None,
+             'p_': None, 'q_': None, '_coef': None, 'mu_': None, '_dt': None,
+             'fit_results_': {'initial_loss': np.inf, 'final_loss': np.inf},
+             'iid': None, 'eid': None, 'tol': 1e-03, 'n_objects': None,
              'maxiter': 200, 'random_state': 1234, '_rng': None})
 
         rec.fit(data, disp=False)
-        self.assertAlmostEqual(rec.i_loss_,
+        self.assertAlmostEqual(rec.fit_results_['initial_loss'],
                                0.74652578358324106, delta=1e-5)
-        self.assertAlmostEqual(rec.f_loss_,
+        self.assertAlmostEqual(rec.fit_results_['final_loss'],
                                0.025638738121075231, delta=1e-5)
 
         # single prediction

@@ -181,21 +181,11 @@ def training(info, ev, tsc, event_feature=None, fold=0):
     data.set_events(
         ev, tsc, score_domain=score_domain, event_feature=event_feature)
 
-    # init learning results
-    if 'start_time' not in info['training']:
-        info['training']['start_time'] = [0] * n_folds
-    if 'end_time' not in info['training']:
-        info['training']['end_time'] = [0] * n_folds
-    if 'initial_loss' not in info['training']:
-        info['training']['initial_loss'] = [np.inf] * n_folds
-    if 'final_loss' not in info['training']:
-        info['training']['final_loss'] = [np.inf] * n_folds
-    if 'optimization_outputs' not in info['training']:
-        info['training']['optimization_outputs'] = [[]] * n_folds
-
     # set starting time
     start_time = datetime.datetime.now()
     start_utime = os.times()[0]
+    if 'start_time' not in info['training']:
+        info['training']['start_time'] = [0] * n_folds
     info['training']['start_time'][fold] = start_time.isoformat()
     logger.info("training_start_time = " + start_time.isoformat())
 
@@ -208,6 +198,8 @@ def training(info, ev, tsc, event_feature=None, fold=0):
     end_utime = os.times()[0]
     elapsed_time = end_time - start_time
     elapsed_utime = end_utime - start_utime
+    if 'end_time' not in info['training']:
+        info['training']['end_time'] = [0] * n_folds
     info['training']['end_time'][fold] = end_time.isoformat()
     logger.info("training_end_time = " + end_time.isoformat())
 
@@ -225,9 +217,9 @@ def training(info, ev, tsc, event_feature=None, fold=0):
                 str(info['training']['elapsed_utime']))
 
     # preserve optimizer's outputs
-    info['training']['initial_loss'][fold] = rec.i_loss_
-    info['training']['final_loss'][fold] = rec.f_loss_
-    info['training']['optimization_outputs'][fold] = list(rec.opt_outputs_)
+    if 'results' not in info['training']:
+        info['training']['results'] = [{}] * n_folds
+    info['training']['results'][fold] = rec.fit_results_
 
     return rec
 
@@ -252,6 +244,9 @@ def testing(rec, info, ev, fold=0):
     esc : array, shape=(n_events,), dtype=float
         estimated scores
     """
+
+    if 'data' not in info['training']:
+        info['training']['data'] = [{}] * n_folds
 
     # set starting time
     start_time = datetime.datetime.now()
@@ -284,6 +279,11 @@ def testing(rec, info, ev, fold=0):
     else:
         info['test']['elapsed_utime'] += elapsed_utime
     logger.info("test_elapsed_utime = " + str(info['test']['elapsed_utime']))
+
+    # preserve predictor's outputs
+    if 'results' not in info['test']:
+        info['test']['results'] = [{}] * n_folds
+    info['test']['results'][fold] = {'n_events': rec.n_events}
 
     return esc
 
