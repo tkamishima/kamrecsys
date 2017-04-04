@@ -61,10 +61,10 @@ class EventUtilMixin(with_metaclass(ABCMeta, object)):
             array whose elements are represented by external ids
         """
         if data.ndim == 1 and data.shape[0] == self.s_event:
-            new_data = \
-                np.array([self.eid[self.event_otypes[e]][data[e]]
-                          for e in xrange(self.s_event)],
-                         dtype=self.eid[0].dtype)
+            new_data = np.array(
+                [self.eid[self.event_otypes[e]][data[e]]
+                 for e in xrange(self.s_event)],
+                dtype=self.eid[0].dtype)
         elif data.ndim == 2 and data.shape[1] == self.s_event:
             new_data = np.empty_like(data, dtype=self.eid[0].dtype)
             for e in xrange(self.s_event):
@@ -155,8 +155,7 @@ class EventData(BaseData, EventUtilMixin):
             self.s_event = n_otypes
             self.event_otypes = np.arange(self.s_event, dtype=int)
         else:
-            if (event_otypes.ndim != 1 or
-                np.min(event_otypes) < 0 or
+            if (event_otypes.ndim != 1 or np.min(event_otypes) < 0 or
                 np.max(event_otypes) >= n_otypes):
                 raise ValueError("Illegal event_otypes specification")
             self.s_event = event_otypes.shape[0]
@@ -274,7 +273,7 @@ class EventWithScoreData(EventData):
             each row corresponds to an event represented by a vector of object
             with external ids
         score : array_like, shape=(n_events) or (n_stypes, n_events)
-            raiting scores for the i-th elemnt
+            rating scores for the i-th element
         score_domain : optional, tuple or 1d-array of tuple
             min and max of scores, and the interval between scores
         event_feature : optional, array_like, shape=(n_events, variable)

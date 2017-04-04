@@ -74,12 +74,6 @@ class EventScorePredictor(BaseEventScorePredictor):
         latent factors of users
     q_ : array_like
         latent factors of items
-    i_loss_ : float
-        the loss value after initialization
-    f_loss_ : float
-        the loss value after fitting
-    opt_outputs_ : tuple
-        extra outputs of an optimizer
 
     Notes
     -----
@@ -127,9 +121,10 @@ class EventScorePredictor(BaseEventScorePredictor):
         self.bi_ = None
         self.p_ = None
         self.q_ = None
-        self.i_loss_ = np.inf
-        self.f_loss_ = np.inf
-        self.opt_outputs_ = None
+        self.fit_results_ = {
+            'initial_loss': np.inf,
+            'final_loss': np.inf,
+        }
 
         # private instance variables
         self._coef = None
@@ -334,8 +329,12 @@ class EventScorePredictor(BaseEventScorePredictor):
         random_state: RandomState or an int seed (None by default)
             A random number generator instance. If None is given, the
             object's random_state is used
+        tol : float
+            Tolerance of optimizer's convergence
+        maxiter : int
+            Maximum number of iterations in optimization
         kwargs : keyword arguments
-            keyword arguments passed to optimizers
+            Keyword arguments passed to optimizers
         """
 
         # call super class
@@ -360,8 +359,9 @@ class EventScorePredictor(BaseEventScorePredictor):
         else:
             kwargs['maxiter'] = int(maxiter * self._coef.shape[0])
 
-        # get final loss
-        self.i_loss_ = self.loss(self._coef, ev, sc, n_objects)
+        # get initial loss
+        self.fit_results_['initial_loss'] = self.loss(
+            self._coef, ev, sc, n_objects)
 
         # optimize model
         # fmin_bfgs is slow for large data, maybe because due to the
@@ -375,8 +375,6 @@ class EventScorePredictor(BaseEventScorePredictor):
 
         # get parameters
         self._coef[:] = res[0]
-        self.f_loss_ = res[1]
-        self.opt_outputs_ = res[2:]
 
         # add parameters for unknown users and items
         self.mu_ = self._coef.view(self._dt)['mu'][0].copy()
@@ -386,6 +384,15 @@ class EventScorePredictor(BaseEventScorePredictor):
                         np.zeros((1, self.k), dtype=np.float)]
         self.q_ = np.r_[self._coef.view(self._dt)['q'][0],
                         np.zeros((1, self.k), dtype=np.float)]
+
+        # store fitting results
+        self.fit_results_['n_users'] = n_objects[0]
+        self.fit_results_['n_items'] = n_objects[1]
+        self.fit_results_['n_events'] = ev.shape[0]
+        self.fit_results_['final_loss'] = res[1]
+        self.fit_results_['func_calls'] = res[2]
+        self.fit_results_['grad_calls'] = res[3]
+        self.fit_results_['warnflag'] = res[4]
 
         # clean up temporary instance variables
         del self._coef

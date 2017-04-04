@@ -33,6 +33,7 @@ from kamrecsys.datasets import load_movielens_mini
 # Functions
 # =============================================================================
 
+
 class EventItemFinder(BaseEventItemFinder):
 
     def __init__(self):

@@ -66,7 +66,9 @@ class BaseRecommender(with_metaclass(ABCMeta, BaseEstimator)):
         conversion table to external ids, succeed from training data sets
     iid : dictionary
         conversion table to internal ids, succeed from training data sets
-    random_state: RandomState or an int seed (None by default)
+    fit_results_ : dict
+        Side information about results of fitting
+    random_state : RandomState or an int seed (None by default)
         A random number generator instance
 
     Raises
@@ -82,6 +84,7 @@ class BaseRecommender(with_metaclass(ABCMeta, BaseEstimator)):
         self.iid = None
         self.random_state = random_state
         self._rng = None
+        self.fit_results_ = {}
 
     def fit(self, random_state=None):
         """
@@ -282,8 +285,8 @@ class BaseEventItemFinder(with_metaclass(ABCMeta, BaseEventRecommender)):
     """
 
     def __init__(self, random_state=None):
-        super(BaseEventItemFinder, self).\
-            __init__(random_state=random_state)
+        super(BaseEventItemFinder, self).__init__(
+            random_state=random_state)
 
     def fit(self, random_state=None):
         """
@@ -291,7 +294,7 @@ class BaseEventItemFinder(with_metaclass(ABCMeta, BaseEventRecommender)):
         """
         super(BaseEventItemFinder, self).fit(random_state=random_state)
 
-    def _get_event_array(self, data, event_index=(0,1), sparse_type='csr'):
+    def _get_event_array(self, data, event_index=(0, 1), sparse_type='csr'):
         """
         Set statistics of input dataset, and generate a matrix representing
         implicit feedbacks.
@@ -317,9 +320,9 @@ class BaseEventItemFinder(with_metaclass(ABCMeta, BaseEventRecommender)):
             events
         """
 
-        # varidity of arguments
+        # validity of arguments
         if sparse_type not in ['csr', 'csc', 'lil', 'array']:
-            raise TypeError("illigal type of sparse matrices")
+            raise TypeError("illegal type of sparse matrices")
 
         if not isinstance(data, EventData):
             raise TypeError("input data must data.EventData class")

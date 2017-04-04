@@ -49,6 +49,7 @@ __all__ = []
 # Functions
 # =============================================================================
 
+
 def score_predictor_report(y_true, y_pred, disp=True):
     """
     Report belief summary of prediction performance
@@ -63,7 +64,7 @@ def score_predictor_report(y_true, y_pred, disp=True):
     y_pred : array, shape(n_samples,)
         Predicted scores
     disp : bool, optional, default=True
-        if Ture, print report
+        if True, print report
 
     Returns
     -------
@@ -99,6 +100,7 @@ def score_predictor_report(y_true, y_pred, disp=True):
             file=sys.stderr)
 
     return stats
+
 
 def score_predictor_statistics(y_true, y_pred, scores=2):
     """
@@ -160,9 +162,9 @@ def score_predictor_statistics(y_true, y_pred, scores=2):
 
     hist, scores = score_histogram(y_true, scores=scores)
     # NOTE: if scores is int, it is replaced with estimated scores
-    stats['scores'] = list(scores)
-    stats['true']['histogram'] = list(hist)
-    stats['true']['histogram_density'] = list(hist / hist.sum())
+    stats['scores'] = scores.tolist()
+    stats['true']['histogram'] = hist.tolist()
+    stats['true']['histogram_density'] = (hist / hist.sum()).tolist()
 
     # descriptive statistics of ground predicted scores
     stats['predicted'] = {}
@@ -171,8 +173,8 @@ def score_predictor_statistics(y_true, y_pred, scores=2):
 
     # NOTE: the same bin boundaries are used for predicted scores
     hist, scores = score_histogram(y_pred, scores=scores)
-    stats['predicted']['histogram'] = list(hist)
-    stats['predicted']['histogram_density'] = list(hist / hist.sum())
+    stats['predicted']['histogram'] = hist.tolist()
+    stats['predicted']['histogram_density'] = (hist / hist.sum()).tolist()
 
     return stats
 
