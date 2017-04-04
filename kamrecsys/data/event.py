@@ -155,8 +155,7 @@ class EventData(BaseData, EventUtilMixin):
             self.s_event = n_otypes
             self.event_otypes = np.arange(self.s_event, dtype=int)
         else:
-            if (event_otypes.ndim != 1 or
-                np.min(event_otypes) < 0 or
+            if (event_otypes.ndim != 1 or np.min(event_otypes) < 0 or
                 np.max(event_otypes) >= n_otypes):
                 raise ValueError("Illegal event_otypes specification")
             self.s_event = event_otypes.shape[0]
@@ -274,7 +273,7 @@ class EventWithScoreData(EventData):
             each row corresponds to an event represented by a vector of object
             with external ids
         score : array_like, shape=(n_events) or (n_stypes, n_events)
-            raiting scores for the i-th elemnt
+            rating scores for the i-th element
         score_domain : optional, tuple or 1d-array of tuple
             min and max of scores, and the interval between scores
         event_feature : optional, array_like, shape=(n_events, variable)

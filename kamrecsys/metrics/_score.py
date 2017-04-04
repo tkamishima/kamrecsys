@@ -41,6 +41,7 @@ from sklearn.utils import (
 # Functions
 # =============================================================================
 
+
 def mean_absolute_error(y_true, y_pred):
     """
     Mean absolute error and its standard deviation.
@@ -145,7 +146,7 @@ def score_histogram(x, scores=(1, 2, 3, 4, 5)):
     # check inputs
     assert_all_finite(x)
     if isinstance(scores, int):
-        bins=scores
+        bins = scores
     else:
         assert_all_finite(scores)
         scores = as_float_array(scores)

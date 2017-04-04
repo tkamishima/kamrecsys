@@ -241,7 +241,6 @@ class TestEventScorePredictor(unittest.TestCase):
             rtol=1e-5)
 
     def test_class(self):
-        import numpy as np
         from kamrecsys.datasets import load_movielens_mini
         from kamrecsys.mf.pmf import EventScorePredictor
 

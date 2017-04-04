@@ -120,7 +120,7 @@ class EventScorePredictor(BaseEventScorePredictor):
         self.score_levels_ = None
         self.n_score_levels_ = 0
         self.n_events_ = 0
-        self.fit_results_ ={
+        self.fit_results_ = {
             'initial_loss': np.inf,
             'final_loss': np.inf,
             'n_iterations': 0
@@ -155,14 +155,12 @@ class EventScorePredictor(BaseEventScorePredictor):
 
         return l
 
-    def _init_params(self, ev, sc):
+    def _init_params(self, sc):
         """
         initialize latent variables
 
         Parameters
         ----------
-        ev : array, shape(n_events, 2)
-            event data
         sc : array, shape(n_events,)
             digitized scores corresponding to events
         """
@@ -247,6 +245,9 @@ class EventScorePredictor(BaseEventScorePredictor):
             Ignored if score of data is a single criterion type. In a multi-
             criteria case, specify the position of the target score in a score
             vector. (default=0)
+        random_state: RandomState or an int seed (None by default)
+            A random number generator instance. If None is given, the
+            object's random_state is used
 
         Notes
         -----
@@ -266,7 +267,7 @@ class EventScorePredictor(BaseEventScorePredictor):
             data.score_domain[0], data.score_domain[1], self.n_score_levels_)
         self.n_events_ = ev.shape[0]
         sc = data.digitize_score(sc)
-        self._init_params(ev, sc)
+        self._init_params(sc)
 
         # first m-step
         self.maximization_step(ev, sc)
@@ -305,7 +306,6 @@ class EventScorePredictor(BaseEventScorePredictor):
                     " {:.15g}".format(precision))
                 break
             pre_loss = cur_loss
-
 
         if iter_no >= self.maxiter - 1:
             logger.warning(

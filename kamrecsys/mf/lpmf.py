@@ -131,7 +131,7 @@ class EventItemFinder(BaseEventItemFinder):
         self.bi_ = None
         self.p_ = None
         self.q_ = None
-        self.fit_results_ ={
+        self.fit_results_ = {
             'initial_loss': np.inf,
             'final_loss': np.inf,
         }
@@ -252,7 +252,7 @@ class EventItemFinder(BaseEventItemFinder):
 
         # regularization term
         reg = (np.sum(bu ** 2) + np.sum(bi ** 2) +
-              np.sum(p ** 2) + np.sum(q ** 2))
+               np.sum(p ** 2) + np.sum(q ** 2))
 
         return loss + self._reg * reg
 
@@ -339,6 +339,10 @@ class EventItemFinder(BaseEventItemFinder):
         random_state: RandomState or an int seed (None by default)
             A random number generator instance. If None is given, the
             object's random_state is used
+        tol : float
+            Tolerance of optimizer's convergence
+        maxiter : int
+            Maximum number of iterations in optimization
         kwargs : keyword arguments
             keyword arguments passed to optimizers
         """

@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 from kamrecsys import (__version__, __license__, __author__)
 
 (author, author_email) = \
-    re.search('([^\(\)]+)\s+\(\s+(.+)\s+\)', __author__).groups()
+    re.search('([^()]+)\s+\(\s+(.+)\s+\)', __author__).groups()
 
 with open('readme.md') as in_file:
     long_description = in_file.read()

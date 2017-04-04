@@ -52,6 +52,7 @@ class TestMeanAbsoluteError(TestCase):
         self.assertAlmostEqual(mean, 0.9534215971390001, delta=1e-5)
         self.assertAlmostEqual(stdev, 0.6602899115612394, delta=1e-5)
 
+
 class TestMeanSquaredError(TestCase):
 
     def test_class(self):
@@ -62,6 +63,7 @@ class TestMeanSquaredError(TestCase):
         self.assertAlmostEqual(rmse, 1.1597394143516166, delta=1e-5)
         self.assertAlmostEqual(mean, 1.3449955092006309, delta=1e-5)
         self.assertAlmostEqual(stdev, 1.4418716080648177, delta=1e-5)
+
 
 class TestScoreHistogram(unittest.TestCase):
 
@@ -77,7 +79,7 @@ class TestScoreHistogram(unittest.TestCase):
         assert_array_equal(scores, [3, 5])
 
         hist, scores = score_histogram(
-            np.linspace(0.0, 1.0, 21),scores=[0.2, 0.4])
+            np.linspace(0.0, 1.0, 21), scores=[0.2, 0.4])
         assert_array_equal(hist, [6, 15])
         assert_array_equal(scores, [0.2, 0.4])
 

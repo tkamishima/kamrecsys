@@ -49,6 +49,7 @@ __all__ = []
 # Functions
 # =============================================================================
 
+
 def score_predictor_report(y_true, y_pred, disp=True):
     """
     Report belief summary of prediction performance
@@ -63,7 +64,7 @@ def score_predictor_report(y_true, y_pred, disp=True):
     y_pred : array, shape(n_samples,)
         Predicted scores
     disp : bool, optional, default=True
-        if Ture, print report
+        if True, print report
 
     Returns
     -------
@@ -99,6 +100,7 @@ def score_predictor_report(y_true, y_pred, disp=True):
             file=sys.stderr)
 
     return stats
+
 
 def score_predictor_statistics(y_true, y_pred, scores=2):
     """

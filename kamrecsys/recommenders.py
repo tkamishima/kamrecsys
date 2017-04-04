@@ -294,7 +294,7 @@ class BaseEventItemFinder(with_metaclass(ABCMeta, BaseEventRecommender)):
         """
         super(BaseEventItemFinder, self).fit(random_state=random_state)
 
-    def _get_event_array(self, data, event_index=(0,1), sparse_type='csr'):
+    def _get_event_array(self, data, event_index=(0, 1), sparse_type='csr'):
         """
         Set statistics of input dataset, and generate a matrix representing
         implicit feedbacks.
@@ -320,9 +320,9 @@ class BaseEventItemFinder(with_metaclass(ABCMeta, BaseEventRecommender)):
             events
         """
 
-        # varidity of arguments
+        # validity of arguments
         if sparse_type not in ['csr', 'csc', 'lil', 'array']:
-            raise TypeError("illigal type of sparse matrices")
+            raise TypeError("illegal type of sparse matrices")
 
         if not isinstance(data, EventData):
             raise TypeError("input data must data.EventData class")
