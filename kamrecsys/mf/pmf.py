@@ -30,7 +30,7 @@ from ..recommenders import BaseEventScorePredictor
 # Public symbols
 # =============================================================================
 
-__all__ = ['EventScorePredictor']
+__all__ = []
 
 # =============================================================================
 # Constants

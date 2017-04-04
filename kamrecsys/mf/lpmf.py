@@ -30,7 +30,7 @@ from ..recommenders import BaseEventItemFinder
 # Public symbols
 # =============================================================================
 
-__all__ = ['EventItemFinder']
+__all__ = []
 
 # =============================================================================
 # Constants

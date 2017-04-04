@@ -39,10 +39,10 @@ __all__ = [
     'cross_validation',
     'data',
     'datasets',
+    'item_finder',
     'metrics',
-    'mf',
     'recommenders',
-    'tm'
+    'score_predictor'
 ]
 
 # =============================================================================
