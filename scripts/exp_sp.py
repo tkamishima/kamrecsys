@@ -172,7 +172,7 @@ def training(info, ev, tsc, event_feature=None, fold=0):
 
     # start new fold
     n_folds = info['test']['n_folds']
-    logger.info("start fold = " + str(fold + 1) + " / " + str(n_folds))
+    logger.info("training fold = " + str(fold + 1) + " / " + str(n_folds))
 
     # generate event data
     data = EventWithScoreData(n_otypes=2, n_stypes=1)
@@ -249,14 +249,15 @@ def testing(rec, info, ev, fold=0):
         estimated scores
     """
 
-    if 'data' not in info['training']:
-        info['training']['data'] = [{}] * n_folds
+    # start new fold
+    n_folds = info['test']['n_folds']
+    logger.info("test fold = " + str(fold + 1) + " / " + str(n_folds))
 
     # set starting time
     start_time = datetime.datetime.now()
     start_utime = os.times()[0]
     if 'start_time' not in info['test']:
-        info['test']['start_time'] = [0] * info['test']['n_folds']
+        info['test']['start_time'] = [0] * n_folds
     info['test']['start_time'][fold] = start_time.isoformat()
     logger.info("test_start_time = " + start_time.isoformat())
 
@@ -270,7 +271,7 @@ def testing(rec, info, ev, fold=0):
     elapsed_utime = end_utime - start_utime
 
     if 'end_time' not in info['test']:
-        info['test']['end_time'] = [0] * info['test']['n_folds']
+        info['test']['end_time'] = [0] * n_folds
     info['test']['end_time'][fold] = start_time.isoformat()
     logger.info("test_end_time = " + end_time.isoformat())
     if 'elapsed_time' not in info['test']:
@@ -287,7 +288,7 @@ def testing(rec, info, ev, fold=0):
     # preserve predictor's outputs
     if 'results' not in info['test']:
         info['test']['results'] = [{}] * n_folds
-    info['test']['results'][fold] = {'n_events': rec.n_events}
+    info['test']['results'][fold] = {'n_events': ev.shape[0]}
 
     return esc
 
