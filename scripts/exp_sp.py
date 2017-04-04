@@ -14,6 +14,8 @@ Options
     specify algorithm: default=pmf
 
     * pmf : probabilistic matrix factorization
+    * plsam : pLSA (multinomial / use expectation in prediction)
+    * plsamm : pLSA (multinomial / use mode in prediction)
 
 -v <VALIDATION>, --validation <VALIDATION>
     validation scheme: default=holdout
@@ -33,6 +35,8 @@ Options
     regularization parameter, default=0.01.
 -k <K>, --dim <K>
     the number of latent factors, default=1.
+--alpha <ALPHA>
+    smoothing parameter of multinomial pLSA
 --tol <TOL>
     optimization parameter. the size of norm of gradient. default=1e-05.
 --maxiter <MAXITER>
@@ -80,7 +84,7 @@ from kamrecsys.cross_validation import KFold
 
 __author__ = "Toshihiro Kamishima ( http://www.kamishima.net/ )"
 __date__ = "2014/07/06"
-__version__ = "2.0.0"
+__version__ = "3.0.0"
 __copyright__ = "Copyright (c) 2014 Toshihiro Kamishima all rights reserved."
 __license__ = "MIT License: http://www.opensource.org/licenses/mit-license.php"
 
@@ -563,7 +567,7 @@ def command_line_parser():
 
     # script specific options
     ap.add_argument('-m', '--method', type=str, default='pmf',
-                    choices=['pmf'])
+                    choices=['pmf', 'plsam', 'plsamm'])
     ap.add_argument('-v', '--validation', type=str, default='holdout',
                     choices=['holdout', 'cv'])
     ap.add_argument('-f', '--fold', type=int, default=5)
@@ -578,6 +582,7 @@ def command_line_parser():
 
     ap.add_argument('-C', '--lambda', dest='C', type=float, default=0.01)
     ap.add_argument('-k', '--dim', dest='k', type=int, default=1)
+    ap.add_argument('--alpha', dest='alpha', type=float, default=1.0)
     ap.add_argument('--tol', type=float, default=1e-05)
     ap.add_argument('--maxiter', type=float, default=200)
 
@@ -635,10 +640,28 @@ def init_info(opt):
     info['model']['options']['random_state'] = opt.rseed
     if opt.method == 'pmf':
         from kamrecsys.mf.pmf import EventScorePredictor
-        info['model']['method'] = 'probabilistic matrix factorization'
+        info['model']['method'] = 'PMF'
         info['model']['options']['C'] = opt.C
         info['model']['options']['k'] = opt.k
         info['model']['options']['tol'] = opt.tol
+        info['model']['options']['maxiter'] = opt.maxiter
+        info['assets']['recommender'] = EventScorePredictor
+    elif opt.method == 'plsam':
+        from kamrecsys.tm.plsa_multi import EventScorePredictor
+        info['model']['method'] = 'MultinomialPLSA_ExpectationPredictor'
+        info['model']['options']['alpha'] = opt.alpha
+        info['model']['options']['k'] = opt.k
+        info['model']['options']['tol'] = opt.tol
+        info['model']['options']['use_expectation'] = True
+        info['model']['options']['maxiter'] = opt.maxiter
+        info['assets']['recommender'] = EventScorePredictor
+    elif opt.method == 'plsamm':
+        from kamrecsys.tm.plsa_multi import EventScorePredictor
+        info['model']['method'] = 'MultinomialPLSA_ModePredictor'
+        info['model']['options']['alpha'] = opt.alpha
+        info['model']['options']['k'] = opt.k
+        info['model']['options']['tol'] = opt.tol
+        info['model']['options']['use_expectation'] = False
         info['model']['options']['maxiter'] = opt.maxiter
         info['assets']['recommender'] = EventScorePredictor
     else:
