@@ -366,7 +366,8 @@ class EventItemFinder(BaseEventItemFinder):
             kwargs['maxiter'] = int(maxiter * self._coef.shape[0])
 
         # get final loss
-        self.fit_results_['initial_loss'] = self.loss(self._coef, ev, n_objects)
+        self.fit_results_['initial_loss'] = self.loss(
+            self._coef, ev, n_objects)
 
         # optimize model
         # fmin_bfgs is slow for large data, maybe because due to the

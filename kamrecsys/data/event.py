@@ -61,10 +61,10 @@ class EventUtilMixin(with_metaclass(ABCMeta, object)):
             array whose elements are represented by external ids
         """
         if data.ndim == 1 and data.shape[0] == self.s_event:
-            new_data = \
-                np.array([self.eid[self.event_otypes[e]][data[e]]
-                          for e in xrange(self.s_event)],
-                         dtype=self.eid[0].dtype)
+            new_data = np.array(
+                [self.eid[self.event_otypes[e]][data[e]]
+                 for e in xrange(self.s_event)],
+                dtype=self.eid[0].dtype)
         elif data.ndim == 2 and data.shape[1] == self.s_event:
             new_data = np.empty_like(data, dtype=self.eid[0].dtype)
             for e in xrange(self.s_event):

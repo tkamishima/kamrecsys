@@ -285,8 +285,8 @@ class BaseEventItemFinder(with_metaclass(ABCMeta, BaseEventRecommender)):
     """
 
     def __init__(self, random_state=None):
-        super(BaseEventItemFinder, self).\
-            __init__(random_state=random_state)
+        super(BaseEventItemFinder, self).__init__(
+            random_state=random_state)
 
     def fit(self, random_state=None):
         """
