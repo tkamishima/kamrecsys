@@ -17,13 +17,14 @@ from six.moves import xrange
 
 import logging
 from abc import ABCMeta, abstractmethod
-from six import with_metaclass
+
 import numpy as np
 import scipy.sparse as sparse
+from six import with_metaclass
 from sklearn.base import BaseEstimator
 from sklearn.utils import check_random_state, check_array
 
-from .data import BaseData, EventData, EventWithScoreData, EventUtilMixin
+from .data import BaseData, EventData, EventUtilMixin
 
 # =============================================================================
 # Module metadata variables
@@ -35,8 +36,7 @@ from .data import BaseData, EventData, EventWithScoreData, EventUtilMixin
 
 __all__ = ['BaseRecommender',
            'BaseEventRecommender',
-           'BaseEventItemFinder',
-           'BaseEventScorePredictor']
+           'BaseEventItemFinder']
 
 # =============================================================================
 # Constants
@@ -353,73 +353,6 @@ class BaseEventItemFinder(with_metaclass(ABCMeta, BaseEventRecommender)):
 
         return event, n_objects
 
-
-class BaseEventScorePredictor(with_metaclass(ABCMeta, BaseEventRecommender)):
-    """
-    Recommenders to predict preference scores from event data
-    """
-
-    def __init__(self, random_state=None):
-        super(BaseEventScorePredictor, self).\
-            __init__(random_state=random_state)
-
-    def fit(self, random_state=None):
-        """
-        fitting model
-        """
-        super(BaseEventScorePredictor, self).fit(random_state=random_state)
-
-    def _get_event_and_score(self, data, event_index, score_index):
-        """
-        Parameters
-        ----------
-        data : :class:`kamrecsys.data.EventWithScoreData`
-            data to fit
-        event_index : array_like, shape=(variable,)
-            a set of indexes to specify the elements in events that are used in
-            a recommendation model
-        score_index : int
-            Ignored if score of data is a single criterion type. In a multi-
-            criteria case, specify the position of the target score in a score
-            vector. (default=0)
-
-        Returns
-        -------
-        event : array_like, shape=(n_events, event_index.shape[0])
-            an extracted set of events
-        score : array_like, shape=(n_events,)
-            scores for each event
-        n_objects : array_like, shape=(event_index.shape[0],), dtype=int
-            the number of objects corresponding to elements tof an extracted
-            events
-
-        Raises
-        ------
-        TypeError
-            if input data is not :class:`kamrecsys.data.EventWithScoreData`
-            class
-        """
-        if not isinstance(data, EventWithScoreData):
-            raise TypeError("input data must data.EventWithScoreData class")
-
-        # import meta information of objects and events to this recommender
-        self._set_object_info(data)
-        self._set_event_info(data)
-        event_index = np.asarray(event_index)
-
-        # get event data
-        event = np.atleast_2d(data.event)[:, event_index]
-
-        # get score information
-        if data.n_stypes == 1:
-            score = data.score
-        else:
-            score = data.score[:, score_index]
-
-        # get number of objects
-        n_objects = self.n_objects[self.event_otypes[event_index]]
-
-        return event, score, n_objects
 
 # =============================================================================
 # Functions

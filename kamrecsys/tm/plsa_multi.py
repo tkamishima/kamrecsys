@@ -23,7 +23,7 @@ import logging
 import sys
 import numpy as np
 
-from ..recommenders import BaseEventScorePredictor
+from ..score_predictor import BaseEventScorePredictor
 
 # =============================================================================
 # Public symbols
