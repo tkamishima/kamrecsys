@@ -64,19 +64,18 @@ from six.moves import xrange
 
 import sys
 import argparse
+import datetime
+import json
+import logging
 import os
 import platform
 import subprocess
-import logging
-import datetime
-import json
 
 import numpy as np
 import scipy as sp
 import sklearn
-
-from kamrecsys.data import EventWithScoreData
 from kamrecsys.cross_validation import KFold
+from kamrecsys.data import EventWithScoreData
 
 # =============================================================================
 # Module metadata variables
@@ -640,31 +639,31 @@ def init_info(opt):
     # model
     info['model']['options']['random_state'] = opt.rseed
     if opt.method == 'pmf':
-        from kamrecsys.mf.pmf import EventScorePredictor
+        from kamrecsys.score_predictor.matrix_factorization import PMF
         info['model']['method'] = 'PMF'
         info['model']['options']['C'] = opt.C
         info['model']['options']['k'] = opt.k
         info['model']['options']['tol'] = opt.tol
         info['model']['options']['maxiter'] = opt.maxiter
-        info['assets']['recommender'] = EventScorePredictor
+        info['assets']['recommender'] = PMF
     elif opt.method == 'plsam':
-        from kamrecsys.tm.plsa_multi import EventScorePredictor
+        from kamrecsys.score_predictor.topic_model import MultinomialPLSA
         info['model']['method'] = 'MultinomialPLSA_ExpectationPredictor'
         info['model']['options']['alpha'] = opt.alpha
         info['model']['options']['k'] = opt.k
         info['model']['options']['tol'] = opt.tol
         info['model']['options']['use_expectation'] = True
         info['model']['options']['maxiter'] = opt.maxiter
-        info['assets']['recommender'] = EventScorePredictor
+        info['assets']['recommender'] = MultinomialPLSA
     elif opt.method == 'plsamm':
-        from kamrecsys.tm.plsa_multi import EventScorePredictor
+        from kamrecsys.score_predictor.topic_model import MultinomialPLSA
         info['model']['method'] = 'MultinomialPLSA_ModePredictor'
         info['model']['options']['alpha'] = opt.alpha
         info['model']['options']['k'] = opt.k
         info['model']['options']['tol'] = opt.tol
         info['model']['options']['use_expectation'] = False
         info['model']['options']['maxiter'] = opt.maxiter
-        info['assets']['recommender'] = EventScorePredictor
+        info['assets']['recommender'] = MultinomialPLSA
     else:
         raise TypeError(
             "Invalid method name: {0:s}".format(info['model']['method']))

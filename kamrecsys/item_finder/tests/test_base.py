@@ -13,17 +13,19 @@ from six.moves import xrange
 # =============================================================================
 
 from numpy.testing import (
+    TestCase,
+    run_module_suite,
+    assert_,
     assert_array_equal,
     assert_array_less,
     assert_allclose,
     assert_array_max_ulp,
     assert_array_almost_equal_nulp)
-import unittest
 
 import numpy as np
 
-from kamrecsys.recommenders import BaseEventItemFinder
 from kamrecsys.datasets import load_movielens_mini
+from kamrecsys.item_finder import BaseEventItemFinder
 
 # =============================================================================
 # Variables
@@ -31,6 +33,10 @@ from kamrecsys.datasets import load_movielens_mini
 
 # =============================================================================
 # Functions
+# =============================================================================
+
+# =============================================================================
+# Test Classes
 # =============================================================================
 
 
@@ -42,12 +48,8 @@ class EventItemFinder(BaseEventItemFinder):
     def raw_predict(self):
         pass
 
-# =============================================================================
-# Test Classes
-# =============================================================================
 
-
-class TestBaseEventItemFinder(unittest.TestCase):
+class TestBaseEventItemFinder(TestCase):
 
     def setUp(self):
         self.rec = EventItemFinder()
@@ -76,10 +78,9 @@ class TestBaseEventItemFinder(unittest.TestCase):
         event2, n_objects = self.rec._get_event_array(data, sparse_type='lil')
         assert_array_equal(event, event2.todense())
 
-
 # =============================================================================
 # Main Routine
 # =============================================================================
 
 if __name__ == '__main__':
-    unittest.main()
+    run_module_suite()
