@@ -13,15 +13,20 @@ from six.moves import xrange
 # =============================================================================
 
 from numpy.testing import (
+    TestCase,
+    run_module_suite,
+    assert_,
     assert_array_equal,
     assert_array_less,
     assert_allclose,
     assert_array_max_ulp,
     assert_array_almost_equal_nulp)
-import unittest
 
 import numpy as np
 from sklearn.utils import check_random_state
+
+from kamrecsys.datasets import load_movielens_mini
+from kamrecsys.score_predictor import PMF
 
 # =============================================================================
 # Module variables
@@ -36,15 +41,13 @@ from sklearn.utils import check_random_state
 # =============================================================================
 
 
-class TestEventScorePredictor(unittest.TestCase):
+class TestPMF(TestCase):
 
     def test_loss(self):
-        from kamrecsys.datasets import load_movielens_mini
-        from kamrecsys.mf.pmf import EventScorePredictor
 
         # setup
         data = load_movielens_mini()
-        rec = EventScorePredictor(C=0.1, k=2, tol=1e-03, random_state=1234)
+        rec = PMF(C=0.1, k=2, tol=1e-03, random_state=1234)
 
         rec._rng = check_random_state(rec.random_state)
         ev, sc, n_objects = rec._get_event_and_score(data, (0, 1), 0)
@@ -100,12 +103,10 @@ class TestEventScorePredictor(unittest.TestCase):
                                62.877151622787892, delta=1e-5)
 
     def test_grad_loss(self):
-        from kamrecsys.datasets import load_movielens_mini
-        from kamrecsys.mf.pmf import EventScorePredictor
 
         # setup
         data = load_movielens_mini()
-        rec = EventScorePredictor(C=0.1, k=2, tol=1e-03, random_state=1234)
+        rec = PMF(C=0.1, k=2, tol=1e-03, random_state=1234)
 
         rec._rng = check_random_state(rec.random_state)
         ev, sc, n_objects = rec._get_event_and_score(data, (0, 1), 0)
@@ -241,12 +242,10 @@ class TestEventScorePredictor(unittest.TestCase):
             rtol=1e-5)
 
     def test_class(self):
-        from kamrecsys.datasets import load_movielens_mini
-        from kamrecsys.mf.pmf import EventScorePredictor
 
         data = load_movielens_mini()
 
-        rec = EventScorePredictor(C=0.1, k=2, tol=1e-03, random_state=1234)
+        rec = PMF(C=0.1, k=2, tol=1e-03, random_state=1234)
 
         self.assertDictEqual(
             vars(rec),
@@ -299,4 +298,4 @@ class TestEventScorePredictor(unittest.TestCase):
 # =============================================================================
 
 if __name__ == '__main__':
-    unittest.main()
+    run_module_suite()

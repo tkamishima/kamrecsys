@@ -639,13 +639,13 @@ def init_info(opt):
     # model
     info['model']['options']['random_state'] = opt.rseed
     if opt.method == 'pmf':
-        from kamrecsys.mf.pmf import EventScorePredictor
+        from kamrecsys.score_predictor.matrix_factorization import PMF
         info['model']['method'] = 'PMF'
         info['model']['options']['C'] = opt.C
         info['model']['options']['k'] = opt.k
         info['model']['options']['tol'] = opt.tol
         info['model']['options']['maxiter'] = opt.maxiter
-        info['assets']['recommender'] = EventScorePredictor
+        info['assets']['recommender'] = PMF
     elif opt.method == 'plsam':
         from kamrecsys.score_predictor.topic_model import MultinomialPLSA
         info['model']['method'] = 'MultinomialPLSA_ExpectationPredictor'

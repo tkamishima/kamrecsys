@@ -21,8 +21,8 @@ from six.moves import xrange
 import logging
 
 from .base import BaseEventScorePredictor
-from .topic_model import (
-    MultinomialPLSA)
+from .matrix_factorization import PMF
+from .topic_model import MultinomialPLSA
 
 # =============================================================================
 # Metadata variables
@@ -34,6 +34,7 @@ from .topic_model import (
 
 __all__ = [
     'BaseEventScorePredictor',
+    'PMF',
     'MultinomialPLSA']
 
 # =============================================================================
