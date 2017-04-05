@@ -20,7 +20,8 @@ from six.moves import xrange
 
 import logging
 
-from .base import (BaseEventItemFinder)
+from .base import BaseEventItemFinder
+from .matrix_factorization import LogisticPMF
 
 # =============================================================================
 # Metadata variables
@@ -31,7 +32,8 @@ from .base import (BaseEventItemFinder)
 # =============================================================================
 
 __all__ = [
-    'BaseEventItemFinder']
+    'BaseEventItemFinder',
+    'LogisticPMF']
 
 # =============================================================================
 # Constants

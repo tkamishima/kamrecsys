@@ -13,15 +13,20 @@ from six.moves import xrange
 # =============================================================================
 
 from numpy.testing import (
+    TestCase,
+    run_module_suite,
+    assert_,
     assert_array_equal,
     assert_array_less,
     assert_allclose,
     assert_array_max_ulp,
     assert_array_almost_equal_nulp)
-import unittest
 
 import numpy as np
 from sklearn.utils import check_random_state
+
+from kamrecsys.datasets import load_movielens_mini
+from kamrecsys.item_finder import LogisticPMF
 
 # =============================================================================
 # Module variables
@@ -36,12 +41,11 @@ from sklearn.utils import check_random_state
 # =============================================================================
 
 
-class TestEventItemFinder(unittest.TestCase):
+class TestLogisticPMF(TestCase):
 
     def test_logistic(self):
-        from kamrecsys.mf.lpmf import EventItemFinder
 
-        rec = EventItemFinder()
+        rec = LogisticPMF()
         self.assertAlmostEqual(rec.sigmoid(0.), 0.5)
         self.assertAlmostEqual(rec.sigmoid(1.), 1 / (1 + 1 / np.e))
         self.assertAlmostEqual(rec.sigmoid(-1.), 1 / (1 + np.e))
@@ -49,12 +53,10 @@ class TestEventItemFinder(unittest.TestCase):
         self.assertAlmostEqual(rec.sigmoid(-1000.), 1e-15)
 
     def test_loss(self):
-        from kamrecsys.datasets import load_movielens_mini
-        from kamrecsys.mf.lpmf import EventItemFinder
 
         # setup
         data = load_movielens_mini()
-        rec = EventItemFinder(C=0.1, k=2, tol=1e-03, random_state=1234)
+        rec = LogisticPMF(C=0.1, k=2, tol=1e-03, random_state=1234)
 
         rec._rng = check_random_state(rec.random_state)
         ev, n_objects = rec._get_event_array(data, sparse_type='csr')
@@ -110,12 +112,10 @@ class TestEventItemFinder(unittest.TestCase):
                                7.6233440104662717, delta=1e-5)
 
     def test_grad_loss(self):
-        from kamrecsys.datasets import load_movielens_mini
-        from kamrecsys.mf.lpmf import EventItemFinder
 
         # setup
         data = load_movielens_mini()
-        rec = EventItemFinder(C=0.1, k=2, tol=1e-03, random_state=1234)
+        rec = LogisticPMF(C=0.1, k=2, tol=1e-03, random_state=1234)
 
         rec._rng = check_random_state(rec.random_state)
         ev, n_objects = rec._get_event_array(data, sparse_type='csr')
@@ -251,12 +251,10 @@ class TestEventItemFinder(unittest.TestCase):
             rtol=1e-5)
 
     def test_class(self):
-        from kamrecsys.datasets import load_movielens_mini
-        from kamrecsys.mf.lpmf import EventItemFinder
 
         # setup
         data = load_movielens_mini()
-        rec = EventItemFinder(C=0.1, k=2, tol=1e-03, random_state=1234)
+        rec = LogisticPMF(C=0.1, k=2, tol=1e-03, random_state=1234)
 
         self.assertDictEqual(
             vars(rec),
@@ -309,4 +307,4 @@ class TestEventItemFinder(unittest.TestCase):
 # =============================================================================
 
 if __name__ == '__main__':
-    unittest.main()
+    run_module_suite()
