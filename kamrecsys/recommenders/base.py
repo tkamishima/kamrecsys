@@ -62,8 +62,6 @@ class BaseRecommender(with_metaclass(ABCMeta, BaseEstimator)):
         conversion table to external ids, succeed from training data sets
     iid : dictionary
         conversion table to internal ids, succeed from training data sets
-    fit_results_ : dict
-        Side information about results of fitting
     random_state : RandomState or an int seed (None by default)
         A random number generator instance
 
@@ -80,7 +78,6 @@ class BaseRecommender(with_metaclass(ABCMeta, BaseEstimator)):
         self.iid = None
         self.random_state = random_state
         self._rng = None
-        self.fit_results_ = {}
 
     def fit(self, random_state=None):
         """
@@ -205,10 +202,14 @@ class BaseEventRecommender(
     s_event : int
         the size of event, which is the number of objects to represent a
         rating event
+    fit_results_ : dict
+        Side information about results of fitting
     """
 
     def __init__(self, random_state=None):
         super(BaseEventRecommender, self).__init__(random_state=random_state)
+
+        self.fit_results_ = {}
 
     def _set_event_info(self, data):
         """
