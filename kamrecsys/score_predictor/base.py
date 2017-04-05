@@ -4,28 +4,20 @@
 Base class for Score Predictors
 """
 
-from __future__ import (
-    print_function,
-    division,
-    absolute_import,
-    unicode_literals)
-from six.moves import xrange
+from __future__ import (print_function, division, absolute_import,
+                        unicode_literals)
 
 # =============================================================================
 # Imports
 # =============================================================================
-
 import logging
-from abc import ABCMeta, abstractmethod
+from abc import ABCMeta
 
 import numpy as np
-import scipy.sparse as sparse
 from six import with_metaclass
-from sklearn.base import BaseEstimator
-from sklearn.utils import check_random_state, check_array
 
-from ..data import EventWithScoreData
 from ..recommenders import BaseEventRecommender
+from ..data import EventWithScoreData
 
 # =============================================================================
 # Metadata variables

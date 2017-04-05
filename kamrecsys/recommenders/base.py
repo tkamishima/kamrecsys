@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Recommenders: abstract classes
+Base Recommender Classes
 """
 
 from __future__ import (
@@ -23,7 +23,7 @@ from six import with_metaclass
 from sklearn.base import BaseEstimator
 from sklearn.utils import check_random_state, check_array
 
-from .data import BaseData, EventData, EventUtilMixin
+from ..data import BaseData, EventData, EventUtilMixin
 
 # =============================================================================
 # Module metadata variables
@@ -33,8 +33,6 @@ from .data import BaseData, EventData, EventUtilMixin
 # Public symbols
 # =============================================================================
 
-__all__ = ['BaseRecommender',
-           'BaseEventRecommender']
 
 # =============================================================================
 # Constants

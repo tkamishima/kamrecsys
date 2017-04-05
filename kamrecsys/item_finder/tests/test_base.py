@@ -22,6 +22,8 @@ from numpy.testing import (
     assert_array_max_ulp,
     assert_array_almost_equal_nulp)
 
+import numpy as np
+
 from kamrecsys.datasets import load_movielens_mini
 from kamrecsys.item_finder import BaseEventItemFinder
 
@@ -47,7 +49,7 @@ class EventItemFinder(BaseEventItemFinder):
         pass
 
 
-class TestBaseEventItemFinder(unittest.TestCase):
+class TestBaseEventItemFinder(TestCase):
 
     def setUp(self):
         self.rec = EventItemFinder()

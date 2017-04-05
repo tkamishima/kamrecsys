@@ -22,7 +22,6 @@ from numpy.testing import (
     assert_array_max_ulp,
     assert_array_almost_equal_nulp)
 
-from kamrecsys.datasets import load_movielens_mini
 from kamrecsys.recommenders import BaseEventRecommender
 
 # =============================================================================
@@ -34,7 +33,7 @@ from kamrecsys.recommenders import BaseEventRecommender
 # =============================================================================
 
 # =============================================================================
-# Test Classes
+# Classes
 # =============================================================================
 
 
@@ -45,6 +44,10 @@ class EventRecommender(BaseEventRecommender):
 
     def raw_predict(self):
         pass
+
+# =============================================================================
+# Test Classes
+# =============================================================================
 
 
 class TestBaseEventRecommender(TestCase):

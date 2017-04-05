@@ -18,12 +18,12 @@ from six.moves import xrange
 import logging
 from abc import ABCMeta
 
-from six import with_metaclass
 import numpy as np
 from scipy import sparse as sparse
+from six import with_metaclass
 
-from ..data import EventData
 from ..recommenders import BaseEventRecommender
+from ..data import EventData
 
 # =============================================================================
 # Metadata variables
