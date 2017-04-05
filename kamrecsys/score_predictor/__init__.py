@@ -21,6 +21,8 @@ from six.moves import xrange
 import logging
 
 from .base import BaseEventScorePredictor
+from .topic_model import (
+    MultinomialPLSA)
 
 # =============================================================================
 # Metadata variables
@@ -30,7 +32,9 @@ from .base import BaseEventScorePredictor
 # Public symbols
 # =============================================================================
 
-__all__ = ['BaseEventScorePredictor']
+__all__ = [
+    'BaseEventScorePredictor',
+    'MultinomialPLSA']
 
 # =============================================================================
 # Constants

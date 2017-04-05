@@ -13,12 +13,17 @@ from six.moves import xrange
 # =============================================================================
 
 from numpy.testing import (
+    TestCase,
+    run_module_suite,
+    assert_,
     assert_array_equal,
     assert_array_less,
     assert_allclose,
     assert_array_max_ulp,
     assert_array_almost_equal_nulp)
-import unittest
+
+from kamrecsys.datasets import load_movielens_mini
+from kamrecsys.score_predictor.topic_model import MultinomialPLSA
 
 # =============================================================================
 # Module variables
@@ -33,16 +38,14 @@ import unittest
 # =============================================================================
 
 
-class TestEventScorePredictor(unittest.TestCase):
+class TestMultinomialPLSA(TestCase):
 
     def test_class(self):
         import numpy as np
-        from kamrecsys.datasets import load_movielens_mini
-        from kamrecsys.tm.plsa_multi import EventScorePredictor
 
         data = load_movielens_mini()
 
-        rec = EventScorePredictor(tol=1e-8, k=2, random_state=1234)
+        rec = MultinomialPLSA(tol=1e-8, k=2, random_state=1234)
         self.assertDictEqual(
             vars(rec), {
                 'k': 2, 'tol': 1e-8, 'maxiter': 100, 'alpha': 1.0,
@@ -113,4 +116,4 @@ class TestEventScorePredictor(unittest.TestCase):
 # =============================================================================
 
 if __name__ == '__main__':
-    unittest.main()
+    run_module_suite()
