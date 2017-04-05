@@ -60,8 +60,8 @@ class BaseEventScorePredictor(with_metaclass(ABCMeta, BaseEventRecommender)):
     """
 
     def __init__(self, random_state=None):
-        super(BaseEventScorePredictor, self). \
-            __init__(random_state=random_state)
+        super(BaseEventScorePredictor, self).__init__(
+            random_state=random_state)
 
     def fit(self, random_state=None):
         """
