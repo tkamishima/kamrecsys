@@ -24,13 +24,13 @@ import numpy as np
 from scipy.optimize import fmin_cg
 from sklearn.utils import check_random_state
 
-from ..recommenders import BaseEventItemFinder
+from . import BaseEventItemFinder
 
 # =============================================================================
 # Public symbols
 # =============================================================================
 
-__all__ = ['EventItemFinder']
+__all__ = []
 
 # =============================================================================
 # Constants
@@ -45,7 +45,7 @@ __all__ = ['EventItemFinder']
 # =============================================================================
 
 
-class EventItemFinder(BaseEventItemFinder):
+class LogisticPMF(BaseEventItemFinder):
     """
     A probabilistic matrix factorization model proposed in [1]_.
     A method of handling bias terms is defined by equation (5) in [2]_.
@@ -120,7 +120,7 @@ class EventItemFinder(BaseEventItemFinder):
     sigmoid_range = 34.538776394910684
 
     def __init__(self, C=1.0, k=1, tol=None, maxiter=200, random_state=None):
-        super(EventItemFinder, self).__init__(random_state=random_state)
+        super(LogisticPMF, self).__init__(random_state=random_state)
 
         self.C = np.float(C)
         self.k = np.int(k)
@@ -348,7 +348,7 @@ class EventItemFinder(BaseEventItemFinder):
         """
 
         # call super class
-        super(EventItemFinder, self).fit(random_state=random_state)
+        super(LogisticPMF, self).fit(random_state=random_state)
 
         # get input data
         ev, n_objects = self._get_event_array(

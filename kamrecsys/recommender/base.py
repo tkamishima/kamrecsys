@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Recommenders: abstract classes
+Base Recommender Classes
 """
 
 from __future__ import (
@@ -17,13 +17,13 @@ from six.moves import xrange
 
 import logging
 from abc import ABCMeta, abstractmethod
-from six import with_metaclass
+
 import numpy as np
-import scipy.sparse as sparse
+from six import with_metaclass
 from sklearn.base import BaseEstimator
 from sklearn.utils import check_random_state, check_array
 
-from .data import BaseData, EventData, EventWithScoreData, EventUtilMixin
+from ..data import BaseData, EventData, EventUtilMixin
 
 # =============================================================================
 # Module metadata variables
@@ -33,10 +33,6 @@ from .data import BaseData, EventData, EventWithScoreData, EventUtilMixin
 # Public symbols
 # =============================================================================
 
-__all__ = ['BaseRecommender',
-           'BaseEventRecommender',
-           'BaseEventItemFinder',
-           'BaseEventScorePredictor']
 
 # =============================================================================
 # Constants
@@ -278,148 +274,6 @@ class BaseEventRecommender(
 
         return np.squeeze(self.raw_predict(self.to_iid_event(eev)))
 
-
-class BaseEventItemFinder(with_metaclass(ABCMeta, BaseEventRecommender)):
-    """
-    Recommenders to find good items from event data
-    """
-
-    def __init__(self, random_state=None):
-        super(BaseEventItemFinder, self).__init__(
-            random_state=random_state)
-
-    def fit(self, random_state=None):
-        """
-        fitting model
-        """
-        super(BaseEventItemFinder, self).fit(random_state=random_state)
-
-    def _get_event_array(self, data, event_index=(0, 1), sparse_type='csr'):
-        """
-        Set statistics of input dataset, and generate a matrix representing
-        implicit feedbacks.
-
-        Parameters
-        ----------
-        data : :class:`kamrecsys.data.EventData`
-            data to fit
-        event_index : array_like, shape=(variable,)
-            a set of indexes to specify the elements in events that are used
-            in a recommendation model
-        sparse_type: str
-            type of sparse matrix: 'csr', 'csc', 'lil', or 'array'
-            default='csr'
-
-        Returns
-        -------
-        event_array: array, shape=(n_users, n_items), dtype=int
-            return rating matrix that takes 1 if it is consumed, 0 otherwise.
-            if event data are not available, return None
-        n_objects : array_like, shape=(event_index.shape[0],), dtype=int
-            the number of objects corresponding to elements tof an extracted
-            events
-        """
-
-        # validity of arguments
-        if sparse_type not in ['csr', 'csc', 'lil', 'array']:
-            raise TypeError("illegal type of sparse matrices")
-
-        if not isinstance(data, EventData):
-            raise TypeError("input data must data.EventData class")
-
-        # import meta information of objects and events to this recommender
-        self._set_object_info(data)
-        self._set_event_info(data)
-        event_index = np.asarray(event_index)
-
-        # get number of objects
-        n_objects = self.n_objects[self.event_otypes[event_index]]
-
-        # get event data
-        users = data.event[:, event_index[0]]
-        items = data.event[:, event_index[1]]
-        scores = np.ones_like(users, dtype=int)
-
-        # generate array
-        event = sparse.coo_matrix((scores, (users, items)), shape=n_objects)
-        if sparse_type == 'csc':
-            event = event.tocsc()
-        elif sparse_type == 'csr':
-            event = event.tocsr()
-        elif sparse_type == 'lil':
-            event = event.tolil()
-        else:
-            event = event.toarray()
-
-        return event, n_objects
-
-
-class BaseEventScorePredictor(with_metaclass(ABCMeta, BaseEventRecommender)):
-    """
-    Recommenders to predict preference scores from event data
-    """
-
-    def __init__(self, random_state=None):
-        super(BaseEventScorePredictor, self).\
-            __init__(random_state=random_state)
-
-    def fit(self, random_state=None):
-        """
-        fitting model
-        """
-        super(BaseEventScorePredictor, self).fit(random_state=random_state)
-
-    def _get_event_and_score(self, data, event_index, score_index):
-        """
-        Parameters
-        ----------
-        data : :class:`kamrecsys.data.EventWithScoreData`
-            data to fit
-        event_index : array_like, shape=(variable,)
-            a set of indexes to specify the elements in events that are used in
-            a recommendation model
-        score_index : int
-            Ignored if score of data is a single criterion type. In a multi-
-            criteria case, specify the position of the target score in a score
-            vector. (default=0)
-
-        Returns
-        -------
-        event : array_like, shape=(n_events, event_index.shape[0])
-            an extracted set of events
-        score : array_like, shape=(n_events,)
-            scores for each event
-        n_objects : array_like, shape=(event_index.shape[0],), dtype=int
-            the number of objects corresponding to elements tof an extracted
-            events
-
-        Raises
-        ------
-        TypeError
-            if input data is not :class:`kamrecsys.data.EventWithScoreData`
-            class
-        """
-        if not isinstance(data, EventWithScoreData):
-            raise TypeError("input data must data.EventWithScoreData class")
-
-        # import meta information of objects and events to this recommender
-        self._set_object_info(data)
-        self._set_event_info(data)
-        event_index = np.asarray(event_index)
-
-        # get event data
-        event = np.atleast_2d(data.event)[:, event_index]
-
-        # get score information
-        if data.n_stypes == 1:
-            score = data.score
-        else:
-            score = data.score[:, score_index]
-
-        # get number of objects
-        n_objects = self.n_objects[self.event_otypes[event_index]]
-
-        return event, score, n_objects
 
 # =============================================================================
 # Functions

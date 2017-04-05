@@ -23,7 +23,7 @@ import logging
 
 __author__ = "Toshihiro Kamishima ( http://www.kamishima.net/ )"
 __date__ = "2012/03/25"
-__version__ = "5.2.0"
+__version__ = "6.0.0"
 __copyright__ = "Copyright (c) 2012 Toshihiro Kamishima all rights reserved."
 __license__ = "MIT License: http://www.opensource.org/licenses/mit-license.php"
 __docformat__ = "restructuredtext en"
@@ -39,10 +39,10 @@ __all__ = [
     'cross_validation',
     'data',
     'datasets',
+    'item_finder',
     'metrics',
-    'mf',
     'recommenders',
-    'tm'
+    'score_predictor'
 ]
 
 # =============================================================================

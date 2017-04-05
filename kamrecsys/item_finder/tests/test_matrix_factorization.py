@@ -13,15 +13,20 @@ from six.moves import xrange
 # =============================================================================
 
 from numpy.testing import (
+    TestCase,
+    run_module_suite,
+    assert_,
     assert_array_equal,
     assert_array_less,
     assert_allclose,
     assert_array_max_ulp,
     assert_array_almost_equal_nulp)
-import unittest
 
 import numpy as np
 from sklearn.utils import check_random_state
+
+from kamrecsys.datasets import load_movielens_mini
+from kamrecsys.item_finder import LogisticPMF
 
 # =============================================================================
 # Module variables
@@ -36,19 +41,26 @@ from sklearn.utils import check_random_state
 # =============================================================================
 
 
-class TestEventScorePredictor(unittest.TestCase):
+class TestLogisticPMF(TestCase):
+
+    def test_logistic(self):
+
+        rec = LogisticPMF()
+        self.assertAlmostEqual(rec.sigmoid(0.), 0.5)
+        self.assertAlmostEqual(rec.sigmoid(1.), 1 / (1 + 1 / np.e))
+        self.assertAlmostEqual(rec.sigmoid(-1.), 1 / (1 + np.e))
+        self.assertAlmostEqual(rec.sigmoid(1000.), 1. - 1e-15)
+        self.assertAlmostEqual(rec.sigmoid(-1000.), 1e-15)
 
     def test_loss(self):
-        from kamrecsys.datasets import load_movielens_mini
-        from kamrecsys.mf.pmf import EventScorePredictor
 
         # setup
         data = load_movielens_mini()
-        rec = EventScorePredictor(C=0.1, k=2, tol=1e-03, random_state=1234)
+        rec = LogisticPMF(C=0.1, k=2, tol=1e-03, random_state=1234)
 
         rec._rng = check_random_state(rec.random_state)
-        ev, sc, n_objects = rec._get_event_and_score(data, (0, 1), 0)
-        rec._init_coef(ev, sc, n_objects)
+        ev, n_objects = rec._get_event_array(data, sparse_type='csr')
+        rec._init_coef(ev, n_objects)
 
         # set array's view
         mu = rec._coef.view(rec._dt)['mu']
@@ -58,8 +70,8 @@ class TestEventScorePredictor(unittest.TestCase):
         q = rec._coef.view(rec._dt)['q']
 
         # initial parameters
-        self.assertAlmostEqual(rec.loss(rec._coef, ev, sc, n_objects),
-                               0.74652578358324118, delta=1e-5)
+        self.assertAlmostEqual(rec.loss(rec._coef, ev, n_objects),
+                               1.3445493746024519, delta=1e-5)
 
         # all zero
         mu[0] = 0.0
@@ -67,8 +79,8 @@ class TestEventScorePredictor(unittest.TestCase):
         bi[0][:] = 0.0
         p[0][:, :] = 0.0
         q[0][:, :] = 0.0
-        self.assertAlmostEqual(rec.loss(rec._coef, ev, sc, n_objects),
-                               15.699999999999999, delta=1e-5)
+        self.assertAlmostEqual(rec.loss(rec._coef, ev, n_objects),
+                               0.69314718055994518, delta=1e-5)
 
         # all one
         mu[0] = 1.0
@@ -76,8 +88,8 @@ class TestEventScorePredictor(unittest.TestCase):
         bi[0][:] = 1.0
         p[0][:, :] = 1.0
         q[0][:, :] = 1.0
-        self.assertAlmostEqual(rec.loss(rec._coef, ev, sc, n_objects),
-                               2.4648484848484848, delta=1e-5)
+        self.assertAlmostEqual(rec.loss(rec._coef, ev, n_objects),
+                               3.2298971666709479, delta=1e-5)
 
         mu[0] = 1.0
         bu[0][:] = np.arange(0.0, 0.8, 0.1)
@@ -86,8 +98,8 @@ class TestEventScorePredictor(unittest.TestCase):
         p[0][:, 1] = 1.0
         q[0][:, 0] = 0.2
         q[0][:, 1] = 1.0
-        self.assertAlmostEqual(rec.loss(rec._coef, ev, sc, n_objects),
-                               1.1806969696969696, delta=1e-5)
+        self.assertAlmostEqual(rec.loss(rec._coef, ev, n_objects),
+                               2.5557470027227374, delta=1e-5)
 
         mu[0] = 2.0
         bu[0][:] = np.arange(0.8, 0.0, -0.1)
@@ -96,20 +108,18 @@ class TestEventScorePredictor(unittest.TestCase):
         p[0][:, 1] = 1.0
         q[0][:, 0] = np.arange(1.0, 0.0, -0.1) * 0.3 + 2
         q[0][:, 1] = np.arange(0.0, 1.0, 0.1)
-        self.assertAlmostEqual(rec.loss(rec._coef, ev, sc, n_objects),
-                               62.877151622787892, delta=1e-5)
+        self.assertAlmostEqual(rec.loss(rec._coef, ev, n_objects),
+                               7.6233440104662717, delta=1e-5)
 
     def test_grad_loss(self):
-        from kamrecsys.datasets import load_movielens_mini
-        from kamrecsys.mf.pmf import EventScorePredictor
 
         # setup
         data = load_movielens_mini()
-        rec = EventScorePredictor(C=0.1, k=2, tol=1e-03, random_state=1234)
+        rec = LogisticPMF(C=0.1, k=2, tol=1e-03, random_state=1234)
 
         rec._rng = check_random_state(rec.random_state)
-        ev, sc, n_objects = rec._get_event_and_score(data, (0, 1), 0)
-        rec._init_coef(ev, sc, n_objects)
+        ev, n_objects = rec._get_event_array(data, sparse_type='csr')
+        rec._init_coef(ev, n_objects)
 
         # set array's view
         mu = rec._coef.view(rec._dt)['mu']
@@ -119,23 +129,23 @@ class TestEventScorePredictor(unittest.TestCase):
         q = rec._coef.view(rec._dt)['q']
 
         # initial parameters
-        grad = rec.grad_loss(rec._coef, ev, sc, n_objects)
-        self.assertAlmostEqual(grad[0], -0.0212968638573, delta=1e-5)
+        grad = rec.grad_loss(rec._coef, ev, n_objects)
+        self.assertAlmostEqual(grad[0], 0.369344884225, delta=1e-5)
         assert_allclose(
             grad[1:5],
-            [0.0363138387, 0.0167620468, -0.0260414192, -0.0018029422],
+            [-0.0164132567, 0.0766020199, 0.0494304519, 0.0523213185],
             rtol=1e-5)
         assert_allclose(
             grad[15:19],
-            [-0.0757083971, -0.0252334057, -0.0393345837, 0.0252304997],
+            [-0.0079795284, 0.0300003295, 0.0221719417, 0.044446273],
             rtol=1e-5)
         assert_allclose(
             grad[19:23],
-            [0.004779893, -0.0979339524, 0.0125761178, -0.0028554421],
+            [-0.0038983432, -0.0106347977, 0.0474443387, -0.0228580645],
             rtol=1e-5)
         assert_allclose(
             grad[-4:],
-            [-0.0109046825, 0.0536041084, 0.0211451743, -0.0097362783],
+            [0.028416647,  0.031852457, 0.0234708758, -0.0061293161],
             rtol=1e-5)
 
         # all zero
@@ -144,15 +154,15 @@ class TestEventScorePredictor(unittest.TestCase):
         bi[0][:] = 0.0
         p[0][:, :] = 0.0
         q[0][:, :] = 0.0
-        grad = rec.grad_loss(rec._coef, ev, sc, n_objects)
-        self.assertAlmostEqual(grad[0], -3.83333333333, delta=1e-5)
+        grad = rec.grad_loss(rec._coef, ev, n_objects)
+        self.assertAlmostEqual(grad[0], 0.125, delta=1e-5)
         assert_allclose(
             grad[1:5],
-            [-1.2, -0.2, -0.2333333333, -0.4666666667],
+            [-0.0625, 0.0375, 0.0375, 0.0125],
             rtol=1e-5)
         assert_allclose(
             grad[15:19],
-            [-0.7333333333, -0.3333333333, -0.6, -0.3],
+            [-0.025, 0.0125, 0., 0.0125],
             rtol=1e-5)
         assert_allclose(
             grad[19:23],
@@ -169,23 +179,23 @@ class TestEventScorePredictor(unittest.TestCase):
         bi[0][:] = 1.0
         p[0][:, :] = 1.0
         q[0][:, :] = 1.0
-        grad = rec.grad_loss(rec._coef, ev, sc, n_objects)
-        self.assertAlmostEqual(grad[0], 1.16666666667, delta=1e-5)
+        grad = rec.grad_loss(rec._coef, ev, n_objects)
+        self.assertAlmostEqual(grad[0], 0.618307149076, delta=1e-5)
         assert_allclose(
             grad[1:5],
-            [0.4684848485, 0.1351515152, 0.1018181818, 0.2018181818],
+            [0.0009815755, 0.1009815755, 0.1009815755, 0.0759815755],
             rtol=1e-5)
         assert_allclose(
             grad[15:19],
-            [0.2684848485, 0.1684848485, 0.0684848485, 0.2018181818],
+            [0.0261488967, 0.0636488967, 0.0511488967, 0.0636488967],
             rtol=1e-5)
         assert_allclose(
             grad[19:23],
-            [0.4684848485, 0.4684848485, 0.1351515152, 0.1351515152],
+            [0.0009815755, 0.0009815755, 0.1009815755, 0.1009815755],
             rtol=1e-5)
         assert_allclose(
             grad[-4:],
-            [0.0684848485, 0.0684848485, 0.2018181818, 0.2018181818],
+            [0.0511488967, 0.0511488967, 0.0636488967, 0.0636488967],
             rtol=1e-5)
 
         mu[0] = 1.0
@@ -195,23 +205,23 @@ class TestEventScorePredictor(unittest.TestCase):
         p[0][:, 1] = 1.0
         q[0][:, 0] = 0.2
         q[0][:, 1] = 1.0
-        grad = rec.grad_loss(rec._coef, ev, sc, n_objects)
-        self.assertAlmostEqual(grad[0], 0.02, delta=1e-5)
+        grad = rec.grad_loss(rec._coef, ev, n_objects)
+        self.assertAlmostEqual(grad[0], 0.603873544619, delta=1e-5)
         assert_allclose(
             grad[1:5],
-            [-0.0166666667, 0.0435151515, -0.0096363636, 0.0572121212],
+            [-0.0036235458, 0.0968933318, 0.0973800461, 0.0728391677],
             rtol=1e-4)
         assert_allclose(
             grad[15:19],
-            [0.0929090909, 0.0730909091, -0.0300606061, 0.1201212121],
+            [0.0261537573, 0.0639998264, 0.051830763, 0.0646479187],
             rtol=1e-5)
         assert_allclose(
             grad[19:23],
-            [-0.0024242424, -0.0148484848, 0.0095757576, 0.0451515152],
+            [0.0001843817, -0.001805364, 0.0202513936, 0.0985296955],
             rtol=1e-5)
         assert_allclose(
             grad[-4:],
-            [-0.0163030303, -0.0315151515, 0.0586969697, 0.1184848485],
+            [0.0246426542, 0.0503762175, 0.030960323, 0.0630115551],
             rtol=1e-5)
 
         mu[0] = 2.0
@@ -221,32 +231,30 @@ class TestEventScorePredictor(unittest.TestCase):
         p[0][:, 1] = 1.0
         q[0][:, 0] = np.arange(1.0, 0.0, -0.1) * 0.3 + 2
         q[0][:, 1] = np.arange(0.0, 1.0, 0.1)
-        grad = rec.grad_loss(rec._coef, ev, sc, n_objects)
-        self.assertAlmostEqual(grad[0], 7.82805333333, delta=1e-5)
+        grad = rec.grad_loss(rec._coef, ev, n_objects)
+        self.assertAlmostEqual(grad[0], 0.624990535043, delta=1e-5)
         assert_allclose(
             grad[1:5],
-            [2.6081212121, 0.5674860606, 0.4974642424, 1.1014690909],
+            [0.0014530243, 0.1012713178, 0.101089603, 0.0759078805],
             rtol=1e-5)
         assert_allclose(
             grad[15:19],
-            [1.6601212121, 0.8680739394, 1.0315733333, 0.9286727273],
+            [0.0284538602, 0.0662266844, 0.0539994948, 0.0667722935],
             rtol=1e-5)
         assert_allclose(
             grad[19:23],
-            [5.6286878788, 1.2421515152, 1.2160690667, 0.3078901818],
+            [0.0054511944, 0.0018176899, 0.2220968956, 0.0468177236],
             rtol=1e-5)
         assert_allclose(
             grad[-4:],
-            [3.3865059879, 1.0290278788, 2.8935863758, 0.9260363636],
+            [0.1677438113, 0.0514540403, 0.2141894977, 0.0641359299],
             rtol=1e-5)
 
     def test_class(self):
-        from kamrecsys.datasets import load_movielens_mini
-        from kamrecsys.mf.pmf import EventScorePredictor
 
+        # setup
         data = load_movielens_mini()
-
-        rec = EventScorePredictor(C=0.1, k=2, tol=1e-03, random_state=1234)
+        rec = LogisticPMF(C=0.1, k=2, tol=1e-03, random_state=1234)
 
         self.assertDictEqual(
             vars(rec),
@@ -258,29 +266,29 @@ class TestEventScorePredictor(unittest.TestCase):
 
         rec.fit(data, disp=False)
         self.assertAlmostEqual(rec.fit_results_['initial_loss'],
-                               0.74652578358324106, delta=1e-5)
+                               1.3445493746, delta=1e-5)
         self.assertAlmostEqual(rec.fit_results_['final_loss'],
-                               0.025638738121075231, delta=1e-5)
+                               0.30760976439390564, delta=1e-5)
 
         # single prediction
         self.assertAlmostEqual(rec.predict((1, 7)),
-                               3.9873641434545979, delta=1e-5)
+                               0.984542941978, delta=1e-5)
         self.assertAlmostEqual(rec.predict((1, 9)),
-                               4.9892118821609106, delta=1e-5)
+                               0.934243410501, delta=1e-5)
         self.assertAlmostEqual(rec.predict((1, 11)),
-                               3.6480799850368273, delta=1e-5)
+                               0.957504275371, delta=1e-5)
         self.assertAlmostEqual(rec.predict((3, 7)),
-                               3.6336318795279228, delta=1e-5)
+                               0.590183096344, delta=1e-5)
         self.assertAlmostEqual(rec.predict((3, 9)),
-                               4.2482001235634943, delta=1e-5)
+                               0.202161811915, delta=1e-5)
         self.assertAlmostEqual(rec.predict((3, 11)),
-                               3.7236984083417841, delta=1e-5)
+                               0.22899801898, delta=1e-5)
         self.assertAlmostEqual(rec.predict((5, 7)),
-                               3.4141968145802597, delta=1e-5)
+                               0.000727177442114, delta=1e-5)
         self.assertAlmostEqual(rec.predict((5, 9)),
-                               3.9818882049478654, delta=1e-5)
+                               0.0399527433316, delta=1e-5)
         self.assertAlmostEqual(rec.predict((5, 11)),
-                               3.4710520150321895, delta=1e-5)
+                               0.08288774155, delta=1e-5)
 
         # multiple prediction
         x = np.array([
@@ -289,9 +297,9 @@ class TestEventScorePredictor(unittest.TestCase):
             [5, 7], [5, 9], [5, 11]])
         assert_allclose(
             rec.predict(x),
-            [3.9873641434545979, 4.9892118821609106, 3.6480799850368273,
-             3.6336318795279228, 4.2482001235634943, 3.7236984083417841,
-             3.4141968145802597, 3.9818882049478654, 3.4710520150321895],
+            [0.984542941978, 0.934243410501, 0.957504275371,
+             0.590183096344, 0.202161811915, 0.22899801898,
+             0.000727177442114, 0.0399527433316, 0.08288774155],
             rtol=1e-5)
 
 # =============================================================================
@@ -299,4 +307,4 @@ class TestEventScorePredictor(unittest.TestCase):
 # =============================================================================
 
 if __name__ == '__main__':
-    unittest.main()
+    run_module_suite()

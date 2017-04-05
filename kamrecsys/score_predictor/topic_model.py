@@ -23,13 +23,13 @@ import logging
 import sys
 import numpy as np
 
-from ..recommenders import BaseEventScorePredictor
+from . import BaseEventScorePredictor
 
 # =============================================================================
 # Public symbols
 # =============================================================================
 
-__all__ = ['EventScorePredictor']
+__all__ = []
 
 # =============================================================================
 # Constants
@@ -44,7 +44,7 @@ __all__ = ['EventScorePredictor']
 # =============================================================================
 
 
-class EventScorePredictor(BaseEventScorePredictor):
+class MultinomialPLSA(BaseEventScorePredictor):
     """
     A probabilistic latent semantic analysis model in [1]_ Figure 2(b).
 
@@ -101,7 +101,7 @@ class EventScorePredictor(BaseEventScorePredictor):
             self, k=1, tol=1e-10, maxiter=100, alpha=1.0, use_expectation=True,
             random_state=None):
 
-        super(EventScorePredictor, self).__init__(random_state=random_state)
+        super(MultinomialPLSA, self).__init__(random_state=random_state)
 
         # parameters
         self.k = k
@@ -256,7 +256,7 @@ class EventScorePredictor(BaseEventScorePredictor):
         """
 
         # initialization #####
-        super(EventScorePredictor, self).fit(random_state=random_state)
+        super(MultinomialPLSA, self).fit(random_state=random_state)
         ev, sc, n_objects = (
             self._get_event_and_score(
                 data, (user_index, item_index), score_index))
