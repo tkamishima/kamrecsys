@@ -23,7 +23,7 @@ from numpy.testing import (
     assert_array_almost_equal_nulp)
 
 from kamrecsys.datasets import load_movielens_mini
-from kamrecsys.recommenders import BaseEventRecommender
+from kamrecsys.item_finder import BaseEventItemFinder
 
 # =============================================================================
 # Variables
@@ -38,20 +38,43 @@ from kamrecsys.recommenders import BaseEventRecommender
 # =============================================================================
 
 
-class EventRecommender(BaseEventRecommender):
+class EventItemFinder(BaseEventItemFinder):
 
     def __init__(self):
-        super(EventRecommender, self).__init__(random_state=1234)
+        super(EventItemFinder, self).__init__(random_state=1234)
 
     def raw_predict(self):
         pass
 
 
-class TestBaseEventRecommender(TestCase):
+class TestBaseEventItemFinder(unittest.TestCase):
 
-    def test_class(self):
-        pass
+    def setUp(self):
+        self.rec = EventItemFinder()
+        self.data = load_movielens_mini()
 
+    def test__get_event_array(self):
+        data = load_movielens_mini()
+        data.filter_event(
+            np.logical_and(data.event[:, 0] < 5, data.event[:, 1] < 5))
+
+        event, n_objects = self.rec._get_event_array(data, sparse_type='array')
+        assert_array_equal(
+            event[:5, :5],
+            [[1, 1, 1, 1, 1],
+             [1, 0, 0, 0, 0],
+             [1, 1, 0, 0, 0],
+             [1, 0, 0, 0, 0],
+             [0, 0, 0, 1, 0]])
+
+        event2, n_objects = self.rec._get_event_array(data, sparse_type='csr')
+        assert_array_equal(event, event2.todense())
+
+        event2, n_objects = self.rec._get_event_array(data, sparse_type='csc')
+        assert_array_equal(event, event2.todense())
+
+        event2, n_objects = self.rec._get_event_array(data, sparse_type='lil')
+        assert_array_equal(event, event2.todense())
 
 # =============================================================================
 # Main Routine
