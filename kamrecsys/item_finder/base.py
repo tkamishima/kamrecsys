@@ -22,7 +22,7 @@ import numpy as np
 from scipy import sparse as sparse
 from six import with_metaclass
 
-from ..recommenders import BaseEventRecommender
+from ..recommender import BaseEventRecommender
 from ..data import EventData
 
 # =============================================================================

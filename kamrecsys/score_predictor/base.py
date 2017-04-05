@@ -16,7 +16,7 @@ from abc import ABCMeta
 import numpy as np
 from six import with_metaclass
 
-from ..recommenders import BaseEventRecommender
+from ..recommender import BaseEventRecommender
 from ..data import EventWithScoreData
 
 # =============================================================================

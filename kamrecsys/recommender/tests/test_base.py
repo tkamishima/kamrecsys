@@ -25,7 +25,7 @@ from numpy.testing import (
 import numpy as np
 
 from kamrecsys.datasets import load_movielens_mini
-from kamrecsys.recommenders import BaseRecommender, BaseEventRecommender
+from kamrecsys.recommender import BaseRecommender, BaseEventRecommender
 
 # =============================================================================
 # Variables
