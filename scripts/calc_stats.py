@@ -56,7 +56,7 @@ __license__ = "MIT License: http://www.opensource.org/licenses/mit-license.php"
 # Public symbols
 # =============================================================================
 
-__all__ = []
+__all__ = ['do_task']
 
 # =============================================================================
 # Constants
