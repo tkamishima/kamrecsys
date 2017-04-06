@@ -20,6 +20,8 @@ from six.moves import xrange
 
 import logging
 
+import numpy as np
+
 # =============================================================================
 # Metadata variables
 # =============================================================================
@@ -42,6 +44,7 @@ __all__ = []
 # Functions
 # =============================================================================
 
+
 def interlace_group(n_data, n_splits=3):
     """
     Generate interlace group.
@@ -55,16 +58,24 @@ def interlace_group(n_data, n_splits=3):
     Parameters
     ----------
     n_splits : int, default=3
-        Number of folds. Must be at least 2.
+        Number of folds. It must be `n_splits >= 2` .
     n_data : int
-        the number of data
+        the number of data. It must be n_data `n_data > n_splits` .
 
     Returns
     -------
     group : array, shape=(n_data,)
         a sequence of indicator-numbers indicating the group assignment
     """
-    pass
+    n_splits = int(n_splits)
+    if n_splits < 2:
+        ValueError('n_splits must be larger or equal than 2.')
+
+    n_data = int(n_data)
+    if n_data < n_splits:
+        ValueError('n_data must be larger than n_splits.')
+
+    return np.arange(n_data, dtype=int) % n_splits
 
 # =============================================================================
 # Classes
