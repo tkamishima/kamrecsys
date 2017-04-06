@@ -74,8 +74,10 @@ import subprocess
 import numpy as np
 import scipy as sp
 import sklearn
-from kamrecsys.cross_validation import KFold
+from sklearn.model_selection import LeaveOneGroupOut
+
 from kamrecsys.data import EventWithScoreData
+from kamrecsys.model_selection import interlace_group
 
 # =============================================================================
 # Module metadata variables
@@ -83,7 +85,7 @@ from kamrecsys.data import EventWithScoreData
 
 __author__ = "Toshihiro Kamishima ( http://www.kamishima.net/ )"
 __date__ = "2014/07/06"
-__version__ = "3.0.0"
+__version__ = "3.1.0"
 __copyright__ = "Copyright (c) 2014 Toshihiro Kamishima all rights reserved."
 __license__ = "MIT License: http://www.opensource.org/licenses/mit-license.php"
 
@@ -91,7 +93,7 @@ __license__ = "MIT License: http://www.opensource.org/licenses/mit-license.php"
 # Public symbols
 # =============================================================================
 
-__all__ = []
+__all__ = ['do_task']
 
 # =============================================================================
 # Constants
@@ -374,8 +376,9 @@ def cv_test(info):
 
     fold = 0
     esc = np.empty(n_events, dtype=float)
-    for train_i, test_i in KFold(
-            n_events, n_folds=info['test']['n_folds'], interlace=True):
+    cv = LeaveOneGroupOut()
+    for train_i, test_i in cv.split(
+            ev, groups=interlace_group(n_events, info['test']['n_folds'])):
 
         # training
         if info['data']['has_timestamp']:
