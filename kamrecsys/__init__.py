@@ -42,8 +42,7 @@ __all__ = [
     'model_selection',
     'metrics',
     'recommender',
-    'score_predictor'
-]
+    'score_predictor']
 
 # =============================================================================
 # Constants
