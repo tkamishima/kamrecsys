@@ -1,7 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-KamRecSys: Algorithms for recommender systems in Python
+Group Generator for cross validations 
+
+Generated groups will be used with functions using groups, such as
+:class:`sklearn.model_selection.LeaveOneGroupOut` .
 """
 
 from __future__ import (
@@ -18,55 +21,60 @@ from six.moves import xrange
 import logging
 
 # =============================================================================
-# Module metadata variables
+# Metadata variables
 # =============================================================================
-
-__author__ = "Toshihiro Kamishima ( http://www.kamishima.net/ )"
-__date__ = "2012/03/25"
-__version__ = "6.0.0"
-__copyright__ = "Copyright (c) 2012 Toshihiro Kamishima all rights reserved."
-__license__ = "MIT License: http://www.opensource.org/licenses/mit-license.php"
-__docformat__ = "restructuredtext en"
 
 # =============================================================================
 # Public symbols
 # =============================================================================
 
-__all__ = [
-    '__author__',
-    '__version__',
-    '__license__',
-    'cross_validation',
-    'data',
-    'datasets',
-    'item_finder',
-    'model_selection',
-    'metrics',
-    'recommender',
-    'score_predictor'
-]
+__all__ = []
 
 # =============================================================================
 # Constants
 # =============================================================================
 
 # =============================================================================
-# Module variables
-# =============================================================================
-
-# =============================================================================
-# Classes
+# Variables
 # =============================================================================
 
 # =============================================================================
 # Functions
 # =============================================================================
 
+def interlace_group(n_data, n_splits=3):
+    """
+    Generate interlace group.
+    
+    The i-th data is assigned to the (i mod n_splits)-th group.
+    This is used with :class:`sklearn.model_selection.LeaveOneGroupOut` .
+    In a case of a standard k-fold cross validation, subsequent data are tend
+    to be grouped into the same fold.  Howeever, this is incovenient, if
+    subsequent data are highly correlated.
+    
+    Parameters
+    ----------
+    n_splits : int, default=3
+        Number of folds. Must be at least 2.
+    n_data : int
+        the number of data
+
+    Returns
+    -------
+    group : array, shape=(n_data,)
+        a sequence of indicator-numbers indicating the group assignment
+    """
+    pass
+
+# =============================================================================
+# Classes
+# =============================================================================
+
 # =============================================================================
 # Module initialization
 # =============================================================================
 
-# init logging system ---------------------------------------------------------
+# init logging system
 logger = logging.getLogger('kamrecsys')
 if not logger.handlers:
     logger.addHandler(logging.NullHandler())
@@ -88,7 +96,7 @@ def _test():
 
     sys.exit(0)
 
-# Check if this is call as command script -------------------------------------
+# Check if this is call as command script
 
 if __name__ == '__main__':
     _test()
