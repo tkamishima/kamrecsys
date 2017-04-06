@@ -41,7 +41,7 @@ __all__ = [
     'datasets',
     'item_finder',
     'metrics',
-    'recommenders',
+    'recommender',
     'score_predictor'
 ]
 
