@@ -36,7 +36,6 @@ __all__ = [
     '__author__',
     '__version__',
     '__license__',
-    'cross_validation',
     'data',
     'datasets',
     'item_finder',
