@@ -31,6 +31,11 @@ from kamrecsys.datasets import load_movielens_mini
 # Variables
 # =============================================================================
 
+true_sc = [
+    3., 4., 4., 4., 5., 4., 5., 5., 5., 3.,
+    3., 4., 5., 3., 4., 1., 5., 2., 3., 2.,
+    5., 4., 5., 3., 4., 4., 4., 4., 4., 4.]
+
 # =============================================================================
 # Functions
 # =============================================================================
@@ -51,29 +56,27 @@ class EventScorePredictor(BaseEventScorePredictor):
 
 class TestBaseScorePredictor(TestCase):
 
-    def setUp(self):
-        self.rec = EventScorePredictor()
-        self.data = load_movielens_mini()
-
-    def test__event_and_score(self):
+    def test_class(self):
         data = load_movielens_mini()
+        rec = EventScorePredictor()
 
-        event, sc, n_objects = self.rec._get_event_and_score(data, (0, 1), 0)
+        # fit()
+        rec.fit(data, (0, 1), 0)
 
-        assert_array_equal(
-            event,
-            [[2, 1], [7, 6], [2, 0], [7, 3], [0, 5],
-             [4, 9], [4, 7], [6, 5], [4, 6], [5, 6],
-             [0, 9], [7, 0], [0, 8], [0, 1], [1, 0],
-             [0, 7], [0, 0], [1, 9], [0, 4], [3, 6],
-             [4, 3], [3, 0], [4, 8], [0, 3], [3, 8],
-             [0, 6], [6, 6], [0, 2], [3, 7], [7, 8]])
-        assert_allclose(
-            sc,
-            [3., 4., 4., 4., 5., 4., 5., 5., 5., 3.,
-             3., 4., 5., 3., 4., 1., 5., 2., 3., 2.,
-             5., 4., 5., 3., 4., 4., 4., 4., 4., 4.])
-        assert_array_equal(n_objects, [8, 10])
+        self.assertEqual(rec.n_stypes, 1)
+        assert_allclose(rec.score_domain, [1., 5., 1.])
+        assert_allclose(rec.score, true_sc)
+        self.assertEqual(rec.n_score_levels, 5)
+
+        # get_score()
+        assert_allclose(rec.get_score(), true_sc)
+
+        # remove_data
+        rec.remove_data()
+        self.assertEqual(rec.n_stypes, 0)
+        self.assertIsNone(rec.score_domain)
+        self.assertIsNone(rec.score)
+        self.assertIsNone(rec.n_score_levels)
 
 # =============================================================================
 # Main Routine

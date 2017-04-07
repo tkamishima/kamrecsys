@@ -226,8 +226,6 @@ class EventWithScoreData(EventData):
     event_otypes : array_like, shape=(variable,), optional
         see attribute event_otypes. as default, a type of the i-th element of
         each event is the i-th object type.
-    n_stypes : optional, int
-        see attribute n_stypes (default=1)
 
     Attributes
     ----------
@@ -237,9 +235,9 @@ class EventWithScoreData(EventData):
     score : array_like, shape=(n_events) or (n_events, n_stypes)
         rating scores of each events. this array takes a vector shape if
         `n_rtypes` is 1; otherwise takes
-    n_scores : int
+    n_stypes : int
         number of score types
-    n_score_levels : int or array, dtype=int, shape=(,n_scores)
+    n_score_levels : int or array, dtype=int, shape=(,n_stypes)
         the number of score levels
 
     Raises
@@ -252,15 +250,12 @@ class EventWithScoreData(EventData):
     :ref:`glossary`
     """
 
-    def __init__(self, n_otypes=2, n_stypes=1, event_otypes=None):
-        if n_stypes < 1:
-            raise ValueError("n_styeps must be >= 1")
+    def __init__(self, n_otypes=2, event_otypes=None):
         super(EventWithScoreData, self).__init__(n_otypes=n_otypes,
                                                  event_otypes=event_otypes)
-        self.n_stypes = n_stypes
+        self.n_stypes = 0
         self.score_domain = None
         self.score = None
-        self.n_scores = 0
         self.n_score_levels = None
 
     def set_events(self, event, score, score_domain=None, event_feature=None):
@@ -281,14 +276,14 @@ class EventWithScoreData(EventData):
 
         Notes
         -----
-        Currently, support only n_scores == 1 case
+        Currently, support only n_stypes == 1 case
         """
 
         super(EventWithScoreData, self).set_events(event, event_feature)
 
         self.score = np.asanyarray(score)
         self.score_domain = np.asanyarray(score_domain)
-        self.n_scores = 1
+        self.n_stypes = 1
         self.n_score_levels = (
             int((score_domain[1] - score_domain[0]) / score_domain[2]) + 1)
 
