@@ -114,6 +114,39 @@ class EventUtilMixin(with_metaclass(ABCMeta, object)):
 
         return new_ev
 
+    def _empty_event_info(self):
+        """
+        Set empty Event Information
+        """
+        self.s_event = 0
+        self.event_otypes = None
+        self.n_events = 0
+        self.event = None
+        self.event_feature = None
+
+    def _set_event_info(self, data):
+        """
+        import event meta information of input data to recommenders
+
+        Parameters
+        ----------
+        data : :class:`kamrecsys.data.EventData`
+            input data
+
+        Raises
+        ------
+        TypeError
+            if input data is not :class:`kamrecsys.data.EventData` class
+        """
+        if not isinstance(data, EventData):
+            raise TypeError("input data must data.EventData class")
+
+        self.s_event = data.s_event
+        self.event_otypes = data.event_otypes
+        self.n_events = data.n_events
+        self.event = data.event
+        self.event_feature = data.event_feature
+
 
 class EventData(BaseData, EventUtilMixin):
     """ Container of rating events and their associated features.
@@ -151,6 +184,8 @@ class EventData(BaseData, EventUtilMixin):
 
     def __init__(self, n_otypes=2, event_otypes=None):
         super(EventData, self).__init__(n_otypes=n_otypes)
+
+        self._empty_event_info()
         if event_otypes is None:
             self.s_event = n_otypes
             self.event_otypes = np.arange(self.s_event, dtype=int)
@@ -160,9 +195,6 @@ class EventData(BaseData, EventUtilMixin):
                 raise ValueError("Illegal event_otypes specification")
             self.s_event = event_otypes.shape[0]
             self.event_otypes = np.asarray(event_otypes)
-        self.n_events = 0
-        self.event = None
-        self.event_feature = None
 
     def set_events(self, event, event_feature=None):
         """Set event data from structured array.

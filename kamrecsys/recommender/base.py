@@ -226,37 +226,6 @@ class BaseEventRecommender(
         self._empty_event_info()
         self.event_index = None
 
-    def _empty_event_info(self):
-        """
-        Set empty Event Information
-        """
-        self.n_events = 0
-        self.event = None
-        self.event_feature = None
-
-    def _set_event_info(self, data):
-        """
-        import event meta information of input data to recommenders
-
-        Parameters
-        ----------
-        data : :class:`kamrecsys.data.EventData`
-            input data
-
-        Raises
-        ------
-        TypeError
-            if input data is not :class:`kamrecsys.data.EventData` class
-        """
-        if not isinstance(data, EventData):
-            raise TypeError("input data must data.EventData class")
-
-        self.s_event = data.s_event
-        self.event_otypes = data.event_otypes
-        self.n_events = data.n_events
-        self.event = data.event
-        self.event_feature = data.event_feature
-
     def get_event(self):
         """
         Returns numbers of objects and an event array
