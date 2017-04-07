@@ -20,7 +20,7 @@ from six.moves import xrange
 
 import logging
 
-from .base import BaseEventItemFinder
+from .base import BaseItemFinder
 from .matrix_factorization import LogisticPMF
 
 # =============================================================================
@@ -32,7 +32,7 @@ from .matrix_factorization import LogisticPMF
 # =============================================================================
 
 __all__ = [
-    'BaseEventItemFinder',
+    'BaseItemFinder',
     'LogisticPMF']
 
 # =============================================================================
