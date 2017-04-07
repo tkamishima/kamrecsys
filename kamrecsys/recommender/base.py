@@ -23,7 +23,7 @@ from six import with_metaclass
 from sklearn.base import BaseEstimator
 from sklearn.utils import check_random_state, check_array
 
-from ..data import BaseData, EventData, EventUtilMixin
+from ..data import BaseData, ObjectUtilMixin, EventData, EventUtilMixin
 
 # =============================================================================
 # Module metadata variables
@@ -47,7 +47,7 @@ from ..data import BaseData, EventData, EventUtilMixin
 # =============================================================================
 
 
-class BaseRecommender(with_metaclass(ABCMeta, BaseEstimator)):
+class BaseRecommender(with_metaclass(ABCMeta, BaseEstimator, ObjectUtilMixin)):
     """
     Abstract class for all recommenders
 
@@ -74,35 +74,10 @@ class BaseRecommender(with_metaclass(ABCMeta, BaseEstimator)):
     """
 
     def __init__(self, random_state=None):
-        self.n_otypes = 0
-        self.n_objects = None
-        self.eid = None
-        self.iid = None
+        self._empty_object_info()
         self.random_state = random_state
         self._rng = None
         self.fit_results_ = {}
-
-    def _set_object_info(self, data):
-        """
-        import object meta information of input data to recommenders
-
-        Parameters
-        ----------
-        data : :class:`kamrecsys.data.BaseData`
-            input data
-
-        Raises
-        ------
-        TypeError
-            if input data is not :class:`kamrecsys.data.BaseData` class
-        """
-        if not isinstance(data, BaseData):
-            raise TypeError("input data must data.BaseData class")
-
-        self.n_otypes = data.n_otypes
-        self.n_objects = data.n_objects
-        self.eid = data.eid
-        self.iid = data.iid
 
     def fit(self, data, random_state=None):
         """
@@ -141,60 +116,6 @@ class BaseRecommender(with_metaclass(ABCMeta, BaseEstimator)):
             predicted scores for given inputs
         """
         pass
-
-    def to_eid(self, otype, iid):
-        """
-        convert an internal id to the corresponding external id
-        (Copied from data.BaseData)
-
-        Parameters
-        ----------
-        otype : int
-            object type
-        iid : int
-            an internal id
-
-        Returns
-        -------
-        eid : int
-            the corresponding external id
-        
-        Raises
-        ------
-        ValueError
-            an internal id is out of range
-        """
-        try:
-            return self.eid[otype][iid]
-        except IndexError:
-            raise ValueError("Illegal internal id")
-
-    def to_iid(self, otype, eid):
-        """
-        convert an external id to the corresponding internal id.
-        (Copied from data.BaseData)
-
-        Parameters
-        ----------
-        otype : int
-            object type
-        eid : int
-            an external id
-        
-        Returns
-        -------
-        iid : int
-            the corresponding internal id
-        
-        Raises
-        ------
-        ValueError
-            an external id is out of range
-        """
-        try:
-            return self.iid[otype][eid]
-        except KeyError:
-            raise ValueError("Illegal external id")
 
 
 class BaseEventRecommender(
@@ -251,8 +172,8 @@ class BaseEventRecommender(
         """
         Remove information related to a training dataset
         """
-        self._empty_event_info()
-        self.event_index = None
+        self.event=None
+        self.event_feature=None
 
     def fit(self, data, event_index=None, random_state=None):
         """
