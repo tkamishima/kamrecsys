@@ -118,10 +118,11 @@ def score_predictor_statistics(y_true, y_pred, scores=2):
         Ground truth scores
     y_pred : array, shape(n_samples,)
         Predicted scores
-    scores : array, shape=(n_scores,) OR int; optional, default=2
+    scores : array, shape=(n_score_levels,) OR int; optional
         A sorted sequence of possible rating scores, if array-like.
         The range between the minimum and the maximum are divided into the
         specified number of bins, if it is integer.
+        (default=2)
 
     Returns
     -------
