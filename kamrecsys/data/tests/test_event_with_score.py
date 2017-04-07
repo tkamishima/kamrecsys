@@ -50,52 +50,41 @@ def load_test_data():
 # =============================================================================
 
 
-class TestEventUtilMixin(unittest.TestCase):
+class TestEventWithScoreData(unittest.TestCase):
 
-    def test_to_eid_event(self):
+    def test_set_events(self):
         data, x = load_test_data()
 
-        # test to_eid_event
-        check = data.to_eid_event(data.event)
-        assert_array_equal(x['event'], check)
+        # test info related to scores
+        assert_allclose(data.score[:5], [3., 4., 3.5, 5., 3.])
+        assert_allclose(data.score_domain, [1.0, 5.0, 0.5])
+        self.assertEqual(data.n_stypes, 1)
+        self.assertEqual(data.n_score_levels, 9)
 
-        # test to_eid_event / per line conversion
-        check = np.empty_like(data.event, dtype=x['event'].dtype)
-        for i, j in enumerate(data.event):
-            check[i, :] = data.to_eid_event(j)
-        assert_array_equal(x['event'], check)
-
-    def test_to_iid_event(self):
-        from kamrecsys.data import EventWithScoreData
+    def test_digitize_score(self):
         data, x = load_test_data()
 
-        # test EventData.to_iid_event
-        assert_array_equal(data.event, data.to_iid_event(x['event']))
+        digitized_scores = data.digitize_score()
+        assert_array_equal(digitized_scores[:5], [4, 6, 5, 8, 4])
+        assert_array_equal(digitized_scores[-5:], [4, 3, 4, 5, 6])
 
-        # test EventData.to_iid_event / per line conversion
-        check = np.empty_like(x['event'], dtype=np.int)
-        for i, j in enumerate(x['event']):
-            check[i, :] = data.to_iid_event(j)
-        assert_array_equal(data.event, check)
-
-
-class TestEventData(unittest.TestCase):
+        digitized_scores = data.digitize_score(np.linspace(1.0, 5.0, 9))
+        assert_array_equal(digitized_scores, np.arange(9))
 
     def test_filter_event(self):
         data = load_movielens_mini()
 
-        data.filter_event(np.arange(data.n_events) % 3 == 0)
-        assert_array_equal(
-            data.event_feature, np.array(
-            [(875636053,), (877889130,), (891351328,), (879362287,),
-             (878543541,), (875072484,), (889751712,), (883599478,),
-             (883599205,), (878542960,)], dtype=[('timestamp', '<i8')]))
-        assert_array_equal(
+        data.filter_event(data.score > 3)
+        assert_allclose(
+            data.score,
+            [4., 4., 4., 5., 4., 5., 5., 5., 4., 5.,
+             4., 5., 5., 4., 5., 4., 4., 4., 4., 4., 4.])
+
+        assert_allclose(
             data.to_eid(0, data.event[:, 0]),
-            [5, 10, 7, 8, 1, 1, 1, 6, 6, 1])
-        assert_array_equal(
-            data.to_eid(1, data.event[:, 1]),
-            [2, 4, 8, 7, 9, 8, 5, 1, 9, 3])
+            [10, 5, 10, 1, 7, 7, 9, 7, 10, 1,
+             2, 1, 7, 6, 7, 6, 1, 9, 1, 6, 10])
+
 
 # =============================================================================
 # Main Routines

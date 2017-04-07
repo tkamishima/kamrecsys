@@ -20,7 +20,9 @@ import logging
 from .base import (BaseData)
 from .event import (
     EventUtilMixin,
-    EventData,
+    EventData)
+from .event_with_score import (
+    ScoreUtilMixin,
     EventWithScoreData)
 
 # =============================================================================
