@@ -42,7 +42,7 @@ from . import BaseData
 class EventUtilMixin(with_metaclass(ABCMeta, object)):
     """
     Methods that are commonly used in data containers and recommenders for
-    handling events..
+    handling events.
     """
 
     def to_eid_event(self, data):
