@@ -17,7 +17,7 @@ import numpy as np
 from six import with_metaclass
 
 from ..recommender import BaseEventRecommender
-from ..data import EventWithScoreData
+from ..data import EventWithScoreData, ScoreUtilMixin
 
 # =============================================================================
 # Metadata variables
@@ -46,7 +46,8 @@ __all__ = []
 # =============================================================================
 
 
-class BaseScorePredictor(with_metaclass(ABCMeta, BaseEventRecommender)):
+class BaseScorePredictor(
+    with_metaclass(ABCMeta, BaseEventRecommender, ScoreUtilMixin)):
     """
     Recommenders to predict preference scores from event data
 
@@ -75,38 +76,6 @@ class BaseScorePredictor(with_metaclass(ABCMeta, BaseEventRecommender)):
         # set empty score information
         self._empty_score_info()
         self.score_index = 0
-
-    def _empty_score_info(self):
-        """
-        Set empty score information
-        """
-
-        self.n_stypes = 0
-        self.score_domain = None
-        self.score = None
-        self.n_score_levels = None
-
-    def _set_score_info(self, data):
-        """
-        
-        Parameters
-        ----------
-        data : :class:`kamrecsys.data.BaseData`
-            input data
-
-        Raises
-        ------
-        TypeError
-            if input data is not :class:`kamrecsys.data.EventWithScoreData`
-            class
-        """
-        if not isinstance(data, EventWithScoreData):
-            raise TypeError("input data must data.EventWithScoreData class")
-
-        self.n_stypes = data.n_stypes
-        self.score_domain = data.score_domain
-        self.score = data.score
-        self.n_score_levels = data.n_score_levels
 
     def get_score(self):
         """

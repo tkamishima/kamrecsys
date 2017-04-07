@@ -39,7 +39,122 @@ __all__ = []
 # =============================================================================
 
 
-class BaseData(with_metaclass(ABCMeta, object)):
+class ObjectUtilMixin(object):
+    """
+    Methods that are commonly used in data containers and recommenders for
+    handling object.
+    """
+
+    def _empty_object_info(self):
+        """
+        Set empty object information
+        """
+        self.n_otypes = 0
+        self.n_objects = None
+        self.eid = None
+        self.iid = None
+
+    def _set_object_info(self, data):
+        """
+        import object meta information of input data to recommenders
+
+        Parameters
+        ----------
+        data : :class:`kamrecsys.data.BaseData`
+            input data
+
+        Raises
+        ------
+        TypeError
+            if input data is not :class:`kamrecsys.data.BaseData` class
+        """
+        if not isinstance(data, BaseData):
+            raise TypeError("input data must data.BaseData class")
+
+        self.n_otypes = data.n_otypes
+        self.n_objects = data.n_objects
+        self.eid = data.eid
+        self.iid = data.iid
+
+    def to_eid(self, otype, iid):
+        """
+        convert an internal id to the corresponding external id
+
+        Parameters
+        ----------
+        otype : int
+            object type
+        iid : int
+            an internal id
+
+        Returns
+        -------
+        eid : int
+            the corresponding external id
+
+        Raises
+        ------
+        ValueError
+            an internal id is out of range
+        """
+        try:
+            return self.eid[otype][iid]
+        except IndexError:
+            raise ValueError("Illegal internal id")
+
+    def to_iid(self, otype, eid):
+        """
+        convert an external id to the corresponding internal id
+
+        Parameters
+        ----------
+        otype : int
+            object type
+        eid : int
+            an external id
+
+        Returns
+        -------
+        iid : int
+            the corresponding internal id
+
+        Raises
+        ------
+        ValueError
+            an external id is out of range
+        """
+        try:
+            return self.iid[otype][eid]
+        except KeyError:
+            raise ValueError("Illegal external id")
+
+    @staticmethod
+    def _gen_id(event):
+        """
+        Generate a conversion map between internal and external ids
+
+        Parameter
+        ---------
+        event : array_like
+            array contains all objects of the specific type
+
+        Returns
+        -------
+        n_objects : int
+            the number of unique objects
+        eid : array, shape=(variable,)
+            map from internal id to external id
+        iid : dict
+            map from external id to internal id
+        """
+        eid = np.sort(np.unique(event))
+        iid = {}
+        for i in xrange(len(eid)):
+            iid[eid[i]] = i
+        return len(eid), eid, iid
+
+
+class BaseData(with_metaclass(ABCMeta, ObjectUtilMixin, object)):
     """
     Abstract class for data container
 
@@ -79,6 +194,9 @@ class BaseData(with_metaclass(ABCMeta, object)):
     """
 
     def __init__(self, n_otypes=2):
+
+        self._empty_object_info()
+
         if n_otypes < 1:
             raise ValueError("n_otypes must be >= 1")
         self.n_otypes = n_otypes
@@ -106,83 +224,6 @@ class BaseData(with_metaclass(ABCMeta, object)):
             if j in iid:
                 index[iid[j]] = i
         self.feature[otype] = feature[index].copy()
-
-    def to_eid(self, otype, iid):
-        """
-        convert an internal id to the corresponding external id
-
-        Parameters
-        ----------
-        otype : int
-            object type
-        iid : int
-            an internal id
-        
-        Returns
-        -------
-        eid : int
-            the corresponding external id
-        
-        Raises
-        ------
-        ValueError
-            an internal id is out of range
-        """
-        try:
-            return self.eid[otype][iid]
-        except IndexError:
-            raise ValueError("Illegal internal id")
-
-    def to_iid(self, otype, eid):
-        """
-        convert an external id to the corresponding internal id
-
-        Parameters
-        ----------
-        otype : int
-            object type
-        eid : int
-            an external id
-        
-        Returns
-        -------
-        iid : int
-            the corresponding internal id
-        
-        Raises
-        ------
-        ValueError
-            an external id is out of range
-        """
-        try:
-            return self.iid[otype][eid]
-        except KeyError:
-            raise ValueError("Illegal external id")
-
-    @staticmethod
-    def _gen_id(event):
-        """
-        Generate a conversion map between internal and external ids
-        
-        Parameter
-        ---------
-        event : array_like
-            array contains all objects of the specific type
-
-        Returns
-        -------
-        n_objects : int
-            the number of unique objects
-        eid : array, shape=(variable,)
-            map from internal id to external id
-        iid : dict
-            map from external id to internal id
-        """
-        eid = np.sort(np.unique(event))
-        iid = {}
-        for i in xrange(len(eid)):
-            iid[eid[i]] = i
-        return len(eid), eid, iid
 
 # =============================================================================
 # Functions
