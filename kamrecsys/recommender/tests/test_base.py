@@ -134,16 +134,14 @@ class TestBaseEventRecommender(TestCase):
         self.assertEqual(rec.predict([[0, 0]]).ndim, 0)
         self.assertEqual(rec.predict([[0, 0], [0, 1]]).ndim, 1)
         assert_array_equal(rec.predict([[0, 0], [0, 1]]).shape, (2,))
-        with self.assertRaises(TypeError):
-            rec.predict([[0]])
 
         # remove_data
         rec.remove_data()
 
-        self.assertEqual(rec.n_events, 0)
+        self.assertEqual(rec.n_events, 30)
         self.assertIsNone(rec.event)
         self.assertIsNone(rec.event_feature)
-        self.assertIsNone(rec.event_index)
+        assert_array_equal(rec.event_index, (0, 1))
 
 # =============================================================================
 # Main Routine

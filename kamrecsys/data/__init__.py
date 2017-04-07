@@ -17,10 +17,14 @@ from six.moves import xrange
 
 import logging
 
-from .base import (BaseData)
+from .base import (
+    ObjectUtilMixin,
+    BaseData)
 from .event import (
     EventUtilMixin,
-    EventData,
+    EventData)
+from .event_with_score import (
+    ScoreUtilMixin,
     EventWithScoreData)
 
 # =============================================================================
@@ -31,10 +35,13 @@ from .event import (
 # Public symbols
 # =============================================================================
 
-__all__ = ['EventUtilMixin',
-           'EventData',
-           'EventWithScoreData',
-           'BaseData']
+__all__ = [
+    'BaseData',
+    'ObjectUtilMixin',
+    'EventData',
+    'EventUtilMixin',
+    'EventWithScoreData',
+    'ScoreUtilMixin']
 
 # =============================================================================
 # Constants
