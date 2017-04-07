@@ -46,17 +46,6 @@ class TestMultinomialPLSA(TestCase):
         data = load_movielens_mini()
 
         rec = MultinomialPLSA(tol=1e-8, k=2, random_state=1234)
-        self.assertDictEqual(
-            vars(rec), {
-                'k': 2, 'tol': 1e-8, 'maxiter': 100, 'alpha': 1.0,
-                'random_state': 1234, '_rng': None,
-                'iid': None, 'eid': None, 'n_objects': None, 'n_otypes': 0,
-                'n_score_levels_': 0,
-                'fit_results_': {'initial_loss': np.inf, 'final_loss': np.inf,
-                                'n_iterations': 0},
-                'pZ_': None, 'pYgZ_': None, 'pRgZ_': None, 'pXgZ_': None,
-                'n_events_': 0, 'n_users_': 0, 'n_items_': 0, '_q': None,
-                'score_levels_': None, 'use_expectation': True})
 
         # import logging
         # logging.getLogger('kamrecsys').addHandler(logging.StreamHandler())

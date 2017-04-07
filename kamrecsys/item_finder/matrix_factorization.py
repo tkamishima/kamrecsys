@@ -24,7 +24,7 @@ import numpy as np
 from scipy.optimize import fmin_cg
 from sklearn.utils import check_random_state
 
-from . import BaseEventItemFinder
+from . import BaseItemFinder
 
 # =============================================================================
 # Public symbols
@@ -45,7 +45,7 @@ __all__ = []
 # =============================================================================
 
 
-class LogisticPMF(BaseEventItemFinder):
+class LogisticPMF(BaseItemFinder):
     """
     A probabilistic matrix factorization model proposed in [1]_.
     A method of handling bias terms is defined by equation (5) in [2]_.
@@ -317,7 +317,7 @@ class LogisticPMF(BaseEventItemFinder):
 
         return grad
 
-    def fit(self, data, user_index=0, item_index=1, score_index=0, tol=None,
+    def fit(self, data, event_index=(0, 1), score_index=0, tol=None,
             maxiter=None, random_state=None, **kwargs):
         """
         fitting model
@@ -326,12 +326,10 @@ class LogisticPMF(BaseEventItemFinder):
         ----------
         data : :class:`kamrecsys.data.EventWithScoreData`
             data to fit
-        user_index : optional, int
-            Index to specify the position of a user in an event vector.
-            (default=0)
-        item_index : optional, int
-            Index to specify the position of a item in an event vector.
-            (default=1)
+        event_index : optional, array-like, shape=(2,), dtype=int 
+            Index to specify the column numbers specifing a user and an item
+            in an event array 
+            (default=(0, 1))
         score_index : optional, int
             Ignored if score of data is a single criterion type. In a multi-
             criteria case, specify the position of the target score in a score
@@ -348,11 +346,11 @@ class LogisticPMF(BaseEventItemFinder):
         """
 
         # call super class
-        super(LogisticPMF, self).fit(random_state=random_state)
+        super(LogisticPMF, self).fit(
+            data, event_index, random_state=random_state)
 
         # get input data
-        ev, n_objects = self._get_event_array(
-            data, (user_index, item_index), sparse_type='csr')
+        ev, n_objects = self.get_event_array('csr')
 
         # initialize coefficients
         self._init_coef(ev, n_objects)
@@ -405,6 +403,7 @@ class LogisticPMF(BaseEventItemFinder):
         self.fit_results_['warnflag'] = res[4]
 
         # clean up temporary instance variables
+        self.remove_data()
         del self._coef
         del self._reg
         del self._dt

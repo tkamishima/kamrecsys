@@ -46,44 +46,53 @@ __all__ = []
 # =============================================================================
 
 
-class BaseEventScorePredictor(with_metaclass(ABCMeta, BaseEventRecommender)):
+class BaseScorePredictor(with_metaclass(ABCMeta, BaseEventRecommender)):
     """
     Recommenders to predict preference scores from event data
+
+    Attributes
+    ----------
+    score_domain : tuple or 1d-array of tuple
+        i-th tuple is a triple of the minimum, the maximum, and strides of the
+        i-th score
+    score : array_like, shape=(n_events) or (n_events, n_stypes)
+        rating scores of each events. this array takes a vector shape if
+        `n_rtypes` is 1; otherwise takes
+    n_stypes : int
+        number of score types
+    n_score_levels : int or array, dtype=int, shape=(,n_stypes)
+        the number of score levels
+    score_index : int
+        Ignored if score of data is a single criterion type. In a multi-
+        criteria case, specify the position of the target score in a score
+        vector.
     """
 
     def __init__(self, random_state=None):
-        super(BaseEventScorePredictor, self).__init__(
+        super(BaseScorePredictor, self).__init__(
             random_state=random_state)
 
-    def fit(self, random_state=None):
-        """
-        fitting model
-        """
-        super(BaseEventScorePredictor, self).fit(random_state=random_state)
+        # set empty score information
+        self._empty_score_info()
+        self.score_index = 0
 
-    def _get_event_and_score(self, data, event_index, score_index):
+    def _empty_score_info(self):
         """
+        Set empty score information
+        """
+
+        self.n_stypes = 0
+        self.score_domain = None
+        self.score = None
+        self.n_score_levels = None
+
+    def _set_score_info(self, data):
+        """
+        
         Parameters
         ----------
-        data : :class:`kamrecsys.data.EventWithScoreData`
-            data to fit
-        event_index : array_like, shape=(variable,)
-            a set of indexes to specify the elements in events that are used in
-            a recommendation model
-        score_index : int
-            Ignored if score of data is a single criterion type. In a multi-
-            criteria case, specify the position of the target score in a score
-            vector. (default=0)
-
-        Returns
-        -------
-        event : array_like, shape=(n_events, event_index.shape[0])
-            an extracted set of events
-        score : array_like, shape=(n_events,)
-            scores for each event
-        n_objects : array_like, shape=(event_index.shape[0],), dtype=int
-            the number of objects corresponding to elements tof an extracted
-            events
+        data : :class:`kamrecsys.data.BaseData`
+            input data
 
         Raises
         ------
@@ -94,24 +103,60 @@ class BaseEventScorePredictor(with_metaclass(ABCMeta, BaseEventRecommender)):
         if not isinstance(data, EventWithScoreData):
             raise TypeError("input data must data.EventWithScoreData class")
 
-        # import meta information of objects and events to this recommender
-        self._set_object_info(data)
-        self._set_event_info(data)
-        event_index = np.asarray(event_index)
+        self.n_stypes = data.n_stypes
+        self.score_domain = data.score_domain
+        self.score = data.score
+        self.n_score_levels = data.n_score_levels
 
-        # get event data
-        event = np.atleast_2d(data.event)[:, event_index]
+    def get_score(self):
+        """
+        return score information
+
+        Returns
+        -------
+        sc : array_like, shape=(n_events,)
+            scores for each event
+        """
 
         # get score information
-        if data.n_stypes == 1:
-            score = data.score
+        if self.n_stypes == 1:
+            sc = self.score
         else:
-            score = data.score[:, score_index]
+            sc = self.score[:, score_index]
 
-        # get number of objects
-        n_objects = self.n_objects[self.event_otypes[event_index]]
+        return sc
 
-        return event, score, n_objects
+    def remove_data(self):
+        """
+        Remove information related to a training dataset
+        """
+        super(BaseScorePredictor, self).remove_data()
+        self._empty_score_info()
+
+    def fit(self, data, event_index=(0, 1), score_index=0, random_state=None):
+        """
+        fitting model
+
+        Parameters
+        ----------
+        data : :class:`kamrecsys.data.BaseData`
+            input data
+        event_index : array_like, shape=(variable,)
+            a set of indexes to specify the elements in events that are used
+            in a recommendation model
+        score_index : int
+            Ignored if score of data is a single criterion type. In a multi-
+            criteria case, specify the position of the target score in a score
+            vector. (default=0)
+        random_state: RandomState or an int seed (None by default)
+            A random number generator instance
+        """
+        super(BaseScorePredictor, self).fit(
+            data, event_index, random_state)
+
+        # set object information in data
+        self._set_score_info(data)
+        self.score_index = score_index
 
 # =============================================================================
 # Module initialization

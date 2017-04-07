@@ -104,11 +104,30 @@ class TestBaseEventRecommender(TestCase):
         rec = EventRecommender()
         rec._set_object_info(data)
 
-        # _set_object_info
+        # _set_event_info
         rec._set_event_info(data)
 
-        assert_array_equal(rec.event_otypes, [0, 1])
         self.assertEqual(rec.s_event, 2)
+        assert_array_equal(rec.event_otypes, [0, 1])
+        self.assertEqual(rec.n_events, 30)
+        assert_array_equal(
+            rec.event[0, :], [rec.to_iid(0, 5), rec.to_iid(1, 2)])
+        assert_array_equal(
+            rec.event[-1, :], [rec.to_iid(0, 10), rec.to_iid(1, 9)])
+        ts = sorted(rec.event_feature['timestamp'])
+        assert_array_equal(ts[:2], [874965758, 875071561])
+        assert_array_equal(ts[-2:], [891352220, 891352864])
+        self.assertIsNone(rec.event_index)
+
+        # fit
+        rec.fit(data)
+        assert_array_equal(rec.event_index, [0, 1])
+
+        # get_event
+        ev, n_objects = rec.get_event()
+        assert_array_equal(ev[0, :], [rec.to_iid(0, 5), rec.to_iid(1, 2)])
+        assert_array_equal(ev[-1, :], [rec.to_iid(0, 10), rec.to_iid(1, 9)])
+        assert_array_equal(n_objects, [8, 10])
 
         # predict
         self.assertEqual(rec.predict([0, 0]).ndim, 0)
@@ -117,6 +136,14 @@ class TestBaseEventRecommender(TestCase):
         assert_array_equal(rec.predict([[0, 0], [0, 1]]).shape, (2,))
         with self.assertRaises(TypeError):
             rec.predict([[0]])
+
+        # remove_data
+        rec.remove_data()
+
+        self.assertEqual(rec.n_events, 0)
+        self.assertIsNone(rec.event)
+        self.assertIsNone(rec.event_feature)
+        self.assertIsNone(rec.event_index)
 
 # =============================================================================
 # Main Routine

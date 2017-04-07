@@ -23,7 +23,7 @@ import logging
 import sys
 import numpy as np
 
-from . import BaseEventScorePredictor
+from . import BaseScorePredictor
 
 # =============================================================================
 # Public symbols
@@ -44,7 +44,7 @@ __all__ = []
 # =============================================================================
 
 
-class MultinomialPLSA(BaseEventScorePredictor):
+class MultinomialPLSA(BaseScorePredictor):
     """
     A probabilistic latent semantic analysis model in [1]_ Figure 2(b).
 
@@ -71,12 +71,6 @@ class MultinomialPLSA(BaseEventScorePredictor):
         Item distribution: Pr[Y | Z]
     pRgZ_ : array_like
         Raring distribution: Pr[R | Z]
-    n_users_ : int
-        nos of users
-    n_items_ : int
-        nos of items
-    n_score_levels_ : int
-        nos of score levels
     score_levels_ : array, dtype=float, shape=(n_score_levels_,)
         1d-array of score levels corresponding to each digitized score
     n_events_ : int
@@ -115,11 +109,7 @@ class MultinomialPLSA(BaseEventScorePredictor):
         self.pXgZ_ = None
         self.pYgZ_ = None
         self.pRgZ_ = None
-        self.n_users_ = 0
-        self.n_items_ = 0
         self.score_levels_ = None
-        self.n_score_levels_ = 0
-        self.n_events_ = 0
         self.fit_results_ = {
             'initial_loss': np.inf,
             'final_loss': np.inf,
@@ -151,7 +141,7 @@ class MultinomialPLSA(BaseEventScorePredictor):
             self.pRgZ_[sc, :] *
             self.pXgZ_[ev[:, 0], :] *
             self.pYgZ_[ev[:, 1], :], axis=1)
-        l = -np.sum(np.log(l)) / self.n_events_
+        l = -np.sum(np.log(l)) / self.n_events
 
         return l
 
@@ -165,19 +155,19 @@ class MultinomialPLSA(BaseEventScorePredictor):
             digitized scores corresponding to events
         """
 
-        a = np.empty((self.n_score_levels_, self.k), dtype=float)
-        for r in xrange(self.n_score_levels_):
+        a = np.empty((self.n_score_levels, self.k), dtype=float)
+        for r in xrange(self.n_score_levels):
             for k in xrange(self.k):
-                if (k % self.n_score_levels_) == r:
+                if (k % self.n_score_levels) == r:
                     a[r, k] = 1000.0
                 else:
                     a[r, k] = 1.0
 
-        self._q = np.empty((self.n_events_, self.k), dtype=float)
-        for i in xrange(self.n_events_):
+        self._q = np.empty((self.n_events, self.k), dtype=float)
+        for i in xrange(self.n_events):
             self._q[i, :] = self._rng.dirichlet(alpha=a[sc[i], :])
 
-    def maximization_step(self, ev, sc):
+    def maximization_step(self, ev, sc, n_objects):
         """
         maximization step
 
@@ -187,6 +177,8 @@ class MultinomialPLSA(BaseEventScorePredictor):
             event data
         sc : array, shape(n_events,)
             digitized scores corresponding to events
+        n_objects : array, dtype=int, shape=(2,)
+            the numbers of users and items
         """
 
         # p[r | z]
@@ -195,7 +187,7 @@ class MultinomialPLSA(BaseEventScorePredictor):
                          np.bincount(
                              sc,
                              weights=self._q[:, k],
-                             minlength=self.n_score_levels_
+                             minlength=self.n_score_levels
                          ) for k in xrange(self.k)]).T +
             self.alpha)
         self.pRgZ_ /= self.pRgZ_.sum(axis=0, keepdims=True)
@@ -206,7 +198,7 @@ class MultinomialPLSA(BaseEventScorePredictor):
                          np.bincount(
                              ev[:, 0],
                              weights=self._q[:, k],
-                             minlength=self.n_users_
+                             minlength=n_objects[0]
                          ) for k in xrange(self.k)]).T +
             self.alpha)
         self.pXgZ_ /= self.pXgZ_.sum(axis=0, keepdims=True)
@@ -217,7 +209,7 @@ class MultinomialPLSA(BaseEventScorePredictor):
                          np.bincount(
                              ev[:, 1],
                              weights=self._q[:, k],
-                             minlength=self.n_items_
+                             minlength=n_objects[1]
                          ) for k in xrange(self.k)]).T +
             self.alpha)
         self.pYgZ_ /= self.pYgZ_.sum(axis=0, keepdims=True)
@@ -226,7 +218,7 @@ class MultinomialPLSA(BaseEventScorePredictor):
         self.pZ_ = np.sum(self._q, axis=0) + self.alpha
         self.pZ_ /= np.sum(self.pZ_)
 
-    def fit(self, data, user_index=0, item_index=1, score_index=0,
+    def fit(self, data, event_index=(0, 1), score_index=0,
             random_state=None):
         """
         fitting model
@@ -235,12 +227,10 @@ class MultinomialPLSA(BaseEventScorePredictor):
         ----------
         data : :class:`kamrecsys.data.EventWithScoreData`
             data to fit
-        user_index : optional, int
-            Index to specify the position of a user in an event vector.
-            (default=0)
-        item_index : optional, int
-            Index to specify the position of a item in an event vector.
-            (default=1)
+        event_index : optional, array-like, shape=(2,), dtype=int 
+            Index to specify the column numbers specifing a user and an item
+            in an event array 
+            (default=(0, 1))
         score_index : optional, int
             Ignored if score of data is a single criterion type. In a multi-
             criteria case, specify the position of the target score in a score
@@ -256,21 +246,18 @@ class MultinomialPLSA(BaseEventScorePredictor):
         """
 
         # initialization #####
-        super(MultinomialPLSA, self).fit(random_state=random_state)
-        ev, sc, n_objects = (
-            self._get_event_and_score(
-                data, (user_index, item_index), score_index))
-        self.n_users_ = n_objects[0]
-        self.n_items_ = n_objects[1]
-        self.n_score_levels_ = data.n_score_levels
+        super(MultinomialPLSA, self).fit(
+            data, event_index, score_index, random_state=random_state)
+        ev, n_objects = self.get_event()
+        sc = self.get_score()
         self.score_levels_ = np.linspace(
-            data.score_domain[0], data.score_domain[1], self.n_score_levels_)
-        self.n_events_ = ev.shape[0]
+            self.score_domain[0], self.score_domain[1], self.n_score_levels)
+
         sc = data.digitize_score(sc)
         self._init_params(sc)
 
         # first m-step
-        self.maximization_step(ev, sc)
+        self.maximization_step(ev, sc, n_objects)
 
         self.fit_results_['initial_loss'] = self.loss(ev, sc)
         self.fit_results_['warnflag'] = 0
@@ -294,7 +281,7 @@ class MultinomialPLSA(BaseEventScorePredictor):
             self._q /= (self._q.sum(axis=1, keepdims=True))
 
             # M-step
-            self.maximization_step(ev, sc)
+            self.maximization_step(ev, sc, n_objects)
 
             # check loss
             cur_loss = self.loss(ev, sc)
@@ -329,6 +316,8 @@ class MultinomialPLSA(BaseEventScorePredictor):
 
         # clean garbage variables
         del self._q
+
+        self.remove_data()
 
     def raw_predict(self, ev):
         """

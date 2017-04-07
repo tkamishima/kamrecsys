@@ -89,7 +89,7 @@ def load_flixster_rating(infile=None, event_dtype=None):
         dtype = np.dtype([('event', np.int, 2), ('score', np.float),
                           ('event_feature', event_dtype)])
     x = np.genfromtxt(fname=infile, delimiter='\t', dtype=dtype)
-    data = EventWithScoreData(n_otypes=2, n_stypes=1)
+    data = EventWithScoreData(n_otypes=2)
     if event_dtype is None:
         data.set_events(x['event'], x['score'], score_domain=(0.5, 5.0, 0.5))
     else:

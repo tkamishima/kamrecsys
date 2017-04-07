@@ -159,8 +159,7 @@ def load_movielens100k(infile=None,
                       ('score', np.float),
                       ('event_feature', event_dtype)])
     x = np.genfromtxt(fname=infile, delimiter='\t', dtype=dtype)
-    data = EventWithScoreData(n_otypes=2, n_stypes=1,
-                              event_otypes=np.array([0, 1]))
+    data = EventWithScoreData(n_otypes=2, event_otypes=np.array([0, 1]))
     data.set_events(x['event'], x['score'], score_domain=(1.0, 5.0, 1.0),
                     event_feature=x['event_feature'])
 
@@ -295,8 +294,7 @@ def load_movielens1m(infile=None,
                       ('score', np.float),
                       ('event_feature', event_dtype)])
     x = np.genfromtxt(fname=infile, delimiter='\t', dtype=dtype)
-    data = EventWithScoreData(n_otypes=2, n_stypes=1,
-                              event_otypes=np.array([0, 1]))
+    data = EventWithScoreData(n_otypes=2, event_otypes=np.array([0, 1]))
     data.set_events(x['event'], x['score'], score_domain=(1.0, 5.0, 1.0),
                     event_feature=x['event_feature'])
 
