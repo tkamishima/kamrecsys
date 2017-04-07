@@ -176,7 +176,7 @@ def training(info, ev, tsc, event_feature=None, fold=0):
     logger.info("training fold = " + str(fold + 1) + " / " + str(n_folds))
 
     # generate event data
-    data = EventWithScoreData(n_otypes=2, n_stypes=1)
+    data = EventWithScoreData(n_otypes=2)
     score_domain = info['data']['score_domain']
     if np.all(np.array(score_domain) == 0):
         score_domain = [
