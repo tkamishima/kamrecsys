@@ -315,9 +315,8 @@ class MultinomialPLSA(BaseScorePredictor):
         self.pYgZ_ = np.r_[self.pYgZ_, np.ones((1, self.k), dtype=float)]
 
         # clean garbage variables
-        del self._q
-
         self.remove_data()
+        del self._q
 
     def raw_predict(self, ev):
         """
