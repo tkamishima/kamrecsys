@@ -498,7 +498,7 @@ def do_task(info):
     # update information dictionary
     info['script']['name'] = os.path.basename(sys.argv[0])
     info['script']['version'] = __version__
-    info['model']['type'] = 'event_score_predictor'
+    info['model']['type'] = 'score_predictor'
     info['model']['module'] = info['assets']['recommender'].__module__
 
     # select validation scheme
@@ -640,36 +640,30 @@ def init_info(opt):
     # model
 
     # model
-    info['model']['options']['random_state'] = opt.rseed
     if opt.method == 'pmf':
-        from kamrecsys.score_predictor.matrix_factorization import PMF
+        from kamrecsys.score_predictor import PMF
         info['model']['method'] = 'PMF'
-        info['model']['options']['C'] = opt.C
-        info['model']['options']['k'] = opt.k
-        info['model']['options']['tol'] = opt.tol
-        info['model']['options']['maxiter'] = opt.maxiter
+        info['model']['options'] = {
+            'C': opt.C, 'k': opt.k, 'tol': opt.tol, 'maxiter': opt.maxiter}
         info['assets']['recommender'] = PMF
     elif opt.method == 'plsam':
-        from kamrecsys.score_predictor.topic_model import MultinomialPLSA
+        from kamrecsys.score_predictor import MultinomialPLSA
         info['model']['method'] = 'MultinomialPLSA_ExpectationPredictor'
-        info['model']['options']['alpha'] = opt.alpha
-        info['model']['options']['k'] = opt.k
-        info['model']['options']['tol'] = opt.tol
-        info['model']['options']['use_expectation'] = True
-        info['model']['options']['maxiter'] = opt.maxiter
+        info['model']['options'] = {
+            'alpha': opt.alpha, 'k': opt.k, 'use_expectation': True,
+            'tol': opt.tol, 'maxiter': opt.maxiter}
         info['assets']['recommender'] = MultinomialPLSA
     elif opt.method == 'plsamm':
-        from kamrecsys.score_predictor.topic_model import MultinomialPLSA
+        from kamrecsys.score_predictor import MultinomialPLSA
         info['model']['method'] = 'MultinomialPLSA_ModePredictor'
-        info['model']['options']['alpha'] = opt.alpha
-        info['model']['options']['k'] = opt.k
-        info['model']['options']['tol'] = opt.tol
-        info['model']['options']['use_expectation'] = False
-        info['model']['options']['maxiter'] = opt.maxiter
+        info['model']['options'] = {
+            'alpha': opt.alpha, 'k': opt.k, 'use_expectation': False,
+            'tol': opt.tol, 'maxiter': opt.maxiter}
         info['assets']['recommender'] = MultinomialPLSA
     else:
         raise TypeError(
             "Invalid method name: {0:s}".format(info['model']['method']))
+    info['model']['options']['random_state'] = opt.rseed
 
     # test
     info['test']['scheme'] = opt.validation
