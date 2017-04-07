@@ -23,6 +23,7 @@ from numpy.testing import (
     assert_array_almost_equal_nulp)
 
 import numpy as np
+from scipy import sparse as sparse
 from sklearn.utils import check_random_state
 
 from kamrecsys.datasets import load_movielens_mini
@@ -59,7 +60,11 @@ class TestLogisticPMF(TestCase):
         rec = LogisticPMF(C=0.1, k=2, tol=1e-03, random_state=1234)
 
         rec._rng = check_random_state(rec.random_state)
-        ev, n_objects = rec._get_event_array(data, sparse_type='csr')
+        n_objects = data.n_objects
+        ev = sparse.coo_matrix(
+            (np.ones(data.n_events, dtype=int),
+             (data.event[:, 0], data.event[:, 1])), shape=n_objects)
+        ev = ev.tocsr()
         rec._init_coef(ev, n_objects)
 
         # set array's view
@@ -118,7 +123,11 @@ class TestLogisticPMF(TestCase):
         rec = LogisticPMF(C=0.1, k=2, tol=1e-03, random_state=1234)
 
         rec._rng = check_random_state(rec.random_state)
-        ev, n_objects = rec._get_event_array(data, sparse_type='csr')
+        n_objects = data.n_objects
+        ev = sparse.coo_matrix(
+            (np.ones(data.n_events, dtype=int),
+             (data.event[:, 0], data.event[:, 1])), shape=n_objects)
+        ev = ev.tocsr()
         rec._init_coef(ev, n_objects)
 
         # set array's view
@@ -255,14 +264,6 @@ class TestLogisticPMF(TestCase):
         # setup
         data = load_movielens_mini()
         rec = LogisticPMF(C=0.1, k=2, tol=1e-03, random_state=1234)
-
-        self.assertDictEqual(
-            vars(rec),
-            {'C': 0.1, 'n_otypes': 0, 'bu_': None, 'bi_': None, 'k': 2,
-             'p_': None, 'q_': None, '_coef': None, 'mu_': None, '_dt': None,
-             'fit_results_': {'initial_loss': np.inf, 'final_loss': np.inf},
-             'iid': None, 'eid': None, 'tol': 1e-03, 'n_objects': None,
-             'maxiter': 200, 'random_state': 1234, '_rng': None})
 
         rec.fit(data, disp=False)
         self.assertAlmostEqual(rec.fit_results_['initial_loss'],
