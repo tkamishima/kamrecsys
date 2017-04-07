@@ -20,7 +20,7 @@ from six.moves import xrange
 
 import logging
 
-from .base import BaseEventScorePredictor
+from .base import BaseScorePredictor
 from .matrix_factorization import PMF
 from .topic_model import MultinomialPLSA
 
@@ -32,8 +32,7 @@ from .topic_model import MultinomialPLSA
 # Public symbols
 # =============================================================================
 
-__all__ = [
-    'BaseEventScorePredictor',
+__all__ = ['BaseScorePredictor',
     'PMF',
     'MultinomialPLSA']
 

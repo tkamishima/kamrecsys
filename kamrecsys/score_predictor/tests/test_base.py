@@ -24,7 +24,7 @@ from numpy.testing import (
 import numpy as np
 import sys
 
-from kamrecsys.score_predictor import BaseEventScorePredictor
+from kamrecsys.score_predictor import BaseScorePredictor
 from kamrecsys.datasets import load_movielens_mini
 
 # =============================================================================
@@ -41,10 +41,10 @@ true_sc = [
 # =============================================================================
 
 
-class EventScorePredictor(BaseEventScorePredictor):
+class ScorePredictor(BaseScorePredictor):
 
     def __init__(self):
-        super(EventScorePredictor, self).__init__(random_state=1234)
+        super(ScorePredictor, self).__init__(random_state=1234)
 
     def raw_predict(self):
         pass
@@ -58,10 +58,10 @@ class TestBaseScorePredictor(TestCase):
 
     def test_class(self):
         data = load_movielens_mini()
-        rec = EventScorePredictor()
+        rec = ScorePredictor()
 
         # fit()
-        rec.fit(data, (0, 1), 0)
+        rec.fit(data, event_index=(0, 1), score_index=0)
 
         self.assertEqual(rec.n_stypes, 1)
         assert_allclose(rec.score_domain, [1., 5., 1.])
