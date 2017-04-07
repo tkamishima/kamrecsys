@@ -52,40 +52,44 @@ __all__ = []
 # =============================================================================
 
 
-class BaseEventItemFinder(with_metaclass(ABCMeta, BaseEventRecommender)):
+class BaseItemFinder(with_metaclass(ABCMeta, BaseEventRecommender)):
     """
     Recommenders to find good items from event data
     """
 
     def __init__(self, random_state=None):
-        super(BaseEventItemFinder, self).__init__(
-            random_state=random_state)
+        super(BaseItemFinder, self).__init__(random_state=random_state)
 
-    def fit(self, random_state=None):
+    def fit(self, data, event_index=(0, 1), random_state=None):
         """
         fitting model
-        """
-        super(BaseEventItemFinder, self).fit(random_state=random_state)
 
-    def _get_event_array(self, data, event_index=(0, 1), sparse_type='csr'):
+        Parameters
+        ----------
+        data : :class:`kamrecsys.data.BaseData`
+            input data
+        event_index : array_like, shape=(variable,)
+            a set of indexes to specify the elements in events that are used
+            in a recommendation model
+        random_state: RandomState or an int seed (None by default)
+            A random number generator instance
+        """
+        super(BaseItemFinder, self).fit(data, event_index, random_state)
+
+    def get_event_array(self, sparse_type='csr'):
         """
         Set statistics of input dataset, and generate a matrix representing
         implicit feedbacks.
 
         Parameters
         ----------
-        data : :class:`kamrecsys.data.EventData`
-            data to fit
-        event_index : array_like, shape=(variable,)
-            a set of indexes to specify the elements in events that are used
-            in a recommendation model
         sparse_type: str
             type of sparse matrix: 'csr', 'csc', 'lil', or 'array'
             default='csr'
 
         Returns
         -------
-        event_array: array, shape=(n_users, n_items), dtype=int
+        ev : array, shape=(n_users, n_items), dtype=int
             return rating matrix that takes 1 if it is consumed, 0 otherwise.
             if event data are not available, return None
         n_objects : array_like, shape=(event_index.shape[0],), dtype=int
@@ -97,34 +101,26 @@ class BaseEventItemFinder(with_metaclass(ABCMeta, BaseEventRecommender)):
         if sparse_type not in ['csr', 'csc', 'lil', 'array']:
             raise TypeError("illegal type of sparse matrices")
 
-        if not isinstance(data, EventData):
-            raise TypeError("input data must data.EventData class")
-
-        # import meta information of objects and events to this recommender
-        self._set_object_info(data)
-        self._set_event_info(data)
-        event_index = np.asarray(event_index)
-
         # get number of objects
-        n_objects = self.n_objects[self.event_otypes[event_index]]
+        n_objects = self.n_objects[self.event_otypes[self.event_index]]
 
         # get event data
-        users = data.event[:, event_index[0]]
-        items = data.event[:, event_index[1]]
+        users = self.event[:, self.event_index[0]]
+        items = self.event[:, self.event_index[1]]
         scores = np.ones_like(users, dtype=int)
 
         # generate array
-        event = sparse.coo_matrix((scores, (users, items)), shape=n_objects)
+        ev = sparse.coo_matrix((scores, (users, items)), shape=n_objects)
         if sparse_type == 'csc':
-            event = event.tocsc()
+            ev = ev.tocsc()
         elif sparse_type == 'csr':
-            event = event.tocsr()
+            ev = ev.tocsr()
         elif sparse_type == 'lil':
-            event = event.tolil()
+            ev = ev.tolil()
         else:
-            event = event.toarray()
+            ev = ev.toarray()
 
-        return event, n_objects
+        return ev, n_objects
 
 # =============================================================================
 # Module initialization

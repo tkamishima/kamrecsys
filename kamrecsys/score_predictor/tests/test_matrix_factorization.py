@@ -50,7 +50,9 @@ class TestPMF(TestCase):
         rec = PMF(C=0.1, k=2, tol=1e-03, random_state=1234)
 
         rec._rng = check_random_state(rec.random_state)
-        ev, sc, n_objects = rec._get_event_and_score(data, (0, 1), 0)
+        ev = data.event
+        sc = data.score
+        n_objects = data.n_objects
         rec._init_coef(ev, sc, n_objects)
 
         # set array's view
@@ -107,9 +109,10 @@ class TestPMF(TestCase):
         # setup
         data = load_movielens_mini()
         rec = PMF(C=0.1, k=2, tol=1e-03, random_state=1234)
-
         rec._rng = check_random_state(rec.random_state)
-        ev, sc, n_objects = rec._get_event_and_score(data, (0, 1), 0)
+        ev = data.event
+        sc = data.score
+        n_objects = data.n_objects
         rec._init_coef(ev, sc, n_objects)
 
         # set array's view
@@ -246,16 +249,8 @@ class TestPMF(TestCase):
         data = load_movielens_mini()
 
         rec = PMF(C=0.1, k=2, tol=1e-03, random_state=1234)
-
-        self.assertDictEqual(
-            vars(rec),
-            {'C': 0.1, 'n_otypes': 0, 'bu_': None, 'bi_': None, 'k': 2,
-             'p_': None, 'q_': None, '_coef': None, 'mu_': None, '_dt': None,
-             'fit_results_': {'initial_loss': np.inf, 'final_loss': np.inf},
-             'iid': None, 'eid': None, 'tol': 1e-03, 'n_objects': None,
-             'maxiter': 200, 'random_state': 1234, '_rng': None})
-
         rec.fit(data, disp=False)
+
         self.assertAlmostEqual(rec.fit_results_['initial_loss'],
                                0.74652578358324106, delta=1e-5)
         self.assertAlmostEqual(rec.fit_results_['final_loss'],

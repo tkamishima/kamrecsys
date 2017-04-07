@@ -82,12 +82,36 @@ class BaseRecommender(with_metaclass(ABCMeta, BaseEstimator)):
         self._rng = None
         self.fit_results_ = {}
 
-    def fit(self, random_state=None):
+    def _set_object_info(self, data):
+        """
+        import object meta information of input data to recommenders
+
+        Parameters
+        ----------
+        data : :class:`kamrecsys.data.BaseData`
+            input data
+
+        Raises
+        ------
+        TypeError
+            if input data is not :class:`kamrecsys.data.BaseData` class
+        """
+        if not isinstance(data, BaseData):
+            raise TypeError("input data must data.BaseData class")
+
+        self.n_otypes = data.n_otypes
+        self.n_objects = data.n_objects
+        self.eid = data.eid
+        self.iid = data.iid
+
+    def fit(self, data, random_state=None):
         """
         fitting model
 
         Parameters
         ----------
+        data : :class:`kamrecsys.data.BaseData`
+            input data
         random_state: RandomState or an int seed (None by default)
             A random number generator instance
         """
@@ -96,6 +120,9 @@ class BaseRecommender(with_metaclass(ABCMeta, BaseEstimator)):
         if random_state is None:
             random_state = self.random_state
         self._rng = check_random_state(random_state)
+
+        # set object information in data
+        self._set_object_info(data)
 
     @abstractmethod
     def predict(self, eev, **kwargs):
@@ -169,28 +196,6 @@ class BaseRecommender(with_metaclass(ABCMeta, BaseEstimator)):
         except KeyError:
             raise ValueError("Illegal external id")
 
-    def _set_object_info(self, data):
-        """
-        import object meta information of input data to recommenders
-
-        Parameters
-        ----------
-        data : :class:`kamrecsys.data.BaseData`
-            input data
-        
-        Raises
-        ------
-        TypeError
-            if input data is not :class:`kamrecsys.data.BaseData` class
-        """
-        if not isinstance(data, BaseData):
-            raise TypeError("input data must data.BaseData class")
-
-        self.n_otypes = data.n_otypes
-        self.n_objects = data.n_objects
-        self.eid = data.eid
-        self.iid = data.iid
-
 
 class BaseEventRecommender(
         with_metaclass(ABCMeta, BaseRecommender, EventUtilMixin)):
@@ -199,16 +204,35 @@ class BaseEventRecommender(
     
     Attributes
     ----------
-    event_otypes : array_like, shape=(variable,), optional
+    s_event : int
+        the size of event, which is the number of object types to represent a
+        rating event
+    event_otypes : array_like, shape=(s_event,)
         see attribute event_otypes. as default, a type of the i-th element of
         each event is the i-th object type.
-    s_event : int
-        the size of event, which is the number of objects to represent a
+    event : array_like, shape=(n_events, s_event), dtype=int
+        each row is a vector of internal ids that indicates the target of
         rating event
+    event_feature : array_like, shape=(n_events, variable), dtype=variable
+        i-the row contains the feature assigned to the i-th event
+    event_index : array_like, shape=(s_event,)
+            a set of indexes to specify the elements in events that are used in
+            a recommendation model
     """
 
     def __init__(self, random_state=None):
         super(BaseEventRecommender, self).__init__(random_state=random_state)
+
+        self._empty_event_info()
+        self.event_index = None
+
+    def _empty_event_info(self):
+        """
+        Set empty Event Information
+        """
+        self.n_events = 0
+        self.event = None
+        self.event_feature = None
 
     def _set_event_info(self, data):
         """
@@ -227,14 +251,62 @@ class BaseEventRecommender(
         if not isinstance(data, EventData):
             raise TypeError("input data must data.EventData class")
 
-        self.event_otypes = data.event_otypes
         self.s_event = data.s_event
+        self.event_otypes = data.event_otypes
+        self.n_events = data.n_events
+        self.event = data.event
+        self.event_feature = data.event_feature
 
-    def fit(self, random_state=None):
+    def get_event(self):
+        """
+        Returns numbers of objects and an event array
+    
+        Returns
+        -------
+        ev : array_like, shape=(n_events, event_index.shape[0])
+            an extracted set of events
+        n_objects : array_like, shape=(event_index.shape[0],), dtype=int
+            the number of objects corresponding to elements tof an extracted
+            events
+        """
+
+        # get event data
+        ev = np.atleast_2d(self.event)[:, self.event_index]
+
+        # get number of objects
+        n_objects = self.n_objects[self.event_otypes[self.event_index]]
+
+        return ev, n_objects
+
+    def remove_data(self):
+        """
+        Remove information related to a training dataset
+        """
+        self._empty_event_info()
+        self.event_index = None
+
+    def fit(self, data, event_index=None, random_state=None):
         """
         fitting model
+
+        Parameters
+        ----------
+        data : :class:`kamrecsys.data.BaseData`
+            input data
+        event_index : array_like, shape=(variable,)
+            a set of indexes to specify the elements in events that are used
+            in a recommendation model
+        random_state: RandomState or an int seed (None by default)
+            A random number generator instance
         """
-        super(BaseEventRecommender, self).fit(random_state=random_state)
+        super(BaseEventRecommender, self).fit(data, random_state)
+
+        # set object information in data
+        self._set_event_info(data)
+        if event_index is None:
+            self.event_index = np.arange(self.s_event, dtype=int)
+        else:
+            self.event_index = np.asanyarray(event_index, dtype=int)
 
     @abstractmethod
     def raw_predict(self, ev, **kwargs):

@@ -129,16 +129,17 @@ def score_histogram(x, scores=(1, 2, 3, 4, 5)):
     ----------
     x : array, shape=(n_samples), dtype=float or int
         A set of scores
-    scores : array, shape=(n_scores,) OR int; optional, default=(1, 2, 3, 4, 5)
+    scores : array, shape=(n_score_levels,) OR int, optional 
         A sorted sequence of possible rating scores, if array-like.
         The range between the minimum and the maximum are divided into the
         specified number of bins, if int.
+        default=(1, 2, 3, 4, 5)
 
     Returns
     -------
-    hist : array_like, shape=(n_scores,)
+    hist : array_like, shape=(n_score_levels,)
         The number of data in each bin
-    scores : array_like, shape=(n_scores + 1,)
+    scores : array_like, shape=(n_score_levels + 1,)
         If a sequence of scores is explicitly specified return a list of
         scores.
         If the number of bins is specified as `scores`, a list of centers of

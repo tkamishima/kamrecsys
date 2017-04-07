@@ -24,7 +24,7 @@ import numpy as np
 from scipy.optimize import fmin_cg
 from sklearn.utils import check_random_state
 
-from . import BaseEventScorePredictor
+from . import BaseScorePredictor
 
 # =============================================================================
 # Public symbols
@@ -45,7 +45,7 @@ __all__ = []
 # =============================================================================
 
 
-class PMF(BaseEventScorePredictor):
+class PMF(BaseScorePredictor):
     """
     A probabilistic matrix factorization model proposed in [1]_.
     A method of handling bias terms is defined by equation (5) in [2]_.
@@ -307,7 +307,7 @@ class PMF(BaseEventScorePredictor):
 
         return grad
 
-    def fit(self, data, user_index=0, item_index=1, score_index=0, tol=None,
+    def fit(self, data, event_index=(0, 1), score_index=0, tol=None,
             maxiter=None, random_state=None, **kwargs):
         """
         fitting model
@@ -316,12 +316,10 @@ class PMF(BaseEventScorePredictor):
         ----------
         data : :class:`kamrecsys.data.EventWithScoreData`
             data to fit
-        user_index : optional, int
-            Index to specify the position of a user in an event vector.
-            (default=0)
-        item_index : optional, int
-            Index to specify the position of a item in an event vector.
-            (default=1)
+        event_index : optional, array-like, shape=(2,), dtype=int 
+            Index to specify the column numbers specifing a user and an item
+            in an event array 
+            (default=(0, 1))
         score_index : optional, int
             Ignored if score of data is a single criterion type. In a multi-
             criteria case, specify the position of the target score in a score
@@ -338,11 +336,11 @@ class PMF(BaseEventScorePredictor):
         """
 
         # call super class
-        super(PMF, self).fit(random_state=random_state)
+        super(PMF, self).fit(data, event_index, score_index, random_state)
 
         # get input data
-        ev, sc, n_objects = self._get_event_and_score(
-            data, (user_index, item_index), score_index)
+        ev, n_objects = self.get_event()
+        sc = self.get_score()
 
         # initialize coefficients
         self._init_coef(ev, sc, n_objects)
@@ -395,6 +393,7 @@ class PMF(BaseEventScorePredictor):
         self.fit_results_['warnflag'] = res[4]
 
         # clean up temporary instance variables
+        self.remove_data()
         del self._coef
         del self._reg
         del self._dt

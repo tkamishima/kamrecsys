@@ -25,7 +25,7 @@ from numpy.testing import (
 import numpy as np
 
 from kamrecsys.datasets import load_movielens_mini
-from kamrecsys.item_finder import BaseEventItemFinder
+from kamrecsys.item_finder import BaseItemFinder
 
 # =============================================================================
 # Variables
@@ -40,43 +40,41 @@ from kamrecsys.item_finder import BaseEventItemFinder
 # =============================================================================
 
 
-class EventItemFinder(BaseEventItemFinder):
+class ItemFinder(BaseItemFinder):
 
     def __init__(self):
-        super(EventItemFinder, self).__init__(random_state=1234)
+        super(ItemFinder, self).__init__(random_state=1234)
 
     def raw_predict(self):
         pass
 
 
-class TestBaseEventItemFinder(TestCase):
-
-    def setUp(self):
-        self.rec = EventItemFinder()
-        self.data = load_movielens_mini()
+class TestBaseItemFinder(TestCase):
 
     def test__get_event_array(self):
+        rec = ItemFinder()
         data = load_movielens_mini()
         data.filter_event(
             np.logical_and(data.event[:, 0] < 5, data.event[:, 1] < 5))
-
-        event, n_objects = self.rec._get_event_array(data, sparse_type='array')
+        
+        rec.fit(data)
+        ev, n_objects = rec.get_event_array(sparse_type='array')
         assert_array_equal(
-            event[:5, :5],
+            ev[:5, :5],
             [[1, 1, 1, 1, 1],
              [1, 0, 0, 0, 0],
              [1, 1, 0, 0, 0],
              [1, 0, 0, 0, 0],
              [0, 0, 0, 1, 0]])
 
-        event2, n_objects = self.rec._get_event_array(data, sparse_type='csr')
-        assert_array_equal(event, event2.todense())
+        ev2, n_objects = rec.get_event_array('csr')
+        assert_array_equal(ev, ev2.todense())
 
-        event2, n_objects = self.rec._get_event_array(data, sparse_type='csc')
-        assert_array_equal(event, event2.todense())
+        ev2, n_objects = rec.get_event_array('csc')
+        assert_array_equal(ev, ev2.todense())
 
-        event2, n_objects = self.rec._get_event_array(data, sparse_type='lil')
-        assert_array_equal(event, event2.todense())
+        ev2, n_objects = rec.get_event_array('lil')
+        assert_array_equal(ev, ev2.todense())
 
 # =============================================================================
 # Main Routine
