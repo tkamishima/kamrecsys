@@ -230,7 +230,7 @@ class BaseEventRecommender(
             predicted scores for given inputs
         """
 
-        eev = check_array(np.atleast_2d(eev), dtype=int)[:, self.event_index]
+        eev = check_array(eev, dtype=int)[:, self.event_index]
 
         return np.squeeze(self.raw_predict(self.to_iid_event(eev)))
 
