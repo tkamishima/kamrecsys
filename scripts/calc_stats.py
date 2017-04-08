@@ -88,7 +88,7 @@ def do_task(opt):
     info = json.load(opt.infile, encoding='utf-8')
 
     # calculate statistics
-    if info['model']['type'] == 'event_score_predictor':
+    if info['model']['type'] == 'score_predictor':
         scores = info['data']['score_domain']
         scores = np.r_[np.arange(scores[0], scores[1], scores[2]), scores[1]]
         stats = score_predictor_statistics(
