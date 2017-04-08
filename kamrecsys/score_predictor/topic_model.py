@@ -308,7 +308,7 @@ class MultinomialPLSA(BaseScorePredictor):
         self.fit_results_['n_iterations'] = iter_no + 1
         self.fit_results_['n_users'] = n_objects[0]
         self.fit_results_['n_items'] = n_objects[1]
-        self.fit_results_['n_events'] = ev.shape[0]
+        self.fit_results_['n_events'] = self.n_events
 
         # add parameters for unknown users and items
         self.pXgZ_ = np.r_[self.pXgZ_, np.ones((1, self.k), dtype=float)]
