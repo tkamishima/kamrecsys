@@ -195,7 +195,7 @@ def training(info, ev, tsc, event_feature=None, fold=0):
     logger.info("training_start_time = " + start_time.isoformat())
 
     # create and learning model
-    rec = info['assets']['recommender'](**info['model']['options'])
+    rec = info['model']['recommender'](**info['model']['options'])
     rec.fit(data)
 
     # set end and elapsed time
@@ -306,20 +306,18 @@ def holdout_test(info):
 
     # prepare training data
     train_x = load_data(
-        info['assets']['infile'],
+        info['training']['file'],
         info['data']['has_timestamp'])
-    info['training']['file'] = str(info['assets']['infile'])
     info['training']['version'] = get_version_info()
     info['training']['system'] = get_system_info()
     info['training']['random_seed'] = info['model']['options']['random_state']
 
     # prepare test data
-    if info['assets']['testfile'] is None:
+    if info['test']['file'] is None:
         raise IOError('hold-out test data is required')
     test_x = load_data(
-        info['assets']['testfile'],
+        info['test']['file'],
         info['data']['has_timestamp'])
-    info['test']['file'] = str(info['assets']['testfile'])
     info['test']['version'] = get_version_info()
     info['test']['system'] = get_system_info()
     info['test']['random_seed'] = info['model']['options']['random_state']
@@ -330,19 +328,14 @@ def holdout_test(info):
 
     # training
     rec = training(info, train_x['event'], train_x['score'], event_feature=ef)
-    info['training']['elapsed_time'] = str(info['training']['elapsed_time'])
-    info['training']['elapsed_utime'] = str(info['training']['elapsed_utime'])
 
     # test
     esc = testing(rec, info, test_x['event'])
-    info['test']['elapsed_time'] = str(info['training']['elapsed_time'])
-    info['test']['elapsed_utime'] = str(info['training']['elapsed_utime'])
 
     # set predicted result
-    info['prediction'] = {
-        'event': test_x['event'].tolist(),
-        'true': test_x['score'].tolist(),
-        'predicted': esc.tolist()}
+    info['prediction']['event'] = test_x['event'].tolist()
+    info['prediction']['true'] = test_x['score'].tolist()
+    info['prediction']['predicted'] = esc.tolist()
     if info['data']['has_timestamp']:
         info['prediction']['event_feature'] = (
             {'timestamp': test_x['event_feature']['timestamp'].tolist()})
@@ -360,13 +353,12 @@ def cv_test(info):
 
     # prepare training data
     x = load_data(
-        info['assets']['infile'],
+        info['training']['file'],
         info['data']['has_timestamp'])
-    info['training']['file'] = str(info['assets']['infile'])
     info['training']['version'] = get_version_info()
     info['training']['system'] = get_system_info()
     info['training']['random_seed'] = info['model']['options']['random_state']
-    info['test']['file'] = str(info['assets']['infile'])
+    info['test']['file'] = info['training']['file']
     info['test']['version'] = get_version_info()
     info['test']['system'] = get_system_info()
     info['test']['random_seed'] = info['model']['options']['random_state']
@@ -394,14 +386,10 @@ def cv_test(info):
 
         fold += 1
 
-    info['training']['elapsed_time'] = str(info['training']['elapsed_time'])
-    info['training']['elapsed_utime'] = str(info['training']['elapsed_utime'])
-    info['test']['elapsed_time'] = str(info['training']['elapsed_time'])
-    info['test']['elapsed_utime'] = str(info['training']['elapsed_utime'])
-
     # set predicted result
-    info['prediction'] = {
-        'event': ev.tolist(), 'true': tsc.tolist(), 'predicted': esc.tolist()}
+    info['prediction']['event'] = ev.tolist()
+    info['prediction']['true'] = tsc.tolist()
+    info['prediction']['predicted'] = esc.tolist()
     if info['data']['has_timestamp']:
         info['prediction']['event_feature'] = {
             'timestamp': x['event_feature']['timestamp'].tolist()}
@@ -482,6 +470,41 @@ def get_version_info():
     return version_info
 
 
+def json_decodable(x):
+    """
+    convert to make serializable type
+
+    Parameters
+    ----------
+    x : dict, list
+        container to convert
+    """
+    if isinstance(x, dict):
+        for k, v in x.items():
+            if isinstance(v, (dict, list)):
+                json_decodable(v)
+            elif isinstance(v, np.integer):
+                x[k] = int(v)
+            elif isinstance(v, np.floating):
+                x[k] = float(v)
+            elif isinstance(v, np.complexfloating):
+                x[k] = complex(v)
+            elif not isinstance(v, (bool, int, float, complex)):
+                x[k] = str(v)
+    if isinstance(x, list):
+        for k, v in enumerate(x):
+            if isinstance(v, (dict, list)):
+                json_decodable(v)
+            elif isinstance(v, np.integer):
+                x[k] = int(v)
+            elif isinstance(v, np.floating):
+                x[k] = float(v)
+            elif isinstance(v, np.complexfloating):
+                x[k] = complex(v)
+            elif not isinstance(v, (bool, int, float, complex)):
+                x[k] = str(v)
+
+
 def do_task(info):
     """
     Main task
@@ -499,7 +522,7 @@ def do_task(info):
     info['script']['name'] = os.path.basename(sys.argv[0])
     info['script']['version'] = __version__
     info['model']['type'] = 'score_predictor'
-    info['model']['module'] = info['assets']['recommender'].__module__
+    info['model']['module'] = info['model']['recommender'].__module__
 
     # select validation scheme
     if info['test']['scheme'] == 'holdout':
@@ -512,9 +535,11 @@ def do_task(info):
         raise TypeError("Invalid validation scheme: {0:s}".format(opt.method))
 
     # output information
-    outfile = info['assets']['outfile']
+    outfile = info['prediction']['file']
     info['prediction']['file'] = str(outfile)
-    del info['assets']
+    for k in info.keys():
+        if k not in ['prediction']:
+            json_decodable(info)
     outfile.write(json.dumps(info))
     if outfile is not sys.stdout:
         outfile.close()
@@ -630,36 +655,34 @@ def init_info(opt):
     """
 
     info = {'script': {}, 'data': {}, 'training': {}, 'test': {},
-            'model': {'options': {}}, 'assets': {}}
+            'model': {'options': {}}, 'prediction': {}}
 
     # files
-    info['assets']['infile'] = opt.infile
-    info['assets']['outfile'] = opt.outfile
-    info['assets']['testfile'] = opt.testfile
-
-    # model
+    info['training']['file'] = opt.infile
+    info['prediction']['file'] = opt.outfile
+    info['test']['file'] = opt.testfile
 
     # model
     if opt.method == 'pmf':
         from kamrecsys.score_predictor import PMF
-        info['model']['method'] = 'PMF'
+        info['model']['method'] = 'probabilistic matrix factroization'
+        info['model']['recommender'] = PMF
         info['model']['options'] = {
             'C': opt.C, 'k': opt.k, 'tol': opt.tol, 'maxiter': opt.maxiter}
-        info['assets']['recommender'] = PMF
     elif opt.method == 'plsam':
         from kamrecsys.score_predictor import MultinomialPLSA
-        info['model']['method'] = 'MultinomialPLSA_ExpectationPredictor'
+        info['model']['method'] = 'multionomial pLSA - expectation'
+        info['model']['recommender'] = MultinomialPLSA
         info['model']['options'] = {
             'alpha': opt.alpha, 'k': opt.k, 'use_expectation': True,
             'tol': opt.tol, 'maxiter': opt.maxiter}
-        info['assets']['recommender'] = MultinomialPLSA
     elif opt.method == 'plsamm':
         from kamrecsys.score_predictor import MultinomialPLSA
-        info['model']['method'] = 'MultinomialPLSA_ModePredictor'
+        info['model']['recommender'] = MultinomialPLSA
+        info['model']['method'] = 'multionomial pLSA - expectation'
         info['model']['options'] = {
             'alpha': opt.alpha, 'k': opt.k, 'use_expectation': False,
             'tol': opt.tol, 'maxiter': opt.maxiter}
-        info['assets']['recommender'] = MultinomialPLSA
     else:
         raise TypeError(
             "Invalid method name: {0:s}".format(info['model']['method']))

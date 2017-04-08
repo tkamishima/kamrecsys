@@ -396,7 +396,7 @@ class LogisticPMF(BaseItemFinder):
         # store fitting results
         self.fit_results_['n_users'] = n_objects[0]
         self.fit_results_['n_items'] = n_objects[1]
-        self.fit_results_['n_events'] = n_objects[0] * n_objects[1]
+        self.fit_results_['n_events'] = self.n_events
         self.fit_results_['final_loss'] = res[1]
         self.fit_results_['func_calls'] = res[2]
         self.fit_results_['grad_calls'] = res[3]
