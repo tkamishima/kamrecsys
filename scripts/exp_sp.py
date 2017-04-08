@@ -522,6 +522,7 @@ def do_task(info):
     info['script']['name'] = os.path.basename(sys.argv[0])
     info['script']['version'] = __version__
     info['model']['type'] = 'score_predictor'
+    info['model']['name'] = info['model']['recommender'].__name__
     info['model']['module'] = info['model']['recommender'].__module__
 
     # select validation scheme
