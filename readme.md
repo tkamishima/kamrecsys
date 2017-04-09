@@ -24,8 +24,7 @@ Requirements
 
 We tested this module under the following packages:
 
-* Python 2.7.x
-    * work on Python 3, but not fully tested
+* Python 3.5+ or Python 2.7.x
 * NumPy
 * SciPy
 * scikit-learn
