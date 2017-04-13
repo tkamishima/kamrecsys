@@ -32,17 +32,7 @@ __docformat__ = "restructuredtext en"
 # Public symbols
 # =============================================================================
 
-__all__ = [
-    '__author__',
-    '__version__',
-    '__license__',
-    'data',
-    'datasets',
-    'item_finder',
-    'model_selection',
-    'metrics',
-    'recommender',
-    'score_predictor']
+__all__ = ['__author__', '__version__', '__license__']
 
 # =============================================================================
 # Constants
