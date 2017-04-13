@@ -29,8 +29,9 @@ from .base import (
 # Public symbols
 # =============================================================================
 
-__all__ = ['BaseRecommender',
-           'BaseEventRecommender']
+__all__ = [
+    'BaseRecommender',
+    'BaseEventRecommender']
 
 # =============================================================================
 # Constants
