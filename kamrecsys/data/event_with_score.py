@@ -111,6 +111,10 @@ class EventWithScoreData(EventData, ScoreUtilMixin):
     See Also
     --------
     :ref:`glossary`
+
+    .. waraning::
+    
+        Multiple scores (n_stypes > 1) are not supported.
     """
 
     def __init__(self, n_otypes=2, event_otypes=None):
@@ -137,10 +141,15 @@ class EventWithScoreData(EventData, ScoreUtilMixin):
         Notes
         -----
         Currently, support only n_stypes == 1 case
+
+        .. waraning::
+        
+            Multiple scores (n_stypes > 1) are not supported.
         """
 
         super(EventWithScoreData, self).set_event(event, event_feature)
 
+        # TOOD: support cases where n_stypes > 1
         self.score = np.asanyarray(score)
         self.score_domain = np.asanyarray(score_domain)
         self.n_stypes = 1
@@ -160,7 +169,12 @@ class EventWithScoreData(EventData, ScoreUtilMixin):
         Returns
         -------
         digitized_scores : array, dtype=int, shape=(n_events,)
+
+        .. waraning::
+        
+            Multiple scores (n_stypes > 1) are not supported.
         """
+        # TOOD: support cases where n_stypes > 1
         bins = np.arange(
             self.score_domain[0], self.score_domain[1], self.score_domain[2])
         bins = np.r_[-np.inf, bins + self.score_domain[2] / 2, np.inf]
@@ -183,6 +197,10 @@ class EventWithScoreData(EventData, ScoreUtilMixin):
         filter_cond : array, dtype=bool, shape=(n_events,)
             Boolean array that specifies whether each event should be included
             in a new event array.
+
+        .. waraning::
+        
+            Multiple scores (n_stypes > 1) are not supported.
         """
 
         # check whether event info is available
@@ -193,6 +211,7 @@ class EventWithScoreData(EventData, ScoreUtilMixin):
         super(EventWithScoreData, self).filter_event(filter_cond)
 
         # filter out event data
+        # TOOD: support cases where n_stypes > 1
         if self.score is not None:
             self.score = self.score[filter_cond]
 
