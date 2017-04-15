@@ -17,15 +17,20 @@ from six.moves import xrange
 
 import logging
 
-from .base import (SAMPLE_PATH)
-from .flixster import (load_flixster_rating)
+from .base import (
+    SAMPLE_PATH,
+    load_event,
+    load_event_with_score)
+from .flixster import (
+    load_flixster_rating)
 from .movielens import (
     MOVIELENS100K_INFO,
     load_movielens100k,
     load_movielens_mini,
     MOVIELENS1M_INFO,
     load_movielens1m)
-from .others import (load_pci_sample)
+from .others import (
+    load_pci_sample)
 from .sushi3 import (
     SUSHI3_INFO,
     load_sushi3b_score)
@@ -40,6 +45,8 @@ from .sushi3 import (
 
 __all__ = [
     'SAMPLE_PATH',
+    'load_event',
+    'load_event_with_score',
     'load_flixster_rating',
     'MOVIELENS100K_INFO',
     'load_movielens100k',
