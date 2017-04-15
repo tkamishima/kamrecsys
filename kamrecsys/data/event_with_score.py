@@ -164,7 +164,9 @@ class EventWithScoreData(EventData, ScoreUtilMixin):
         bins = np.arange(
             self.score_domain[0], self.score_domain[1], self.score_domain[2])
         bins = np.r_[-np.inf, bins + self.score_domain[2] / 2, np.inf]
-        if score is None:
+
+        digitized_scores = score
+        if digitized_scores is None:
             digitized_scores = np.digitize(self.score, bins) - 1
         else:
             digitized_scores = np.digitize(score, bins) - 1
