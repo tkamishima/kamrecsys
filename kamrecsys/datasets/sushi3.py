@@ -178,10 +178,10 @@ def load_sushi3b_score(infile=None, event_dtype=None):
     x = np.genfromtxt(fname=infile, delimiter='\t', dtype=dtype)
     data = EventWithScoreData(n_otypes=2)
     if event_dtype is None:
-        data.set_events(x['event'], x['score'], score_domain=(0.0, 4.0, 1.0))
+        data.set_event(x['event'], x['score'], score_domain=(0.0, 4.0, 1.0))
     else:
-        data.set_events(x['event'], x['score'], score_domain=(0.0, 4.0, 1.0),
-                        event_feature=x['event_feature'])
+        data.set_event(x['event'], x['score'], score_domain=(0.0, 4.0, 1.0),
+                       event_feature=x['event_feature'])
 
     # load user's feature file
     infile = os.path.join(SAMPLE_PATH, 'sushi3.user')

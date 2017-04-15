@@ -196,7 +196,7 @@ class EventData(BaseData, EventUtilMixin):
             self.s_event = event_otypes.shape[0]
             self.event_otypes = np.asarray(event_otypes)
 
-    def set_events(self, event, event_feature=None):
+    def set_event(self, event, event_feature=None):
         """Set event data from structured array.
 
         Parameters

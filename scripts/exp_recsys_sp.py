@@ -183,7 +183,7 @@ def training(info, ev, tsc, event_feature=None, fold=0):
             np.min(tsc), np.max(tsc), np.min(np.diff(np.unique(tsc)))]
         info['data']['score_domain'] = score_domain
         logger.info("score domain is changed to " + str(score_domain))
-    data.set_events(
+    data.set_event(
         ev, tsc, score_domain=score_domain, event_feature=event_feature)
 
     # set starting time

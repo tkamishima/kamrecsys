@@ -118,7 +118,7 @@ class EventWithScoreData(EventData, ScoreUtilMixin):
                                                  event_otypes=event_otypes)
         self._empty_score_info()
 
-    def set_events(self, event, score, score_domain=None, event_feature=None):
+    def set_event(self, event, score, score_domain=None, event_feature=None):
         """
         Set event data from structured array.
 
@@ -139,7 +139,7 @@ class EventWithScoreData(EventData, ScoreUtilMixin):
         Currently, support only n_stypes == 1 case
         """
 
-        super(EventWithScoreData, self).set_events(event, event_feature)
+        super(EventWithScoreData, self).set_event(event, event_feature)
 
         self.score = np.asanyarray(score)
         self.score_domain = np.asanyarray(score_domain)

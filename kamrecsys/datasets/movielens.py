@@ -160,8 +160,8 @@ def load_movielens100k(infile=None,
                       ('event_feature', event_dtype)])
     x = np.genfromtxt(fname=infile, delimiter='\t', dtype=dtype)
     data = EventWithScoreData(n_otypes=2, event_otypes=np.array([0, 1]))
-    data.set_events(x['event'], x['score'], score_domain=(1.0, 5.0, 1.0),
-                    event_feature=x['event_feature'])
+    data.set_event(x['event'], x['score'], score_domain=(1.0, 5.0, 1.0),
+                   event_feature=x['event_feature'])
 
     # load user's feature file
     infile = os.path.join(SAMPLE_PATH, 'movielens100k.user')
@@ -295,8 +295,8 @@ def load_movielens1m(infile=None,
                       ('event_feature', event_dtype)])
     x = np.genfromtxt(fname=infile, delimiter='\t', dtype=dtype)
     data = EventWithScoreData(n_otypes=2, event_otypes=np.array([0, 1]))
-    data.set_events(x['event'], x['score'], score_domain=(1.0, 5.0, 1.0),
-                    event_feature=x['event_feature'])
+    data.set_event(x['event'], x['score'], score_domain=(1.0, 5.0, 1.0),
+                   event_feature=x['event_feature'])
 
     # load user's feature file
     infile = os.path.join(SAMPLE_PATH, 'movielens1m.user')
