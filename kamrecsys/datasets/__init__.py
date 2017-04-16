@@ -19,6 +19,7 @@ import logging
 
 from .base import (
     SAMPLE_PATH,
+    event_dtype_timestamp,
     load_event,
     load_event_with_score)
 from .flixster import (
@@ -45,6 +46,7 @@ from .sushi3 import (
 
 __all__ = [
     'SAMPLE_PATH',
+    'event_dtype_timestamp',
     'load_event',
     'load_event_with_score',
     'load_flixster_rating',

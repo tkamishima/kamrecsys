@@ -36,6 +36,11 @@ __all__ = []
 # path to the directory containing sample files
 SAMPLE_PATH = os.path.join(os.path.dirname(__file__), 'data')
 
+# default event dtype definitions ---------------------------------------------
+
+# timestamp
+event_dtype_timestamp = np.dtype([('timestamp', int)])
+
 # =============================================================================
 # Module variables
 # =============================================================================

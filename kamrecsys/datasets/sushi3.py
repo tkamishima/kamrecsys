@@ -21,7 +21,7 @@ import logging
 import numpy as np
 
 from ..data import EventWithScoreData
-from .base import SAMPLE_PATH
+from .base import SAMPLE_PATH, load_event_with_score
 
 # =============================================================================
 # Public symbols
@@ -170,18 +170,9 @@ def load_sushi3b_score(infile=None, event_dtype=None):
     # load event file
     if infile is None:
         infile = os.path.join(SAMPLE_PATH, 'sushi3b_score.event')
-    if event_dtype is None:
-        dtype = np.dtype([('event', np.int, 2), ('score', np.float)])
-    else:
-        dtype = np.dtype([('event', np.int, 2), ('score', np.float),
-                          ('event_feature', event_dtype)])
-    x = np.genfromtxt(fname=infile, delimiter='\t', dtype=dtype)
-    data = EventWithScoreData(n_otypes=2)
-    if event_dtype is None:
-        data.set_event(x['event'], x['score'], score_domain=(0.0, 4.0, 1.0))
-    else:
-        data.set_event(x['event'], x['score'], score_domain=(0.0, 4.0, 1.0),
-                       event_feature=x['event_feature'])
+    data = load_event_with_score(
+        infile, n_otypes=2, event_otypes=(0, 1),
+        score_domain=(0., 4., 1.), event_dtype=event_dtype)
 
     # load user's feature file
     infile = os.path.join(SAMPLE_PATH, 'sushi3.user')
