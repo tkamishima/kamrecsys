@@ -43,14 +43,13 @@ class TestLoadMovielens100k(unittest.TestCase):
         self.assertListEqual(
             sorted(data.__dict__.keys()),
             sorted(['event_otypes', 'n_otypes', 'n_events', 'n_score_levels',
-                    'n_stypes', 'feature', 'event', 'iid', 'event_feature',
+                    'feature', 'event', 'iid', 'event_feature',
                     'score', 'eid', 'n_objects', 's_event', 'score_domain']))
         assert_array_equal(data.event_otypes, [0, 1])
         self.assertEqual(data.n_otypes, 2)
         self.assertEqual(data.n_events, 100000)
         self.assertEqual(data.s_event, 2)
         assert_array_equal(data.n_objects, [943, 1682])
-        self.assertEqual(data.n_stypes, 1)
         assert_array_equal(data.score_domain, [1., 5., 1.])
         assert_array_equal(
             data.event[:5],
@@ -149,8 +148,7 @@ class TestLoadMovielens1m(unittest.TestCase):
             sorted(data.__dict__.keys()),
             sorted([
                 'event_otypes', 'n_otypes', 'n_events',
-                'n_score_levels', 'n_stypes',
-                'feature', 'event', 'iid',
+                'n_score_levels', 'feature', 'event', 'iid',
                 'event_feature', 'score', 'eid', 'n_objects',
                 's_event', 'score_domain']))
         assert_array_equal(data.event_otypes, [0, 1])
@@ -158,7 +156,6 @@ class TestLoadMovielens1m(unittest.TestCase):
         self.assertEqual(data.n_events, 1000209)
         self.assertEqual(data.s_event, 2)
         assert_array_equal(data.n_objects, [6040, 3706])
-        self.assertEqual(data.n_stypes, 1)
         assert_array_equal(data.score_domain, [1., 5., 1.])
         assert_array_equal(
             data.to_eid_event(data.event)[:5],

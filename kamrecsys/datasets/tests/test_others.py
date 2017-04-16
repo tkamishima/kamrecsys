@@ -81,7 +81,6 @@ class TestLoadPCISample(unittest.TestCase):
             ['Just My Luck', 'Lady in the Water', 'Snakes on a Planet',
              'Superman Returns', 'The Night Listener', 'You, Me and Dupree'])
         assert_array_equal(data.n_objects, [7, 6])
-        self.assertEqual(data.n_stypes, 1)
         self.assertEqual(data.s_event, 2)
         assert_array_equal(data.score_domain, [1., 5., 0.5])
 

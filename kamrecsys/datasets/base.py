@@ -110,8 +110,7 @@ def load_event_with_score(
     Tab separated file.  The contnts of columns are as follows:
     
     * the first s_events columns are sets of object IDs representing events 
-    * the subsequent n_stypes columns are scores
-      (WARNING: multiple scores (n_styls > 1) are not currently supported)
+    * the subsequent one column is a set of scores
     * the rest of columns corresponds to event features
     
     Parameters
@@ -134,10 +133,6 @@ def load_event_with_score(
         event data with score information
     
         event_dtype : np.dtype, default=None
-
-    .. waraning::
-    
-        Multiple scores (n_stypes > 1) are not supported.
     """
 
     s_events = n_otypes if event_otypes is None else len(event_otypes)

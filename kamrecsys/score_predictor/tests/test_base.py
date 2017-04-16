@@ -61,9 +61,8 @@ class TestBaseScorePredictor(TestCase):
         rec = ScorePredictor()
 
         # fit()
-        rec.fit(data, event_index=(0, 1), score_index=0)
+        rec.fit(data, event_index=(0, 1))
 
-        self.assertEqual(rec.n_stypes, 1)
         assert_allclose(rec.score_domain, [1., 5., 1.])
         assert_allclose(rec.score, true_sc)
         self.assertEqual(rec.n_score_levels, 5)
@@ -73,7 +72,6 @@ class TestBaseScorePredictor(TestCase):
 
         # remove_data
         rec.remove_data()
-        self.assertEqual(rec.n_stypes, 0)
         self.assertIsNone(rec.score_domain)
         self.assertIsNone(rec.score)
         self.assertIsNone(rec.n_score_levels)

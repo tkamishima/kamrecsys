@@ -49,7 +49,6 @@ class ScoreUtilMixin(with_metaclass(ABCMeta, object)):
         Set empty score information
         """
 
-        self.n_stypes = 0
         self.score_domain = None
         self.score = None
         self.n_score_levels = None
@@ -71,7 +70,6 @@ class ScoreUtilMixin(with_metaclass(ABCMeta, object)):
         if not isinstance(data, EventWithScoreData):
             raise TypeError("input data must data.EventWithScoreData class")
 
-        self.n_stypes = data.n_stypes
         self.score_domain = data.score_domain
         self.score = data.score
         self.n_score_levels = data.n_score_levels
@@ -95,26 +93,14 @@ class EventWithScoreData(EventData, ScoreUtilMixin):
     score_domain : tuple or 1d-array of tuple
         i-th tuple is a triple of the minimum, the maximum, and strides of the
         i-th score
-    score : array_like, shape=(n_events) or (n_events, n_stypes)
-        rating scores of each events. this array takes a vector shape if
-        `n_rtypes` is 1; otherwise takes
-    n_stypes : int
-        number of score types
-    n_score_levels : int or array, dtype=int, shape=(,n_stypes)
+    score : array_like, shape=(n_events,)
+        rating scores of each events.
+    n_score_levels : int
         the number of score levels
-
-    Raises
-    ------
-    ValueError
-        if n_otypes < 1 or n_stypes < 1 or event_otypes is illegal.
 
     See Also
     --------
     :ref:`glossary`
-
-    .. waraning::
-    
-        Multiple scores (n_stypes > 1) are not supported.
     """
 
     def __init__(self, n_otypes=2, event_otypes=None):
@@ -131,24 +117,18 @@ class EventWithScoreData(EventData, ScoreUtilMixin):
         event : array_like, shape=(n_events, s_event)
             each row corresponds to an event represented by a vector of object
             with external ids
-        score : array_like, shape=(n_events) or (n_stypes, n_events)
-            rating scores for the i-th element
+        score : array_like, shape=(n_events,)
+            a set of rating scores
         score_domain : optional, tuple or 1d-array of tuple
             min and max of scores, and the interval between scores
         event_feature : optional, array_like, shape=(n_events, variable)
             feature of events
-
-        .. waraning::
-        
-            Multiple scores (n_stypes > 1) are not supported.
         """
 
         super(EventWithScoreData, self).set_event(event, event_feature)
 
-        # TOOD: support cases where n_stypes > 1
         self.score = np.asanyarray(score)
         self.score_domain = np.asanyarray(score_domain)
-        self.n_stypes = 1
         self.n_score_levels = (
             int((score_domain[1] - score_domain[0]) / score_domain[2]) + 1)
 
@@ -165,12 +145,8 @@ class EventWithScoreData(EventData, ScoreUtilMixin):
         Returns
         -------
         digitized_scores : array, dtype=int, shape=(n_events,)
-
-        .. waraning::
-        
-            Multiple scores (n_stypes > 1) are not supported.
         """
-        # TOOD: support cases where n_stypes > 1
+
         bins = np.arange(
             self.score_domain[0], self.score_domain[1], self.score_domain[2])
         bins = np.r_[-np.inf, bins + self.score_domain[2] / 2, np.inf]
@@ -193,10 +169,6 @@ class EventWithScoreData(EventData, ScoreUtilMixin):
         filter_cond : array, dtype=bool, shape=(n_events,)
             Boolean array that specifies whether each event should be included
             in a new event array.
-
-        .. waraning::
-        
-            Multiple scores (n_stypes > 1) are not supported.
         """
 
         # check whether event info is available
@@ -207,7 +179,6 @@ class EventWithScoreData(EventData, ScoreUtilMixin):
         super(EventWithScoreData, self).filter_event(filter_cond)
 
         # filter out event data
-        # TOOD: support cases where n_stypes > 1
         if self.score is not None:
             self.score = self.score[filter_cond]
 

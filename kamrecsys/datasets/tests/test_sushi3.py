@@ -42,7 +42,7 @@ class TestSushi3Class(unittest.TestCase):
         self.assertListEqual(
             sorted(data.__dict__.keys()),
             sorted(['event_otypes', 'n_otypes', 'n_events', 'n_score_levels',
-                    'n_stypes', 'feature', 'event', 'iid', 'event_feature',
+                    'feature', 'event', 'iid', 'event_feature',
                     'score', 'eid', 'n_objects', 's_event',
                     'score_domain']))
         assert_array_equal(data.event_otypes, [0, 1])
@@ -52,7 +52,6 @@ class TestSushi3Class(unittest.TestCase):
         assert_array_equal(data.n_objects, [5000, 100])
 
         # events
-        self.assertEqual(data.n_stypes, 1)
         assert_array_equal(data.score_domain, [0., 4., 1.0])
         assert_array_equal(
             data.event[:5],
