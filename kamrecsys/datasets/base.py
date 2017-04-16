@@ -19,6 +19,10 @@ import os
 
 import numpy as np
 
+from ..data import (
+    EventData,
+    EventWithScoreData)
+
 # =============================================================================
 # Public symbols
 # =============================================================================
@@ -74,7 +78,22 @@ def load_event(infile, n_otypes=2, event_otypes=None, event_dtype=None):
         event_dtype : np.dtype, default=None
     """
 
-    return
+    s_events = n_otypes if event_otypes is None else len(event_otypes)
+    if event_dtype is None:
+        dtype = np.dtype([('event', np.int, s_events)])
+    else:
+        dtype = np.dtype([('event', np.int, s_events),
+                          ('event_feature', event_dtype)])
+    x = np.genfromtxt(fname=infile, delimiter='\t', dtype=dtype)
+
+    data = EventData(n_otypes=n_otypes, event_otypes=event_otypes)
+    if event_dtype is None:
+        event_feature = None
+    else:
+        event_feature = x['event_feature']
+    data.set_event(x['event'], event_feature=event_feature)
+
+    return data
 
 
 def load_event_with_score(
@@ -115,7 +134,25 @@ def load_event_with_score(
     
         Multiple scores (n_stypes > 1) are not supported.
     """
-    return
+
+    s_events = n_otypes if event_otypes is None else len(event_otypes)
+    if event_dtype is None:
+        dtype = np.dtype([('event', np.int, s_events), ('score', float)])
+    else:
+        dtype = np.dtype([('event', np.int, s_events), ('score', float),
+                          ('event_feature', event_dtype)])
+    x = np.genfromtxt(fname=infile, delimiter='\t', dtype=dtype)
+
+    data = EventWithScoreData(n_otypes=n_otypes, event_otypes=event_otypes)
+    if event_dtype is None:
+        event_feature = None
+    else:
+        event_feature = x['event_feature']
+    data.set_event(
+        x['event'], x['score'], score_domain=score_domain,
+        event_feature=event_feature)
+
+    return data
 
 # =============================================================================
 # Module initialization
