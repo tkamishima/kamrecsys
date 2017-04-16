@@ -218,8 +218,7 @@ class MultinomialPLSA(BaseScorePredictor):
         self.pZ_ = np.sum(self._q, axis=0) + self.alpha
         self.pZ_ /= np.sum(self.pZ_)
 
-    def fit(self, data, event_index=(0, 1), score_index=0,
-            random_state=None):
+    def fit(self, data, event_index=(0, 1), random_state=None):
         """
         fitting model
 
@@ -231,23 +230,18 @@ class MultinomialPLSA(BaseScorePredictor):
             Index to specify the column numbers specifing a user and an item
             in an event array 
             (default=(0, 1))
-        score_index : optional, int
-            Ignored if score of data is a single criterion type. In a multi-
-            criteria case, specify the position of the target score in a score
-            vector. (default=0)
         random_state: RandomState or an int seed (None by default)
             A random number generator instance. If None is given, the
             object's random_state is used
 
         Notes
         -----
-        * Currently `score_index` must be 0.
         * output intermediate results, if the logging level is lower than INFO
         """
 
         # initialization #####
         super(MultinomialPLSA, self).fit(
-            data, event_index, score_index, random_state=random_state)
+            data, event_index, random_state=random_state)
         ev, n_objects = self.get_event()
         sc = self.get_score()
         self.score_levels_ = np.linspace(

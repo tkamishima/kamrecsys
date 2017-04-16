@@ -317,7 +317,7 @@ class LogisticPMF(BaseItemFinder):
 
         return grad
 
-    def fit(self, data, event_index=(0, 1), score_index=0, tol=None,
+    def fit(self, data, event_index=(0, 1), tol=None,
             maxiter=None, random_state=None, **kwargs):
         """
         fitting model
@@ -330,10 +330,6 @@ class LogisticPMF(BaseItemFinder):
             Index to specify the column numbers specifing a user and an item
             in an event array 
             (default=(0, 1))
-        score_index : optional, int
-            Ignored if score of data is a single criterion type. In a multi-
-            criteria case, specify the position of the target score in a score
-            vector. (default=0)
         random_state: RandomState or an int seed (None by default)
             A random number generator instance. If None is given, the
             object's random_state is used

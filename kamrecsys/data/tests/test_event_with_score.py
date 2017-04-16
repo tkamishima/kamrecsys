@@ -58,7 +58,6 @@ class TestEventWithScoreData(unittest.TestCase):
         # test info related to scores
         assert_allclose(data.score[:5], [3., 4., 3.5, 5., 3.])
         assert_allclose(data.score_domain, [1.0, 5.0, 0.5])
-        self.assertEqual(data.n_stypes, 1)
         self.assertEqual(data.n_score_levels, 9)
 
     def test_digitize_score(self):
