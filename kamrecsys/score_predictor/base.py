@@ -91,7 +91,7 @@ class BaseScorePredictor(
         if self.n_stypes == 1:
             sc = self.score
         else:
-            sc = self.score[:, score_index]
+            sc = self.score[:, self.score_index]
 
         return sc
 

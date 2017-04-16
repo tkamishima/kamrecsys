@@ -21,7 +21,7 @@ import logging
 import numpy as np
 
 from ..data import EventWithScoreData
-from .base import SAMPLE_PATH
+from .base import SAMPLE_PATH, load_event_with_score, event_dtype_timestamp
 
 # =============================================================================
 # Public symbols
@@ -79,8 +79,7 @@ MOVIELENS1M_INFO = {
 # =============================================================================
 
 
-def load_movielens100k(infile=None,
-                       event_dtype=np.dtype([('timestamp', np.int)])):
+def load_movielens100k(infile=None, event_dtype=event_dtype_timestamp):
     """ load the MovieLens 100k data set
 
     Original file ``ml-100k.zip`` is distributed by the Grouplens Research
@@ -155,13 +154,9 @@ def load_movielens100k(infile=None,
     # load event file
     if infile is None:
         infile = os.path.join(SAMPLE_PATH, 'movielens100k.event')
-    dtype = np.dtype([('event', np.int, 2),
-                      ('score', np.float),
-                      ('event_feature', event_dtype)])
-    x = np.genfromtxt(fname=infile, delimiter='\t', dtype=dtype)
-    data = EventWithScoreData(n_otypes=2, event_otypes=np.array([0, 1]))
-    data.set_events(x['event'], x['score'], score_domain=(1.0, 5.0, 1.0),
-                    event_feature=x['event_feature'])
+    data = load_event_with_score(
+        infile, n_otypes=2, event_otypes=(0, 1),
+        score_domain=(1., 5., 1.), event_dtype=event_dtype)
 
     # load user's feature file
     infile = os.path.join(SAMPLE_PATH, 'movielens100k.user')
@@ -169,7 +164,7 @@ def load_movielens100k(infile=None,
                        ('occupation', np.int), ('zip', 'U5')])
     dtype = np.dtype([('eid', np.int), ('feature', fdtype)])
     x = np.genfromtxt(fname=infile, delimiter='\t', dtype=dtype)
-    data.set_features(0, x['eid'], x['feature'])
+    data.set_feature(0, x['eid'], x['feature'])
 
     # load item's feature file
     infile = os.path.join(SAMPLE_PATH, 'movielens100k.item')
@@ -182,7 +177,7 @@ def load_movielens100k(infile=None,
     dtype = np.dtype([('eid', np.int), ('feature', fdtype)])
     x = np.genfromtxt(fname=infile, delimiter='\t', dtype=dtype,
                       converters={1: np.char.decode})
-    data.set_features(1, x['eid'], x['feature'])
+    data.set_feature(1, x['eid'], x['feature'])
 
     return data
 
@@ -211,8 +206,7 @@ def load_movielens_mini():
     return load_movielens100k(infile=infile)
 
 
-def load_movielens1m(infile=None,
-                     event_dtype=np.dtype([('timestamp', np.int)])):
+def load_movielens1m(infile=None, event_dtype=event_dtype_timestamp):
     """ load the MovieLens 1m data set
 
     Original file ``ml-1m.zip`` is distributed by the Grouplens Research
@@ -290,13 +284,9 @@ def load_movielens1m(infile=None,
     # load event file
     if infile is None:
         infile = os.path.join(SAMPLE_PATH, 'movielens1m.event')
-    dtype = np.dtype([('event', np.int, 2),
-                      ('score', np.float),
-                      ('event_feature', event_dtype)])
-    x = np.genfromtxt(fname=infile, delimiter='\t', dtype=dtype)
-    data = EventWithScoreData(n_otypes=2, event_otypes=np.array([0, 1]))
-    data.set_events(x['event'], x['score'], score_domain=(1.0, 5.0, 1.0),
-                    event_feature=x['event_feature'])
+    data = load_event_with_score(
+        infile, n_otypes=2, event_otypes=(0, 1),
+        score_domain=(1., 5., 1.), event_dtype=event_dtype)
 
     # load user's feature file
     infile = os.path.join(SAMPLE_PATH, 'movielens1m.user')
@@ -304,7 +294,7 @@ def load_movielens1m(infile=None,
                        ('occupation', np.int), ('zip', 'U5')])
     dtype = np.dtype([('eid', np.int), ('feature', fdtype)])
     x = np.genfromtxt(fname=infile, delimiter='\t', dtype=dtype)
-    data.set_features(0, x['eid'], x['feature'])
+    data.set_feature(0, x['eid'], x['feature'])
 
     # load item's feature file
     infile = os.path.join(SAMPLE_PATH, 'movielens1m.item')
@@ -314,7 +304,7 @@ def load_movielens1m(infile=None,
     dtype = np.dtype([('eid', np.int), ('feature', fdtype)])
     x = np.genfromtxt(fname=infile, delimiter='\t', dtype=dtype,
                       converters={1: np.char.decode})
-    data.set_features(1, x['eid'], x['feature'])
+    data.set_feature(1, x['eid'], x['feature'])
 
     return data
 

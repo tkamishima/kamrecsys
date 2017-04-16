@@ -77,6 +77,7 @@ import sklearn
 from sklearn.model_selection import LeaveOneGroupOut
 
 from kamrecsys.data import EventWithScoreData
+from kamrecsys.datasets import event_dtype_timestamp
 from kamrecsys.model_selection import interlace_group
 
 # =============================================================================
@@ -130,7 +131,7 @@ def load_data(fp, ts):
         dt = np.dtype([
             ('event', int, 2),
             ('score', float),
-            ('event_feature', np.dtype([('timestamp', int)]))
+            ('event_feature', event_dtype_timestamp)
         ])
     else:
         dt = np.dtype([
@@ -183,7 +184,7 @@ def training(info, ev, tsc, event_feature=None, fold=0):
             np.min(tsc), np.max(tsc), np.min(np.diff(np.unique(tsc)))]
         info['data']['score_domain'] = score_domain
         logger.info("score domain is changed to " + str(score_domain))
-    data.set_events(
+    data.set_event(
         ev, tsc, score_domain=score_domain, event_feature=event_feature)
 
     # set starting time
