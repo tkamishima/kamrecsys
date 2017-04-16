@@ -7,8 +7,7 @@ Common definitions of datasets
 from __future__ import (
     print_function,
     division,
-    absolute_import,
-    unicode_literals)
+    absolute_import)
 from six.moves import xrange
 
 # =============================================================================
@@ -46,8 +45,7 @@ SAMPLE_PATH = os.path.join(os.path.dirname(__file__), 'data')
 # =============================================================================
 
 
-def load_event(
-        infile, n_otypes=2, event_otypes=np.array([0, 1]), event_dtype=None):
+def load_event(infile, n_otypes=2, event_otypes=None, event_dtype=None):
     """
     load event file
 
@@ -80,8 +78,8 @@ def load_event(
 
 
 def load_event_with_score(
-        infile, n_otypes=2, event_otypes=np.array([0, 1]),
-        score_domain=(1, 5, 1), event_dtype=None):
+        infile, n_otypes=2, event_otypes=None, score_domain=(1, 5, 1),
+        event_dtype=None):
     """
     load event file with rating score
 
