@@ -205,7 +205,7 @@ class BaseData(with_metaclass(ABCMeta, ObjectUtilMixin, object)):
         self.iid = np.empty(self.n_otypes, dtype=np.object)
         self.feature = np.empty(self.n_otypes, dtype=np.object)
 
-    def set_features(self, otype, eid, feature):
+    def set_feature(self, otype, eid, feature):
         """
         Set object feature
         

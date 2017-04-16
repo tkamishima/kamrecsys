@@ -304,7 +304,7 @@ def load_movielens1m(infile=None,
                        ('occupation', np.int), ('zip', 'U5')])
     dtype = np.dtype([('eid', np.int), ('feature', fdtype)])
     x = np.genfromtxt(fname=infile, delimiter='\t', dtype=dtype)
-    data.set_features(0, x['eid'], x['feature'])
+    data.set_feature(0, x['eid'], x['feature'])
 
     # load item's feature file
     infile = os.path.join(SAMPLE_PATH, 'movielens1m.item')
@@ -314,7 +314,7 @@ def load_movielens1m(infile=None,
     dtype = np.dtype([('eid', np.int), ('feature', fdtype)])
     x = np.genfromtxt(fname=infile, delimiter='\t', dtype=dtype,
                       converters={1: np.char.decode})
-    data.set_features(1, x['eid'], x['feature'])
+    data.set_feature(1, x['eid'], x['feature'])
 
     return data
 

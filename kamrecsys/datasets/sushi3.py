@@ -199,7 +199,7 @@ def load_sushi3b_score(infile=None, event_dtype=None):
         ('moved', np.int)])
     dtype = np.dtype([('eid', np.int), ('feature', fdtype)])
     x = np.genfromtxt(fname=infile, delimiter='\t', dtype=dtype)
-    data.set_features(0, x['eid'], x['feature'])
+    data.set_feature(0, x['eid'], x['feature'])
 
     # load item's feature file
     infile = os.path.join(SAMPLE_PATH, 'sushi3.item')
@@ -215,7 +215,7 @@ def load_sushi3b_score(infile=None, event_dtype=None):
     dtype = np.dtype([('eid', np.int), ('feature', fdtype)])
     x = np.genfromtxt(fname=infile, delimiter='\t', dtype=dtype,
                       converters={1: np.char.decode})
-    data.set_features(1, x['eid'], x['feature'])
+    data.set_feature(1, x['eid'], x['feature'])
 
     return data
 
