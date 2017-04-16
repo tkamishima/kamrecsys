@@ -77,6 +77,7 @@ import sklearn
 from sklearn.model_selection import LeaveOneGroupOut
 
 from kamrecsys.data import EventWithScoreData
+from kamrecsys.datasets import event_dtype_timestamp
 from kamrecsys.model_selection import interlace_group
 
 # =============================================================================
@@ -130,7 +131,7 @@ def load_data(fp, ts):
         dt = np.dtype([
             ('event', int, 2),
             ('score', float),
-            ('event_feature', np.dtype([('timestamp', int)]))
+            ('event_feature', event_dtype_timestamp)
         ])
     else:
         dt = np.dtype([
