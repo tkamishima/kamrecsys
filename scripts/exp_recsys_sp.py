@@ -73,6 +73,7 @@ import subprocess
 
 import numpy as np
 import scipy as sp
+from scipy.sparse import issparse
 import sklearn
 from sklearn.model_selection import LeaveOneGroupOut
 
@@ -334,12 +335,12 @@ def holdout_test(info):
     esc = testing(rec, info, test_x['event'])
 
     # set predicted result
-    info['prediction']['event'] = test_x['event'].tolist()
-    info['prediction']['true'] = test_x['score'].tolist()
-    info['prediction']['predicted'] = esc.tolist()
+    info['prediction']['event'] = test_x['event']
+    info['prediction']['true'] = test_x['score']
+    info['prediction']['predicted'] = esc
     if info['data']['has_timestamp']:
         info['prediction']['event_feature'] = (
-            {'timestamp': test_x['event_feature']['timestamp'].tolist()})
+            {'timestamp': test_x['event_feature']['timestamp']})
 
 
 def cv_test(info):
@@ -388,12 +389,12 @@ def cv_test(info):
         fold += 1
 
     # set predicted result
-    info['prediction']['event'] = ev.tolist()
-    info['prediction']['true'] = tsc.tolist()
-    info['prediction']['predicted'] = esc.tolist()
+    info['prediction']['event'] = ev
+    info['prediction']['true'] = tsc
+    info['prediction']['predicted'] = esc
     if info['data']['has_timestamp']:
         info['prediction']['event_feature'] = {
-            'timestamp': x['event_feature']['timestamp'].tolist()}
+            'timestamp': x['event_feature']['timestamp']}
 
 
 def get_system_info():
@@ -479,11 +480,21 @@ def json_decodable(x):
     ----------
     x : dict, list
         container to convert
+        
+    Notes
+    -----
+    `long` type of Python2 is not supported 
     """
     if isinstance(x, dict):
         for k, v in x.items():
             if isinstance(v, (dict, list)):
                 json_decodable(v)
+            elif isinstance(v, np.ndarray):
+                x[k] = v.tolist()
+                json_decodable(x[k])
+            elif issparse(v):
+                x[k] = v.toarray().tolist()
+                json_decodable(x[k])
             elif isinstance(v, np.integer):
                 x[k] = int(v)
             elif isinstance(v, np.floating):
@@ -492,10 +503,16 @@ def json_decodable(x):
                 x[k] = complex(v)
             elif not isinstance(v, (bool, int, float, complex)):
                 x[k] = str(v)
-    if isinstance(x, list):
+    elif isinstance(x, list):
         for k, v in enumerate(x):
             if isinstance(v, (dict, list)):
                 json_decodable(v)
+            elif isinstance(v, np.ndarray):
+                x[k] = v.tolist()
+                json_decodable(x[k])
+            elif issparse(v):
+                x[k] = v.toarray().tolist()
+                json_decodable(x[k])
             elif isinstance(v, np.integer):
                 x[k] = int(v)
             elif isinstance(v, np.floating):
