@@ -239,8 +239,12 @@ class EventData(BaseData, EventUtilMixin):
         if self.event is None:
             return
 
+        # re-arrange filter
+        filter_cond = np.asarray(filter_cond)
+
         # filter out event data
         self.event = self.event[filter_cond, :]
+        self.n_events = self.event.shape[0]
 
         # filter out event features
         if self.event_feature is not None:
