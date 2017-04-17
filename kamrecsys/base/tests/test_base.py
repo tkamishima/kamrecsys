@@ -52,7 +52,7 @@ class EventRecommender(BaseEventRecommender):
 
     def raw_predict(self, ev):
 
-        return(np.zeros(ev.shape[0]))
+        return np.zeros(ev.shape[0])
 
 # =============================================================================
 # Test Classes
