@@ -22,7 +22,8 @@ import unittest
 import os
 import numpy as np
 
-from kamrecsys.datasets import load_movielens_mini
+from kamrecsys.data import EventData
+from kamrecsys.datasets import SAMPLE_PATH, load_movielens_mini
 
 # =============================================================================
 # Module variables
@@ -34,14 +35,11 @@ from kamrecsys.datasets import load_movielens_mini
 
 
 def load_test_data():
-    from kamrecsys.data import EventWithScoreData
-    from kamrecsys.datasets import SAMPLE_PATH
-
     infile = os.path.join(SAMPLE_PATH, 'pci.event')
     dtype = np.dtype([('event', 'U18', 2), ('score', np.float)])
     x = np.genfromtxt(fname=infile, delimiter='\t', dtype=dtype)
-    data = EventWithScoreData(n_otypes=2, event_otypes=np.array([0, 1]))
-    data.set_event(x['event'], x['score'], score_domain=(1.0, 5.0, 0.5))
+    data = EventData(n_otypes=2, event_otypes=np.array([0, 1]))
+    data.set_event(x['event'])
     return data, x
 
 
@@ -82,6 +80,8 @@ class TestEventUtilMixin(unittest.TestCase):
 class TestEventData(unittest.TestCase):
 
     def test_filter_event(self):
+
+        # load movie_lens
         data = load_movielens_mini()
 
         data.filter_event(np.arange(data.n_events) % 3 == 0)
@@ -96,6 +96,16 @@ class TestEventData(unittest.TestCase):
         assert_array_equal(
             data.to_eid(1, data.event[:, 1]),
             [2, 4, 8, 7, 9, 8, 5, 1, 9, 3])
+
+        # dummry event data
+        data = EventData()
+        data.set_event(np.tile(np.arange(5), (2, 2)).T)
+        data.filter_event(
+            [True, False, True, True, False, False, True, True, False, False])
+
+        self.assertEqual(data.n_events, 5)
+        assert_array_equal(
+            data.event, [[0, 0], [2, 2], [3, 3], [1, 1], [2, 2]])
 
 # =============================================================================
 # Main Routines
