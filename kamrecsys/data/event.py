@@ -114,16 +114,6 @@ class EventUtilMixin(with_metaclass(ABCMeta, object)):
 
         return new_ev
 
-    def _empty_event_info(self):
-        """
-        Set empty Event Information
-        """
-        self.s_event = 0
-        self.event_otypes = None
-        self.n_events = 0
-        self.event = None
-        self.event_feature = None
-
     def _set_event_info(self, data):
         """
         import event meta information of input data to recommenders
@@ -185,7 +175,12 @@ class EventData(BaseData, EventUtilMixin):
     def __init__(self, n_otypes=2, event_otypes=None):
         super(EventData, self).__init__(n_otypes=n_otypes)
 
-        self._empty_event_info()
+        self.s_event = 0
+        self.event_otypes = None
+        self.n_events = 0
+        self.event = None
+        self.event_feature = None
+
         if event_otypes is None:
             self.s_event = n_otypes
             self.event_otypes = np.arange(self.s_event, dtype=int)

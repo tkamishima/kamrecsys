@@ -74,7 +74,11 @@ class BaseRecommender(with_metaclass(ABCMeta, BaseEstimator, ObjectUtilMixin)):
     """
 
     def __init__(self, random_state=None):
-        self._empty_object_info()
+        self.n_otypes = 0
+        self.n_objects = None
+        self.eid = None
+        self.iid = None
+
         self.random_state = random_state
         self._rng = None
         self.fit_results_ = {}
@@ -144,7 +148,12 @@ class BaseEventRecommender(
     def __init__(self, random_state=None):
         super(BaseEventRecommender, self).__init__(random_state=random_state)
 
-        self._empty_event_info()
+        self.s_event = 0
+        self.event_otypes = None
+        self.n_events = 0
+        self.event = None
+        self.event_feature = None
+
         self.event_index = None
 
     def get_event(self):
