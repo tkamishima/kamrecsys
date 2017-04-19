@@ -172,8 +172,8 @@ class BaseEventRecommender(
         """
         Remove information related to a training dataset
         """
-        self.event=None
-        self.event_feature=None
+        self.event = None
+        self.event_feature = None
 
     def fit(self, data, event_index=None, random_state=None):
         """
