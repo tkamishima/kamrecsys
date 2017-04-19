@@ -45,15 +45,6 @@ class ObjectUtilMixin(object):
     handling object.
     """
 
-    def _empty_object_info(self):
-        """
-        Set empty object information
-        """
-        self.n_otypes = 0
-        self.n_objects = None
-        self.eid = None
-        self.iid = None
-
     def _set_object_info(self, data):
         """
         import object meta information of input data to recommenders
@@ -195,7 +186,10 @@ class BaseData(with_metaclass(ABCMeta, ObjectUtilMixin, object)):
 
     def __init__(self, n_otypes=2):
 
-        self._empty_object_info()
+        self.n_otypes = 0
+        self.n_objects = None
+        self.eid = None
+        self.iid = None
 
         if n_otypes < 1:
             raise ValueError("n_otypes must be >= 1")
