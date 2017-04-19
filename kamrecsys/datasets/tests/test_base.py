@@ -85,7 +85,7 @@ class TestLoadEventWithScore(TestCase):
 
         # get data
         infile = os.path.join(SAMPLE_PATH, 'movielens_mini.event')
-        event_dtype = np.dtype([('timestamp', np.int)])
+        event_dtype = np.dtype([('timestamp', int)])
         data = load_event_with_score(infile, event_dtype=event_dtype)
 
         # object information

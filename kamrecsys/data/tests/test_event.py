@@ -36,7 +36,7 @@ from kamrecsys.datasets import SAMPLE_PATH, load_movielens_mini
 
 def load_test_data():
     infile = os.path.join(SAMPLE_PATH, 'pci.event')
-    dtype = np.dtype([('event', 'U18', 2), ('score', np.float)])
+    dtype = np.dtype([('event', 'U18', 2), ('score', float)])
     x = np.genfromtxt(fname=infile, delimiter='\t', dtype=dtype)
     data = EventData(n_otypes=2, event_otypes=np.array([0, 1]))
     data.set_event(x['event'])
@@ -70,7 +70,7 @@ class TestEventUtilMixin(unittest.TestCase):
         assert_array_equal(data.event, data.to_iid_event(x['event']))
 
         # test EventData.to_iid_event / per line conversion
-        check = np.empty_like(x['event'], dtype=np.int)
+        check = np.empty_like(x['event'], dtype=int)
         for i, j in enumerate(x['event']):
             check[i, :] = data.to_iid_event(j)
         assert_array_equal(data.event, check)
