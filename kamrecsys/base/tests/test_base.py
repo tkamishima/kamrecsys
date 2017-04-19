@@ -120,14 +120,14 @@ class TestBaseEventRecommender(TestCase):
         self.assertIsNone(rec.event_index)
 
         # fit
-        rec.fit(data)
-        assert_array_equal(rec.event_index, [0, 1])
+        rec.fit(data, event_index=(1, 0))
+        assert_array_equal(rec.event_index, [1, 0])
 
         # get_event
         ev, n_objects = rec.get_event()
-        assert_array_equal(ev[0, :], [rec.to_iid(0, 5), rec.to_iid(1, 2)])
-        assert_array_equal(ev[-1, :], [rec.to_iid(0, 10), rec.to_iid(1, 9)])
-        assert_array_equal(n_objects, [8, 10])
+        assert_array_equal(ev[0, :], [rec.to_iid(1, 2), rec.to_iid(0, 5)])
+        assert_array_equal(ev[-1, :], [rec.to_iid(1, 9), rec.to_iid(0, 10)])
+        assert_array_equal(n_objects, [10, 8])
 
         # predict
         self.assertEqual(rec.predict([0, 0]).ndim, 0)
@@ -141,7 +141,7 @@ class TestBaseEventRecommender(TestCase):
         self.assertEqual(rec.n_events, 30)
         self.assertIsNone(rec.event)
         self.assertIsNone(rec.event_feature)
-        assert_array_equal(rec.event_index, (0, 1))
+        assert_array_equal(rec.event_index, (1, 0))
 
 # =============================================================================
 # Main Routine
