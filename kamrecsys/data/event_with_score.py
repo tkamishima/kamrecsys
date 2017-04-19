@@ -44,15 +44,6 @@ class ScoreUtilMixin(with_metaclass(ABCMeta, object)):
     handling scores.
     """
 
-    def _empty_score_info(self):
-        """
-        Set empty score information
-        """
-
-        self.score_domain = None
-        self.score = None
-        self.n_score_levels = None
-
     def _set_score_info(self, data):
         """
 
@@ -106,7 +97,9 @@ class EventWithScoreData(EventData, ScoreUtilMixin):
     def __init__(self, n_otypes=2, event_otypes=None):
         super(EventWithScoreData, self).__init__(n_otypes=n_otypes,
                                                  event_otypes=event_otypes)
-        self._empty_score_info()
+        self.score_domain = None
+        self.score = None
+        self.n_score_levels = None
 
     def set_event(self, event, score, score_domain=None, event_feature=None):
         """

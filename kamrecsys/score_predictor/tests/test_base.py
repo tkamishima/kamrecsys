@@ -72,9 +72,9 @@ class TestBaseScorePredictor(TestCase):
 
         # remove_data
         rec.remove_data()
-        self.assertIsNone(rec.score_domain)
         self.assertIsNone(rec.score)
-        self.assertIsNone(rec.n_score_levels)
+        assert_allclose(rec.score_domain, [1., 5., 1.])
+        self.assertEqual(rec.n_score_levels, 5)
 
 # =============================================================================
 # Main Routine
