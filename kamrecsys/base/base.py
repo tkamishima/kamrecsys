@@ -161,10 +161,10 @@ class BaseEventRecommender(
         """
 
         # get event data
-        ev = np.atleast_2d(self.event)[:, self.event_index]
+        ev = np.atleast_2d(self.event)
 
         # get number of objects
-        n_objects = self.n_objects[self.event_otypes[self.event_index]]
+        n_objects = self.n_objects
 
         return ev, n_objects
 
@@ -197,6 +197,11 @@ class BaseEventRecommender(
             self.event_index = np.arange(self.s_event, dtype=int)
         else:
             self.event_index = np.asanyarray(event_index, dtype=int)
+
+        # select information about events used for training
+        self.event = self.event.take(self.event_index, axis=1)
+        self.n_objects = self.n_objects.take(self.event_otypes)
+        self.n_objects = self.n_objects.take(self.event_index)
 
     @abstractmethod
     def raw_predict(self, ev, **kwargs):
