@@ -67,7 +67,9 @@ class BaseScorePredictor(
             random_state=random_state)
 
         # set empty score information
-        self._empty_score_info()
+        self.score_domain = None
+        self.score = None
+        self.n_score_levels = None
 
     def get_score(self):
         """
@@ -86,7 +88,7 @@ class BaseScorePredictor(
         Remove information related to a training dataset
         """
         super(BaseScorePredictor, self).remove_data()
-        self._empty_score_info()
+        self.score = None
 
     def fit(self, data, event_index=(0, 1), random_state=None):
         """
