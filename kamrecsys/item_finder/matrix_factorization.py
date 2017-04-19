@@ -354,14 +354,14 @@ class LogisticPMF(BaseItemFinder):
         # check optimization parameters
         if 'disp' not in kwargs:
             kwargs['disp'] = False
-        if 'gtol' in kwargs:
-            del kwargs['gtol']
-        if self.tol is not None:
+        if tol is not None:
+            kwargs['gtol'] = tol
+        elif self.tol is not None:
             kwargs['gtol'] = self.tol
-        if maxiter is None:
-            kwargs['maxiter'] = int(self.maxiter * self._coef.shape[0])
-        else:
+        if maxiter is not None:
             kwargs['maxiter'] = int(maxiter * self._coef.shape[0])
+        elif self.maxiter is not None:
+            kwargs['maxiter'] = int(self.maxiter * self._coef.shape[0])
 
         # get final loss
         self.fit_results_['initial_loss'] = self.loss(
