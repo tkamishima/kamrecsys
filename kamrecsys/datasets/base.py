@@ -85,9 +85,9 @@ def load_event(infile, n_otypes=2, event_otypes=None, event_dtype=None):
 
     s_events = n_otypes if event_otypes is None else len(event_otypes)
     if event_dtype is None:
-        dtype = np.dtype([('event', np.int, s_events)])
+        dtype = np.dtype([('event', int, s_events)])
     else:
-        dtype = np.dtype([('event', np.int, s_events),
+        dtype = np.dtype([('event', int, s_events),
                           ('event_feature', event_dtype)])
     x = np.genfromtxt(fname=infile, delimiter='\t', dtype=dtype)
 
@@ -137,9 +137,9 @@ def load_event_with_score(
 
     s_events = n_otypes if event_otypes is None else len(event_otypes)
     if event_dtype is None:
-        dtype = np.dtype([('event', np.int, s_events), ('score', float)])
+        dtype = np.dtype([('event', int, s_events), ('score', float)])
     else:
-        dtype = np.dtype([('event', np.int, s_events), ('score', float),
+        dtype = np.dtype([('event', int, s_events), ('score', float),
                           ('event_feature', event_dtype)])
     x = np.genfromtxt(fname=infile, delimiter='\t', dtype=dtype)
 

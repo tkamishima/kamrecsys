@@ -71,13 +71,13 @@ def load_flixster_rating(infile=None, event_dtype=None):
     * each event consists of a vector whose format is [user, item].
     * 8,196,077 events in total
     * 147,612 users rate 48,794 items (=movies)
-    * dtype=np.int
+    * dtype=int
 
     Format of scores:
 
     * one score is given to each event
     * domain of score is {0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0}
-    * dtype=np.float
+    * dtype=float
     """
 
     # load event file

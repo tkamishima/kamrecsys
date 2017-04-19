@@ -71,13 +71,13 @@ def load_pci_sample(infile=None):
 
     * one score is given to each event
     * domain of score is [1.0, 2.0, 3.0, 4.0, 5.0]
-    * dtype=np.float
+    * dtype=float
     """
 
     # load event file
     if infile is None:
         infile = os.path.join(SAMPLE_PATH, 'pci.event')
-    dtype = np.dtype([('event', 'U18', 2), ('score', np.float)])
+    dtype = np.dtype([('event', 'U18', 2), ('score', float)])
     x = np.genfromtxt(fname=infile, delimiter='\t', dtype=dtype)
     data = EventWithScoreData(n_otypes=2, event_otypes=np.array([0, 1]))
     data.set_event(x['event'], x['score'], score_domain=(1.0, 5.0, 0.5))

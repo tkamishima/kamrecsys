@@ -106,13 +106,13 @@ def load_movielens100k(infile=None, event_dtype=event_dtype_timestamp):
     * each event consists of a vector whose format is [user, item].
     * 100,000 events in total
     * 943 users rate 1682 items (=movies)
-    * dtype=np.int
+    * dtype=int
 
     Format of scores:
 
     * one score is given to each event
     * domain of score is [1.0, 2.0, 3.0, 4.0, 5.0]
-    * dtype=np.float
+    * dtype=float
 
     Default format of event_features ( `data.event_feature` ):
     
@@ -160,21 +160,21 @@ def load_movielens100k(infile=None, event_dtype=event_dtype_timestamp):
 
     # load user's feature file
     infile = os.path.join(SAMPLE_PATH, 'movielens100k.user')
-    fdtype = np.dtype([('age', np.int), ('gender', np.int),
-                       ('occupation', np.int), ('zip', 'U5')])
-    dtype = np.dtype([('eid', np.int), ('feature', fdtype)])
+    fdtype = np.dtype([('age', int), ('gender', int),
+                       ('occupation', int), ('zip', 'U5')])
+    dtype = np.dtype([('eid', int), ('feature', fdtype)])
     x = np.genfromtxt(fname=infile, delimiter='\t', dtype=dtype)
     data.set_feature(0, x['eid'], x['feature'])
 
     # load item's feature file
     infile = os.path.join(SAMPLE_PATH, 'movielens100k.item')
     fdtype = np.dtype([('name', 'U81'),
-                       ('day', np.int),
-                       ('month', np.int),
-                       ('year', np.int),
+                       ('day', int),
+                       ('month', int),
+                       ('year', int),
                        ('genre', 'i1', 18),
                        ('imdb', 'U134')])
-    dtype = np.dtype([('eid', np.int), ('feature', fdtype)])
+    dtype = np.dtype([('eid', int), ('feature', fdtype)])
     x = np.genfromtxt(fname=infile, delimiter='\t', dtype=dtype,
                       converters={1: np.char.decode})
     data.set_feature(1, x['eid'], x['feature'])
@@ -233,13 +233,13 @@ def load_movielens1m(infile=None, event_dtype=event_dtype_timestamp):
     * each event consists of a vector whose format is [user, item].
     * 1,000,209 events in total
     * 6,040 users rate 3,706 items (=movies)
-    * dtype=np.int
+    * dtype=int
 
     Format of scores:
 
     * one score is given to each event
     * domain of score is [1.0, 2.0, 3.0, 4.0, 5.0]
-    * dtype=np.float
+    * dtype=float
 
     Default format of event_features ( `data.event_feature` ):
     
@@ -290,18 +290,18 @@ def load_movielens1m(infile=None, event_dtype=event_dtype_timestamp):
 
     # load user's feature file
     infile = os.path.join(SAMPLE_PATH, 'movielens1m.user')
-    fdtype = np.dtype([('gender', np.int), ('age', np.int),
-                       ('occupation', np.int), ('zip', 'U5')])
-    dtype = np.dtype([('eid', np.int), ('feature', fdtype)])
+    fdtype = np.dtype([('gender', int), ('age', int),
+                       ('occupation', int), ('zip', 'U5')])
+    dtype = np.dtype([('eid', int), ('feature', fdtype)])
     x = np.genfromtxt(fname=infile, delimiter='\t', dtype=dtype)
     data.set_feature(0, x['eid'], x['feature'])
 
     # load item's feature file
     infile = os.path.join(SAMPLE_PATH, 'movielens1m.item')
     fdtype = np.dtype([('name', 'U82'),
-                       ('year', np.int),
+                       ('year', int),
                        ('genre', 'i1', 18)])
-    dtype = np.dtype([('eid', np.int), ('feature', fdtype)])
+    dtype = np.dtype([('eid', int), ('feature', fdtype)])
     x = np.genfromtxt(fname=infile, delimiter='\t', dtype=dtype,
                       converters={1: np.char.decode})
     data.set_feature(1, x['eid'], x['feature'])

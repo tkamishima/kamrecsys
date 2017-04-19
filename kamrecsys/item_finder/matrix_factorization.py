@@ -122,8 +122,8 @@ class LogisticPMF(BaseItemFinder):
     def __init__(self, C=1.0, k=1, tol=None, maxiter=200, random_state=None):
         super(LogisticPMF, self).__init__(random_state=random_state)
 
-        self.C = np.float(C)
-        self.k = np.int(k)
+        self.C = float(C)
+        self.k = int(k)
         self.tol = tol
         self.maxiter = maxiter
         self.mu_ = None
@@ -159,11 +159,11 @@ class LogisticPMF(BaseItemFinder):
 
         # define dtype for parameters
         self._dt = np.dtype([
-            ('mu', np.float, (1,)),
-            ('bu', np.float, n_users),
-            ('bi', np.float, n_items),
-            ('p', np.float, (n_users, k)),
-            ('q', np.float, (n_items, k))
+            ('mu', float, (1,)),
+            ('bu', float, n_users),
+            ('bi', float, n_items),
+            ('p', float, (n_users, k)),
+            ('q', float, (n_items, k))
         ])
 
         # memory allocation
@@ -385,9 +385,9 @@ class LogisticPMF(BaseItemFinder):
         self.bu_ = np.r_[self._coef.view(self._dt)['bu'][0], 0.0]
         self.bi_ = np.r_[self._coef.view(self._dt)['bi'][0], 0.0]
         self.p_ = np.r_[self._coef.view(self._dt)['p'][0],
-                        np.zeros((1, self.k), dtype=np.float)]
+                        np.zeros((1, self.k), dtype=float)]
         self.q_ = np.r_[self._coef.view(self._dt)['q'][0],
-                        np.zeros((1, self.k), dtype=np.float)]
+                        np.zeros((1, self.k), dtype=float)]
 
         # store fitting results
         self.fit_results_['n_users'] = n_objects[0]

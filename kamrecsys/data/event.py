@@ -102,9 +102,9 @@ class EventUtilMixin(with_metaclass(ABCMeta, object)):
         if ev.ndim == 1 and ev.shape[0] == self.s_event:
             new_ev = np.array(
                 [self.iid[self.event_otypes[e]].get(ev[e], missing_values[e])
-                 for e in xrange(self.s_event)], dtype=np.int)
+                 for e in xrange(self.s_event)], dtype=int)
         elif ev.ndim == 2 and ev.shape[1] == self.s_event:
-            new_ev = np.empty_like(ev, dtype=np.int)
+            new_ev = np.empty_like(ev, dtype=int)
             for e in xrange(self.s_event):
                 iid = self.iid[self.event_otypes[e]]
                 new_ev[:, e] = [iid.get(i, missing_values[e])
@@ -207,7 +207,7 @@ class EventData(BaseData, EventUtilMixin):
             self.n_objects[otype], self.eid[otype], self.iid[otype] = (
                 self._gen_id(event[:, self.event_otypes == otype]))
 
-        self.event = np.empty_like(event, dtype=np.int)
+        self.event = np.empty_like(event, dtype=int)
         for e in xrange(self.s_event):
             iid = self.iid[self.event_otypes[e]]
             self.event[:, e] = [iid[i] for i in event[:, e]]

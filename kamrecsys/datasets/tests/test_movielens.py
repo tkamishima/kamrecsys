@@ -64,10 +64,10 @@ class TestLoadMovielens100k(unittest.TestCase):
         self.assertListEqual(data.event_feature.dtype.descr,
                              [('timestamp', '<i8')])
         assert_array_equal(
-            data.event_feature[:5].astype(np.int),
+            data.event_feature[:5].astype(int),
             [881250949, 891717742, 878887116, 880606923, 886397596])
         assert_array_equal(
-            data.event_feature[-5:].astype(np.int),
+            data.event_feature[-5:].astype(int),
             [880175444, 879795543, 874795795, 882399156, 879959583])
         assert_array_equal(data.score[:5], [3., 3., 1., 2., 1.])
         assert_array_equal(data.score[-5:], [3., 5., 1., 2., 3.])

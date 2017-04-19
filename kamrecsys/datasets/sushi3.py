@@ -111,13 +111,13 @@ def load_sushi3b_score(infile=None, event_dtype=None):
     * each event consists of a vector whose format is [user, item].
     * 50,000 events in total
     * 5,000 users rate 100 items (=sushis)
-    * dtype=np.int
+    * dtype=int
 
     Format of scores:
 
     * one score is given to each event
     * domain of score is [0.0, 1.0, 2.0, 3.0, 4.0]
-    * dtype=np.float
+    * dtype=float
 
     Format of user's feature ( `data.feature[0]` ):
 
@@ -177,18 +177,18 @@ def load_sushi3b_score(infile=None, event_dtype=None):
     # load user's feature file
     infile = os.path.join(SAMPLE_PATH, 'sushi3.user')
     fdtype = np.dtype([
-        ('original_uid', np.int),
-        ('gender', np.int),
-        ('age', np.int),
-        ('answer_time', np.int),
-        ('child_prefecture', np.int),
-        ('child_region', np.int),
-        ('child_ew', np.int),
-        ('current_prefecture', np.int),
-        ('current_region', np.int),
-        ('current_ew', np.int),
-        ('moved', np.int)])
-    dtype = np.dtype([('eid', np.int), ('feature', fdtype)])
+        ('original_uid', int),
+        ('gender', int),
+        ('age', int),
+        ('answer_time', int),
+        ('child_prefecture', int),
+        ('child_region', int),
+        ('child_ew', int),
+        ('current_prefecture', int),
+        ('current_region', int),
+        ('current_ew', int),
+        ('moved', int)])
+    dtype = np.dtype([('eid', int), ('feature', fdtype)])
     x = np.genfromtxt(fname=infile, delimiter='\t', dtype=dtype)
     data.set_feature(0, x['eid'], x['feature'])
 
@@ -196,14 +196,14 @@ def load_sushi3b_score(infile=None, event_dtype=None):
     infile = os.path.join(SAMPLE_PATH, 'sushi3.item')
     fdtype = np.dtype([
         ('name', 'U20'),
-        ('maki', np.int),
-        ('seafood', np.int),
-        ('genre', np.int),
-        ('heaviness', np.float),
-        ('frequency', np.float),
-        ('price', np.float),
-        ('supply', np.float)])
-    dtype = np.dtype([('eid', np.int), ('feature', fdtype)])
+        ('maki', int),
+        ('seafood', int),
+        ('genre', int),
+        ('heaviness', float),
+        ('frequency', float),
+        ('price', float),
+        ('supply', float)])
+    dtype = np.dtype([('eid', int), ('feature', fdtype)])
     x = np.genfromtxt(fname=infile, delimiter='\t', dtype=dtype,
                       converters={1: np.char.decode})
     data.set_feature(1, x['eid'], x['feature'])
