@@ -438,7 +438,6 @@ def get_system_info():
     # information collected by a platform package
     sys_info = {
         'system': platform.system(),
-        'node': platform.node(),
         'release': platform.release(),
         'version': platform.version(),
         'machine': platform.machine(),
