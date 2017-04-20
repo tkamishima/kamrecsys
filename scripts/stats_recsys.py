@@ -3,7 +3,20 @@
 """
 Calculate evaluation metrics
 
-the details are in the descriptions of statistics functions:
+Input file
+----------
+
+Input file is formatted in json.  Prediction data is stored in the entry with a top-level key: `prediction`.  The sub-entries in this entry are as follows:
+ 
+* `event` : a list of user-item pairs represented by external IDs. 
+* `true` : true rating scores corrsponding to an event 
+* `predicted` : predicted rating scores corrsponding to an event
+
+Output file
+-----------
+
+Statistics of prediction is stored in a json formatted file. 
+The details are in the descriptions of statistics functions:
 
 * :func:`kamrecsys.metrics.score_predictor_statistics`
 
