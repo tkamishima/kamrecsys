@@ -1,6 +1,32 @@
 """
 Experimentation script for Score Predictors
 
+Input Format
+------------
+
+An input dataset is a tab separated file.  Each line correponds to one 
+rating behavior. Each column represents is as fllows: 
+
+* 1. A user represented by External-ID
+* 2. An item rated by the user, represented by External-ID,
+* 3. A rating score given by the user to the item
+* 4. A timestamp of rating behavior, optional.
+
+Output Format
+-------------
+
+Outputs of prediction are stored in a `json` formatted file.  Top-level keys 
+of the outputs are as follows: 
+
+* `data` : the data, such as a domain of rating scores and availability of 
+  timestamp. 
+* `model` : model and its parameters used for prediction 
+* `prediction` : predicted results, user-item pairs and predicted and true 
+  rating scores. 
+* `script` : an experimental script used in an experiment 
+* `test` : environments, conditions, time information in test
+* `training` : environments, conditions, time information in training
+
 Options
 =======
 
