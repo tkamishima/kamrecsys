@@ -71,14 +71,9 @@ class MultinomialPLSA(BaseScorePredictor):
         Item distribution: Pr[Y | Z]
     pRgZ_ : array_like
         Raring distribution: Pr[R | Z]
-    score_levels_ : array, dtype=float, shape=(n_score_levels_,)
-        1d-array of score levels corresponding to each digitized score
-    n_events_ : int
-        nos of events in training data
 
     Notes
     -----
-
     3-way topic model: user x item x rating
 
     .. math::
