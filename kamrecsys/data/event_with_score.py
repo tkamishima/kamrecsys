@@ -65,6 +65,18 @@ class ScoreUtilMixin(with_metaclass(ABCMeta, object)):
         self.score = data.score
         self.n_score_levels = data.n_score_levels
 
+    def get_score_levels(self):
+        """
+        get a set of possible score levels
+
+        Returns
+        -------
+        score_levels : array, shape=(n_score_levels,)
+            a set of possible score levels
+        """
+        return np.linspace(
+            self.score_domain[0], self.score_domain[1], self.n_score_levels)
+
 
 class EventWithScoreData(EventData, ScoreUtilMixin):
     """ Container of rating events, rating scores, and features.

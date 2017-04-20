@@ -12,12 +12,14 @@ from six.moves import xrange
 # =============================================================================
 
 from numpy.testing import (
+    TestCase,
+    run_module_suite,
+    assert_,
     assert_array_equal,
     assert_array_less,
     assert_allclose,
     assert_array_max_ulp,
     assert_array_almost_equal_nulp)
-import unittest
 
 import os
 import numpy as np
@@ -50,7 +52,7 @@ def load_test_data():
 # =============================================================================
 
 
-class TestEventWithScoreData(unittest.TestCase):
+class TestEventWithScoreData(TestCase):
 
     def test_set_event(self):
         data, x = load_test_data()
@@ -84,10 +86,16 @@ class TestEventWithScoreData(unittest.TestCase):
             [10, 5, 10, 1, 7, 7, 9, 7, 10, 1,
              2, 1, 7, 6, 7, 6, 1, 9, 1, 6, 10])
 
+    def test_get_score_levels(self):
+        data = load_movielens_mini()
+
+        score_levels = data.get_score_levels()
+        assert_allclose(score_levels, [1., 2., 3., 4., 5])
+
 
 # =============================================================================
 # Main Routines
 # =============================================================================
 
 if __name__ == '__main__':
-    unittest.main()
+    run_module_suite()
