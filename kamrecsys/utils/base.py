@@ -32,6 +32,7 @@ __all__ = []
 # =============================================================================
 
 # fitting status message
+# compatible with `message` in :class:`scipy.optmize.OptimizeResult`
 fit_status_message = {
     'success': 'Fitting terminated successfully.',
     'maxfev': 'Maximum number of function evaluations has been exceeded.',
@@ -48,6 +49,8 @@ fit_status_message = {
 
 def get_fit_status_message(status):
     """
+    Status messages of fitting results. These are compatible with
+    :class:`scipy.optmize.OptimizeResult`
     
     Parameters
     ----------
