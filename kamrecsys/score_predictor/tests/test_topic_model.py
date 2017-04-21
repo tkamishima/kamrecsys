@@ -55,7 +55,7 @@ class TestMultinomialPLSA(TestCase):
                                5.41836900049, delta=1e-5)
         self.assertAlmostEqual(rec.fit_results_['final_loss'],
                                5.17361298499, delta=1e-5)
-        assert_allclose(rec.score_levels_, [1, 2, 3, 4, 5], rtol=1e-5)
+        assert_allclose(rec.score_levels, [1, 2, 3, 4, 5], rtol=1e-5)
 
         # known user and item
         self.assertAlmostEqual(rec.predict((1, 7)),

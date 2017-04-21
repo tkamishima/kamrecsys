@@ -104,7 +104,7 @@ class MultinomialPLSA(BaseScorePredictor):
         self.pXgZ_ = None
         self.pYgZ_ = None
         self.pRgZ_ = None
-        self.score_levels_ = None
+        self.score_levels = None
         self.fit_results_ = {
             'initial_loss': np.inf,
             'final_loss': np.inf,
@@ -239,8 +239,7 @@ class MultinomialPLSA(BaseScorePredictor):
             data, event_index, random_state=random_state)
         ev, n_objects = self.get_event()
         sc = self.get_score()
-        self.score_levels_ = np.linspace(
-            self.score_domain[0], self.score_domain[1], self.n_score_levels)
+        self.score_levels = self.get_score_levels()
 
         sc = data.digitize_score(sc)
         self._init_params(sc)
@@ -336,9 +335,9 @@ class MultinomialPLSA(BaseScorePredictor):
         pRgXY /= pRgXY.sum(axis=1, keepdims=True)
 
         if self.use_expectation:
-            sc = np.dot(pRgXY, self.score_levels_[:, np.newaxis])
+            sc = np.dot(pRgXY, self.score_levels[:, np.newaxis])
         else:
-            sc = self.score_levels_[np.argmax(pRgXY, axis=1)]
+            sc = self.score_levels[np.argmax(pRgXY, axis=1)]
 
         return sc
 
