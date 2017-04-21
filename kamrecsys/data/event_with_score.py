@@ -65,6 +65,22 @@ class ScoreUtilMixin(with_metaclass(ABCMeta, object)):
         self.score = data.score
         self.n_score_levels = data.n_score_levels
 
+    def generate_score_bins(self):
+        """
+        Generate histogram bins for scores from score_domain
+                
+        Returns
+        -------
+        score_bins : array, shape=(n_score_levels,), dtype=float
+            bins of histogram. boundaries of bins are placed at the center of
+            adjacent scores.
+        """
+        bins = np.arange(
+            self.score_domain[0], self.score_domain[1], self.score_domain[2])
+        bins = np.r_[-np.inf, bins + self.score_domain[2] / 2, np.inf]
+
+        return bins
+
     def get_score_levels(self):
         """
         get a set of possible score levels
@@ -132,7 +148,7 @@ class EventWithScoreData(EventData, ScoreUtilMixin):
 
         super(EventWithScoreData, self).set_event(event, event_feature)
 
-        self.score = np.asanyarray(score)
+        self.score = np.asarray(score)
         self.score_domain = np.asanyarray(score_domain)
         self.n_score_levels = (
             int((score_domain[1] - score_domain[0]) / score_domain[2]) + 1)
@@ -152,9 +168,7 @@ class EventWithScoreData(EventData, ScoreUtilMixin):
         digitized_scores : array, dtype=int, shape=(n_events,)
         """
 
-        bins = np.arange(
-            self.score_domain[0], self.score_domain[1], self.score_domain[2])
-        bins = np.r_[-np.inf, bins + self.score_domain[2] / 2, np.inf]
+        bins = self.generate_score_bins()
 
         digitized_scores = score
         if digitized_scores is None:

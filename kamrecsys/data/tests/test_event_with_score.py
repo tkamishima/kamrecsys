@@ -62,6 +62,14 @@ class TestEventWithScoreData(TestCase):
         assert_allclose(data.score_domain, [1.0, 5.0, 0.5])
         self.assertEqual(data.n_score_levels, 9)
 
+    def test_generate_score_bins(self):
+        data, x = load_test_data()
+
+        bins = data.generate_score_bins()
+        assert_allclose(
+            bins,
+            [-np.inf, 1.25, 1.75, 2.25, 2.75, 3.25, 3.75, 4.25, 4.75, np.inf])
+
     def test_digitize_score(self):
         data, x = load_test_data()
 
