@@ -64,7 +64,7 @@ class TestMeanSquaredError(TestCase):
         self.assertAlmostEqual(stdev, 1.4418716080648177, delta=1e-5)
 
 
-class TestScoreHistogram(unittest.TestCase):
+class TestScoreHistogram(TestCase):
 
     def test_class(self):
         from kamrecsys.metrics import score_histogram
