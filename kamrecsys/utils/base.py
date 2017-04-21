@@ -46,6 +46,34 @@ fit_status_message = {
 # Functions
 # =============================================================================
 
+def get_fit_status_message(status):
+    """
+    
+    Parameters
+    ----------
+    status : int
+        fitting status code        
+
+    Returns
+    -------
+    message : str 
+        Error message corresponding to a given status code
+    """
+
+    if status == 0:
+        message = fit_status_message['success']
+    elif status == 1:
+        message = fit_status_message['maxfev']
+    elif status == 2:
+        message = fit_status_message['maxiter']
+    elif status == 3:
+        message = fit_status_message['pr_loss']
+    else:
+        message = 'Unknown status code.'
+
+    return message
+
+
 # =============================================================================
 # Classes
 # =============================================================================

@@ -17,7 +17,9 @@ from six.moves import xrange
 
 import logging
 
-from .base import fit_status_message
+from .base import (
+    fit_status_message,
+    get_fit_status_message)
 
 # =============================================================================
 # Metadata variables
@@ -28,7 +30,8 @@ from .base import fit_status_message
 # =============================================================================
 
 __all__ = [
-    'fit_status_message']
+    'fit_status_message',
+    'get_fit_status_message']
 
 # =============================================================================
 # Constants
