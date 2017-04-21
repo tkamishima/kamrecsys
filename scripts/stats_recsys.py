@@ -52,6 +52,7 @@ import os
 import json
 
 import numpy as np
+from scipy.sparse import issparse
 
 from kamrecsys.metrics import score_predictor_statistics
 
@@ -84,6 +85,57 @@ __all__ = ['do_task']
 # =============================================================================
 
 
+def json_decodable(x):
+    """
+    convert to make serializable type
+
+    Parameters
+    ----------
+    x : dict, list
+        container to convert
+
+    Notes
+    -----
+    `long` type of Python2 is not supported 
+    """
+    if isinstance(x, dict):
+        for k, v in x.items():
+            if isinstance(v, (dict, list)):
+                json_decodable(v)
+            elif isinstance(v, np.ndarray):
+                x[k] = v.tolist()
+                json_decodable(x[k])
+            elif issparse(v):
+                x[k] = v.toarray().tolist()
+                json_decodable(x[k])
+            elif isinstance(v, np.integer):
+                x[k] = int(v)
+            elif isinstance(v, np.floating):
+                x[k] = float(v)
+            elif isinstance(v, np.complexfloating):
+                x[k] = complex(v)
+            elif not isinstance(v, (bool, int, float, complex)):
+                x[k] = str(v)
+    elif isinstance(x, list):
+        for k, v in enumerate(x):
+            if isinstance(v, (dict, list)):
+                json_decodable(v)
+            elif isinstance(v, np.ndarray):
+                x[k] = v.tolist()
+                json_decodable(x[k])
+            elif issparse(v):
+                x[k] = v.toarray().tolist()
+                json_decodable(x[k])
+            elif isinstance(v, np.integer):
+                x[k] = int(v)
+            elif isinstance(v, np.floating):
+                x[k] = float(v)
+            elif isinstance(v, np.complexfloating):
+                x[k] = complex(v)
+            elif not isinstance(v, (bool, int, float, complex)):
+                x[k] = str(v)
+
+
 def do_task(opt):
     """
     Main task
@@ -111,6 +163,7 @@ def do_task(opt):
     else:
         raise TypeError('Unsupported type of recommendation models')
     info['statistics'] = stats
+    json_decodable(info['statistics'])
 
     # remove input data
     if not opt.keepdata:
