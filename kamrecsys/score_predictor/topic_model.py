@@ -24,6 +24,7 @@ import sys
 import numpy as np
 
 from . import BaseScorePredictor
+from ..utils import fit_status_message
 
 # =============================================================================
 # Public symbols
@@ -104,7 +105,7 @@ class MultinomialPLSA(BaseScorePredictor):
         self.pXgZ_ = None
         self.pYgZ_ = None
         self.pRgZ_ = None
-        self.score_levels_ = None
+        self.score_levels = None
         self.fit_results_ = {
             'initial_loss': np.inf,
             'final_loss': np.inf,
@@ -239,8 +240,7 @@ class MultinomialPLSA(BaseScorePredictor):
             data, event_index, random_state=random_state)
         ev, n_objects = self.get_event()
         sc = self.get_score()
-        self.score_levels_ = np.linspace(
-            self.score_domain[0], self.score_domain[1], self.n_score_levels)
+        self.score_levels = self.get_score_levels()
 
         sc = data.digitize_score(sc)
         self._init_params(sc)
@@ -249,7 +249,8 @@ class MultinomialPLSA(BaseScorePredictor):
         self.maximization_step(ev, sc, n_objects)
 
         self.fit_results_['initial_loss'] = self.loss(ev, sc)
-        self.fit_results_['warnflag'] = 0
+        self.fit_results_['status'] = 0
+        self.fit_results_['message'] = fit_status_message['success']
         logger.info("initial: {:.15g}".format(
             self.fit_results_['initial_loss']))
         pre_loss = self.fit_results_['initial_loss']
@@ -284,10 +285,10 @@ class MultinomialPLSA(BaseScorePredictor):
             pre_loss = cur_loss
 
         if iter_no >= self.maxiter - 1:
-            logger.warning(
-                "Exceeded the maximum number of iterations".format(
-                    self.maxiter))
-            self.fit_results_['warnflag'] = 1
+            self.fit_results_['status'] = 2
+            self.fit_results_['message'] = fit_status_message['maxiter']
+            logger.warning(self.fit_results_['message'] +
+                ": {:d}".format(self.maxiter))
 
         logger.info("final: {:.15g}".format(cur_loss))
         logger.info("nos of iterations: {:d}".format(iter_no + 1))
@@ -298,6 +299,7 @@ class MultinomialPLSA(BaseScorePredictor):
         self.fit_results_['n_users'] = n_objects[0]
         self.fit_results_['n_items'] = n_objects[1]
         self.fit_results_['n_events'] = self.n_events
+        self.fit_results_['success'] = (self.fit_results_['status'] == 0)
 
         # add parameters for unknown users and items
         self.pXgZ_ = np.r_[self.pXgZ_, np.ones((1, self.k), dtype=float)]
@@ -336,9 +338,9 @@ class MultinomialPLSA(BaseScorePredictor):
         pRgXY /= pRgXY.sum(axis=1, keepdims=True)
 
         if self.use_expectation:
-            sc = np.dot(pRgXY, self.score_levels_[:, np.newaxis])
+            sc = np.dot(pRgXY, self.score_levels[:, np.newaxis])
         else:
-            sc = self.score_levels_[np.argmax(pRgXY, axis=1)]
+            sc = self.score_levels[np.argmax(pRgXY, axis=1)]
 
         return sc
 

@@ -51,11 +51,18 @@ class TestMultinomialPLSA(TestCase):
         # logging.getLogger('kamrecsys').addHandler(logging.StreamHandler())
         rec.fit(data)
 
+        self.assertEqual(rec.fit_results_['n_users'], 8)
+        self.assertEqual(rec.fit_results_['n_items'], 10)
+        self.assertEqual(rec.fit_results_['n_events'], 30)
+        self.assertTrue(rec.fit_results_['success'])
+        self.assertEqual(rec.fit_results_['status'], 0)
         self.assertAlmostEqual(rec.fit_results_['initial_loss'],
                                5.41836900049, delta=1e-5)
         self.assertAlmostEqual(rec.fit_results_['final_loss'],
                                5.17361298499, delta=1e-5)
-        assert_allclose(rec.score_levels_, [1, 2, 3, 4, 5], rtol=1e-5)
+        self.assertEqual(rec.fit_results_['n_iterations'], 38)
+
+        assert_allclose(rec.score_levels, [1, 2, 3, 4, 5], rtol=1e-5)
 
         # known user and item
         self.assertAlmostEqual(rec.predict((1, 7)),
