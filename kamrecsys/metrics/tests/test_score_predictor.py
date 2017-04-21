@@ -21,7 +21,6 @@ from numpy.testing import (
     assert_allclose,
     assert_array_max_ulp,
     assert_array_almost_equal_nulp)
-import unittest
 
 # =============================================================================
 # Variables
