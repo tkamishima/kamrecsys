@@ -403,8 +403,8 @@ def cv_test(info):
         # training
         if info['data']['has_timestamp']:
             rec = training(
-                info, ev[train_i], tsc[train_i], fold=fold,
-                event_feature=x['event_feature'][train_i])
+                info, ev[train_i], tsc[train_i],
+                event_feature=x['event_feature'][train_i], fold=fold)
         else:
             rec = training(
                 info, ev[train_i], tsc[train_i], fold=fold)
@@ -723,7 +723,7 @@ def init_info(opt):
     elif opt.method == 'plsamm':
         from kamrecsys.score_predictor import MultinomialPLSA
         info['model']['recommender'] = MultinomialPLSA
-        info['model']['method'] = 'multionomial pLSA - expectation'
+        info['model']['method'] = 'multionomial pLSA - mode'
         info['model']['options'] = {
             'alpha': opt.alpha, 'k': opt.k, 'use_expectation': False,
             'tol': opt.tol, 'maxiter': opt.maxiter}
