@@ -132,7 +132,7 @@ class EventWithScoreData(EventData, ScoreUtilMixin):
 
         super(EventWithScoreData, self).set_event(event, event_feature)
 
-        self.score = np.asanyarray(score)
+        self.score = np.asarray(score)
         self.score_domain = np.asanyarray(score_domain)
         self.n_score_levels = (
             int((score_domain[1] - score_domain[0]) / score_domain[2]) + 1)
