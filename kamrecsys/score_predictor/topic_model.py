@@ -24,7 +24,7 @@ import sys
 import numpy as np
 
 from . import BaseScorePredictor
-from ..utils import fit_status_message, get_fit_status_message
+from ..utils import get_fit_status_message
 
 # =============================================================================
 # Public symbols
@@ -285,8 +285,9 @@ class MultinomialPLSA(BaseScorePredictor):
 
         if iter_no >= self.maxiter - 1:
             self.fit_results_['status'] = 2
-            logger.warning(fit_status_message['maxiter'] +
-                ": {:d}".format(self.maxiter))
+            logger.warning(
+                "Exceeded the maximum number of iterations: {:d}".format(
+                    self.maxiter))
 
         logger.info("final: {:.15g}".format(cur_loss))
         logger.info("nos of iterations: {:d}".format(iter_no + 1))
