@@ -24,7 +24,7 @@ import sys
 import numpy as np
 
 from . import BaseScorePredictor
-from ..utils import fit_status_message
+from ..utils import fit_status_message, get_fit_status_message
 
 # =============================================================================
 # Public symbols
@@ -250,7 +250,6 @@ class MultinomialPLSA(BaseScorePredictor):
 
         self.fit_results_['initial_loss'] = self.loss(ev, sc)
         self.fit_results_['status'] = 0
-        self.fit_results_['message'] = fit_status_message['success']
         logger.info("initial: {:.15g}".format(
             self.fit_results_['initial_loss']))
         pre_loss = self.fit_results_['initial_loss']
@@ -286,8 +285,7 @@ class MultinomialPLSA(BaseScorePredictor):
 
         if iter_no >= self.maxiter - 1:
             self.fit_results_['status'] = 2
-            self.fit_results_['message'] = fit_status_message['maxiter']
-            logger.warning(self.fit_results_['message'] +
+            logger.warning(fit_status_message['maxiter'] +
                 ": {:d}".format(self.maxiter))
 
         logger.info("final: {:.15g}".format(cur_loss))
@@ -300,6 +298,8 @@ class MultinomialPLSA(BaseScorePredictor):
         self.fit_results_['n_items'] = n_objects[1]
         self.fit_results_['n_events'] = self.n_events
         self.fit_results_['success'] = (self.fit_results_['status'] == 0)
+        self.fit_results_['message'] = get_fit_status_message(
+            self.fit_results_['status'])
 
         # add parameters for unknown users and items
         self.pXgZ_ = np.r_[self.pXgZ_, np.ones((1, self.k), dtype=float)]
