@@ -17,7 +17,7 @@ from six.moves import xrange
 
 import logging
 
-from .score import (
+from .real import (
     mean_absolute_error,
     mean_squared_error,
     score_histogram)

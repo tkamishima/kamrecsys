@@ -60,10 +60,10 @@ def mean_absolute_error(y_true, y_pred):
 
     Returns
     -------
-        mean : float
-            mean of squared errors
-        stdev : float
-            standard deviation of squared errors
+    mean : float
+        mean of squared errors
+    stdev : float
+        standard deviation of squared errors
     """
 
     # check inputs
@@ -97,12 +97,12 @@ def mean_squared_error(y_true, y_pred):
 
     Returns
     -------
-        rmse : float
-            root mean squared error
-        mean : float
-            mean of absolute errors
-        stdev : float
-            standard deviation of absolute errors
+    rmse : float
+        root mean squared error
+    mean : float
+        mean of absolute errors
+    stdev : float
+        standard deviation of absolute errors
     """
 
     # check inputs
