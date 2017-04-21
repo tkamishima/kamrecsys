@@ -67,11 +67,11 @@ def mean_absolute_error(y_true, y_pred):
     """
 
     # check inputs
-    check_consistent_length(y_true, y_pred)
     assert_all_finite(y_true)
     y_true = as_float_array(y_true)
     assert_all_finite(y_pred)
     y_pred = as_float_array(y_pred)
+    check_consistent_length(y_true, y_pred)
 
     # calculate errors
     errs = np.abs(y_true - y_pred)
@@ -106,11 +106,11 @@ def mean_squared_error(y_true, y_pred):
     """
 
     # check inputs
-    check_consistent_length(y_true, y_pred)
     assert_all_finite(y_true)
     y_true = as_float_array(y_true)
     assert_all_finite(y_pred)
     y_pred = as_float_array(y_pred)
+    check_consistent_length(y_true, y_pred)
 
     # calculate errors
     errs = (y_true - y_pred) ** 2

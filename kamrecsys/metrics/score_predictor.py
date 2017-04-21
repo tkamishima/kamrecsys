@@ -73,11 +73,11 @@ def score_predictor_report(y_true, y_pred, disp=True):
     """
 
     # check inputs
-    check_consistent_length(y_true, y_pred)
     assert_all_finite(y_true)
     y_true = as_float_array(y_true)
     assert_all_finite(y_pred)
     y_pred = as_float_array(y_pred)
+    check_consistent_length(y_true, y_pred)
 
     # calc statistics
     stats = {}
@@ -131,11 +131,11 @@ def score_predictor_statistics(y_true, y_pred, scores=2):
     """
 
     # check inputs
-    check_consistent_length(y_true, y_pred)
     assert_all_finite(y_true)
     y_true = as_float_array(y_true)
     assert_all_finite(y_pred)
     y_pred = as_float_array(y_pred)
+    check_consistent_length(y_true, y_pred)
 
     # calc statistics
     stats = {}
@@ -145,37 +145,28 @@ def score_predictor_statistics(y_true, y_pred, scores=2):
 
     # mean absolute error
     mean, stdev = mean_absolute_error(y_true, y_pred)
-    stats['mean_absolute_error'] = {}
-    stats['mean_absolute_error']['mean'] = mean
-    stats['mean_absolute_error']['stdev'] = stdev
+    stats['mean_absolute_error'] = {'mean': mean, 'stdev':stdev}
 
     # root mean squared error
     rmse, mean, stdev = mean_squared_error(y_true, y_pred)
-    stats['mean_squared_error'] = {}
-    stats['mean_squared_error']['rmse'] = rmse
-    stats['mean_squared_error']['mean'] = mean
-    stats['mean_squared_error']['stdev'] = stdev
+    stats['mean_squared_error'] = {'rmse': rmse, 'mean': mean, 'stdev': stdev}
 
     # descriptive statistics of ground truth scores
-    stats['true'] = {}
-    stats['true']['mean'] = np.mean(y_true)
-    stats['true']['stdev'] = np.std(y_true)
+    stats['true'] = {'mean': np.mean(y_true), 'stdev':np.std(y_true)}
 
     hist, scores = score_histogram(y_true, scores=scores)
     # NOTE: if scores is int, it is replaced with estimated scores
     stats['scores'] = scores.tolist()
-    stats['true']['histogram'] = hist.tolist()
-    stats['true']['histogram_density'] = (hist / hist.sum()).tolist()
+    stats['true']['histogram'] = hist
+    stats['true']['histogram_density'] = (hist / hist.sum())
 
     # descriptive statistics of ground predicted scores
-    stats['predicted'] = {}
-    stats['predicted']['mean'] = np.mean(y_pred)
-    stats['predicted']['stdev'] = np.std(y_pred)
+    stats['predicted'] = {'mean': np.mean(y_pred), 'stdev': np.std(y_pred)}
 
     # NOTE: the same bin boundaries are used for predicted scores
     hist, scores = score_histogram(y_pred, scores=scores)
-    stats['predicted']['histogram'] = hist.tolist()
-    stats['predicted']['histogram_density'] = (hist / hist.sum()).tolist()
+    stats['predicted']['histogram'] = hist
+    stats['predicted']['histogram_density'] = (hist / hist.sum())
 
     return stats
 
