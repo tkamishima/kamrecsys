@@ -6,11 +6,13 @@ Calculate evaluation metrics
 Input file
 ----------
 
-Input file is formatted in json.  Prediction data is stored in the entry with a top-level key: `prediction`.  The sub-entries in this entry are as follows:
+Input file is formatted in json.  Prediction data is stored in the entry with a
+top-level key: `prediction`.  The sub-entries in this entry are as follows:
  
 * `event` : a list of user-item pairs represented by external IDs. 
 * `true` : true rating scores corrsponding to an event 
 * `predicted` : predicted rating scores corrsponding to an event
+* `event_feature` : event features except for a sensitive feature
 
 Output file
 -----------
