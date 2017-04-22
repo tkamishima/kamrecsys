@@ -22,7 +22,8 @@ from .base import (
 from .real import (
     mean_absolute_error,
     mean_squared_error,
-    score_histogram)
+    score_histogram,
+    variance_with_gamma_prior)
 from .score_predictor import (
     score_predictor_report,
     score_predictor_statistics)
@@ -40,6 +41,7 @@ __all__ = [
     'mean_absolute_error',
     'mean_squared_error',
     'score_histogram',
+    'variance_with_gamma_prior',
     'score_predictor_report',
     'score_predictor_statistics']
 

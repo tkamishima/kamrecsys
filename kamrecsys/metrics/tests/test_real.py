@@ -82,6 +82,28 @@ class TestScoreHistogram(TestCase):
         assert_array_equal(hist, [6, 15])
         assert_array_equal(scores, [0.2, 0.4])
 
+class TestVarianceWithGammaPrior(TestCase):
+
+    def test_func(self):
+        from kamrecsys.metrics import variance_with_gamma_prior as safe_var
+
+        self.assertAlmostEqual(safe_var(y_true), 1.08999999782)
+        self.assertAlmostEqual(safe_var([1], a=1, b=3), 2)
+        self.assertAlmostEqual(safe_var([1], a=1, b=3), 2)
+        self.assertAlmostEqual(safe_var([np.nan, 1, 2]), 0.2499999975)
+        with self.assertRaises(ValueError):
+            safe_var([np.nan, 1, 2], force_all_finite=True)
+        with self.assertRaises(ValueError):
+            safe_var([np.inf])
+        with self.assertRaises(ValueError):
+            safe_var([])
+        with self.assertRaises(ValueError):
+            safe_var([], force_all_finite=True)
+        assert_allclose(
+            safe_var([-np.inf, 3.0, 5.0, np.nan, 2.0, 4.0, 3.0, np.inf],
+                     full_output=True),
+            [1.03999999584, 5])
+
 # =============================================================================
 # Main Routine
 # =============================================================================
