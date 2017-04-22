@@ -21,6 +21,8 @@ from abc import ABCMeta
 from six import with_metaclass
 
 from . import EventData
+from metrics import generate_score_bins
+
 
 # =============================================================================
 # Public symbols
@@ -75,11 +77,8 @@ class ScoreUtilMixin(with_metaclass(ABCMeta, object)):
             bins of histogram. boundaries of bins are placed at the center of
             adjacent scores.
         """
-        bins = np.arange(
-            self.score_domain[0], self.score_domain[1], self.score_domain[2])
-        bins = np.r_[-np.inf, bins + self.score_domain[2] / 2, np.inf]
 
-        return bins
+        return generate_score_bins(self.score_domain)
 
     def get_score_levels(self):
         """

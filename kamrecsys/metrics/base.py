@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Evaluation Metrics
+Common utilities for computing metrics
 """
 
 from __future__ import (
@@ -17,15 +17,7 @@ from six.moves import xrange
 
 import logging
 
-from .base import (
-    generate_score_bins)
-from .real import (
-    mean_absolute_error,
-    mean_squared_error,
-    score_histogram)
-from .score_predictor import (
-    score_predictor_report,
-    score_predictor_statistics)
+import numpy as np
 
 # =============================================================================
 # Metadata variables
@@ -35,13 +27,7 @@ from .score_predictor import (
 # Public symbols
 # =============================================================================
 
-__all__ = [
-    'generate_score_bins',
-    'mean_absolute_error',
-    'mean_squared_error',
-    'score_histogram',
-    'score_predictor_report',
-    'score_predictor_statistics']
+__all__ = []
 
 # =============================================================================
 # Constants
@@ -55,6 +41,30 @@ __all__ = [
 # Functions
 # =============================================================================
 
+
+def generate_score_bins(score_domain):
+    """
+    Generate histogram bins for scores from score_domain
+
+    Parameters
+    ----------
+    score_domain : tuple or 1d-array of tuple
+        i-th tuple is a triple of the minimum, the maximum, and strides of the
+        i-th score
+
+    Returns
+    -------
+    score_bins : array, shape=(n_score_levels,), dtype=float
+        bins of histogram. boundaries of bins are placed at the center of
+        adjacent scores.
+    """
+    bins = np.arange(score_domain[0], score_domain[1], score_domain[2],
+                     dtype=float)
+    bins = np.hstack([-np.inf, bins + score_domain[2] / 2, np.inf])
+
+    return bins
+
+
 # =============================================================================
 # Classes
 # =============================================================================
@@ -64,7 +74,7 @@ __all__ = [
 # =============================================================================
 
 # init logging system
-logger = logging.getLogger('kamrecsys')
+logger = logging.getLogger('kamiers')
 if not logger.handlers:
     logger.addHandler(logging.NullHandler())
 
