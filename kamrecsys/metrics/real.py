@@ -132,8 +132,8 @@ def score_histogram(x, score_domain=(1, 5, 1)):
     x : array, shape=(n_samples), dtype=float or int
         A set of scores
     score_domain : array, shape=(3,) OR int, optional 
-        Domain of scores, represented by a triple: start, end, and stride, if
-        array-like.  
+        Domain of scores, represented by a triple of the minimum, the maximum,
+        and strides of the score, if array-like.  
         The range between the minimum and the maximum are divided into the
         specified number of bins, if int.
         default=(1, 5, 1).

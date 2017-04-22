@@ -48,9 +48,8 @@ def generate_score_bins(score_domain):
 
     Parameters
     ----------
-    score_domain : tuple or 1d-array of tuple
-        i-th tuple is a triple of the minimum, the maximum, and strides of the
-        i-th score
+    score_domain : array-like, shape=(3,)
+        a triple of the minimum, the maximum, and strides of the score
 
     Returns
     -------

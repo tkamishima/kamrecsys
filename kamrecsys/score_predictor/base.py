@@ -53,9 +53,8 @@ class BaseScorePredictor(
 
     Attributes
     ----------
-    score_domain : tuple or 1d-array of tuple
-        i-th tuple is a triple of the minimum, the maximum, and strides of the
-        i-th score
+    score_domain : array-like, shape=(3,)
+        a triple of the minimum, the maximum, and strides of the score
     score : array_like, shape=(n_events,)
         rating scores of each events.
     n_score_levels : int
