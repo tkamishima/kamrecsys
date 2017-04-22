@@ -77,8 +77,8 @@ def mean_absolute_error(y_true, y_pred):
 
     # calculate errors
     errs = np.abs(y_true - y_pred)
-    mean = np.mean(errs)
-    stdev = np.std(errs)
+    mean = np.nanmean(errs)
+    stdev = np.nanstd(errs)
 
     return mean, stdev
 
@@ -116,8 +116,8 @@ def mean_squared_error(y_true, y_pred):
 
     # calculate errors
     errs = (y_true - y_pred) ** 2
-    mean = np.mean(errs)
-    stdev = np.std(errs)
+    mean = np.nanmean(errs)
+    stdev = np.nanstd(errs)
     rmse = np.sqrt(np.maximum(mean, 0.))
 
     return rmse, mean, stdev
