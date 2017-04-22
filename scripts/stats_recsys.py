@@ -154,12 +154,10 @@ def do_task(opt):
 
     # calculate statistics
     if info['model']['type'] == 'score_predictor':
-        scores = info['data']['score_domain']
-        scores = np.r_[np.arange(scores[0], scores[1], scores[2]), scores[1]]
         stats = score_predictor_statistics(
             info['prediction']['true'],
             info['prediction']['predicted'],
-            scores=scores)
+            score_domain=info['data']['score_domain'])
     else:
         raise TypeError('Unsupported type of recommendation models')
     info['statistics'] = stats
