@@ -21,6 +21,8 @@ import numpy as np
 from sklearn.utils import (
     as_float_array, assert_all_finite, check_consistent_length)
 
+from . import generate_score_bins
+
 # =============================================================================
 # Metadata variables
 # =============================================================================
@@ -75,8 +77,8 @@ def mean_absolute_error(y_true, y_pred):
 
     # calculate errors
     errs = np.abs(y_true - y_pred)
-    mean = np.mean(errs)
-    stdev = np.std(errs)
+    mean = np.nanmean(errs)
+    stdev = np.nanstd(errs)
 
     return mean, stdev
 
@@ -114,14 +116,14 @@ def mean_squared_error(y_true, y_pred):
 
     # calculate errors
     errs = (y_true - y_pred) ** 2
-    mean = np.mean(errs)
-    stdev = np.std(errs)
+    mean = np.nanmean(errs)
+    stdev = np.nanstd(errs)
     rmse = np.sqrt(np.maximum(mean, 0.))
 
     return rmse, mean, stdev
 
 
-def score_histogram(x, scores=(1, 2, 3, 4, 5)):
+def score_histogram(x, score_domain=(1, 5, 1)):
     """
     Histogram of scores 
 
@@ -129,41 +131,109 @@ def score_histogram(x, scores=(1, 2, 3, 4, 5)):
     ----------
     x : array, shape=(n_samples), dtype=float or int
         A set of scores
-    scores : array, shape=(n_score_levels,) OR int, optional 
-        A sorted sequence of possible rating scores, if array-like.
+    score_domain : array, shape=(3,) OR int, optional 
+        Domain of scores, represented by a triple of the minimum, the maximum,
+        and strides of the score, if array-like.  
         The range between the minimum and the maximum are divided into the
         specified number of bins, if int.
-        default=(1, 2, 3, 4, 5)
-
+        default=(1, 5, 1).
     Returns
     -------
     hist : array_like, shape=(n_score_levels,)
         The number of data in each bin
     scores : array_like, shape=(n_score_levels + 1,)
-        If a sequence of scores is explicitly specified return a list of
-        scores.
-        If the number of bins is specified as `scores`, a list of centers of
-        bins.        
+        sequences of possible scores
     """
 
     # check inputs
     assert_all_finite(x)
-    if isinstance(scores, int):
-        bins = scores
+    if isinstance(score_domain, np.integer):
+        bins = score_domain
     else:
-        assert_all_finite(scores)
-        scores = as_float_array(scores)
-        bins = np.r_[-np.inf, (scores[1:] + scores[:-1]) / 2, np.inf]
+        assert_all_finite(score_domain)
+        bins = generate_score_bins(score_domain)
 
     # making histogram
     hist, bins = np.histogram(x, bins=bins)
 
     # candidates of possible scores
-    if isinstance(scores, int):
+    if isinstance(score_domain, np.integer):
         scores = (bins[1:] + bins[:-1]) / 2
+    else:
+        scores = np.hstack(
+            [np.arange(score_domain[0], score_domain[1], score_domain[2],
+                       dtype=float),
+             score_domain[1]])
 
     # return statistics
     return hist, scores
+
+def variance_with_gamma_prior(
+        x, a=1e-8, b=1e-24, full_output=False, force_all_finite=False):
+    """
+    Variance with Gamma prior
+    
+    A Variance derived by MAP estimation with Gamma prior. See equation
+    (2.147) and (2.149-151) in [1]_ .  This variance can avoid zero variance.
+    
+    .. math::
+    
+        \frac{
+            2 b + \sum_i x_i^2 - ((\sum_i x_i)^2 / n)
+        }{
+            2 a + n
+        }
+    
+    Parameters
+    ----------
+    x : array-like, dtype=np.number
+        input data.
+    a : int or float
+        parameter of gamma prior. It should be a << n_data. 
+    b : int or float
+        parameter of gamma prior. It should be b << n_data \times var(data)
+    full_output : bool
+        this function returns only a variance, if False.  Otherwise, additional
+        information is returned.
+    force_all_finite : bool
+        x contains non-finite values (NaN or Inf) raise ValueError, if True.
+        Otherwise, non-finite data are simply ignored in computation.
+
+    Returns
+    -------
+    variance : float
+        variance with Gamma prior
+    n_valid_data : int, optional
+        the number of valid (=finite) data in x. returns only if
+        full_output==True. 
+
+    References
+    ----------
+    .. [1] C. M. Bishop. "Pattern Recognition and Machine Learning",
+    Springer, 2006
+    """
+
+    # arrange inputs
+    if force_all_finite:
+        x = as_float_array(x).ravel()
+    else:
+        x = np.compress(np.isfinite(x), x)
+        if x.size < 1:
+            raise ValueError('Found array with 0 sample.')
+
+    # calc variance
+    n = x.size
+
+    x_sum = x.sum()
+    x_sqsum = (x ** 2).sum()
+    var = (2 * b + x_sqsum - (x_sum ** 2) / n) / (2 * a + n)
+    var = b / a if var <= 0. else var
+
+    if full_output:
+        return var, n
+    else:
+        return var
+
 
 # =============================================================================
 # Classes
