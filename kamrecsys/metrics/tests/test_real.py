@@ -73,12 +73,12 @@ class TestScoreHistogram(TestCase):
         assert_array_equal(hist, [0, 0, 2, 7, 1])
         assert_array_equal(scores, [1, 2, 3, 4, 5])
 
-        hist, scores = score_histogram(y_pred, scores=[3, 5])
+        hist, scores = score_histogram(y_pred, score_domain=(3, 5, 2))
         assert_array_equal(hist, [3, 7])
         assert_array_equal(scores, [3, 5])
 
         hist, scores = score_histogram(
-            np.linspace(0.0, 1.0, 21), scores=[0.2, 0.4])
+            np.linspace(0.0, 1.0, 21), score_domain=(0.2, 0.4, 0.2))
         assert_array_equal(hist, [6, 15])
         assert_array_equal(scores, [0.2, 0.4])
 

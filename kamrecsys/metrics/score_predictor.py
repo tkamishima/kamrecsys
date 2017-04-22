@@ -102,7 +102,7 @@ def score_predictor_report(y_true, y_pred, disp=True):
     return stats
 
 
-def score_predictor_statistics(y_true, y_pred, scores=2):
+def score_predictor_statistics(y_true, y_pred, score_domain=(1, 5, 1)):
     """
     Full Statistics of prediction performance
     
@@ -118,11 +118,9 @@ def score_predictor_statistics(y_true, y_pred, scores=2):
         Ground truth scores
     y_pred : array, shape(n_samples,)
         Predicted scores
-    scores : array, shape=(n_score_levels,) OR int; optional
-        A sorted sequence of possible rating scores, if array-like.
-        The range between the minimum and the maximum are divided into the
-        specified number of bins, if it is integer.
-        (default=2)
+    score_domain : array, shape=(3,)
+        Domain of scores, represented by a triple: start, end, and stride
+        default=(1, 5, 1).
 
     Returns
     -------
@@ -154,7 +152,7 @@ def score_predictor_statistics(y_true, y_pred, scores=2):
     # descriptive statistics of ground truth scores
     stats['true'] = {'mean': np.mean(y_true), 'stdev':np.std(y_true)}
 
-    hist, scores = score_histogram(y_true, scores=scores)
+    hist, scores = score_histogram(y_true, score_domain=score_domain)
     # NOTE: if scores is int, it is replaced with estimated scores
     stats['scores'] = scores.tolist()
     stats['true']['histogram'] = hist
@@ -164,7 +162,7 @@ def score_predictor_statistics(y_true, y_pred, scores=2):
     stats['predicted'] = {'mean': np.mean(y_pred), 'stdev': np.std(y_pred)}
 
     # NOTE: the same bin boundaries are used for predicted scores
-    hist, scores = score_histogram(y_pred, scores=scores)
+    hist, scores = score_histogram(y_pred, score_domain=score_domain)
     stats['predicted']['histogram'] = hist
     stats['predicted']['histogram_density'] = (hist / hist.sum())
 

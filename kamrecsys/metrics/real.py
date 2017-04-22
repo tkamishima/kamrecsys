@@ -21,6 +21,8 @@ import numpy as np
 from sklearn.utils import (
     as_float_array, assert_all_finite, check_consistent_length)
 
+from . import generate_score_bins
+
 # =============================================================================
 # Metadata variables
 # =============================================================================
@@ -121,7 +123,7 @@ def mean_squared_error(y_true, y_pred):
     return rmse, mean, stdev
 
 
-def score_histogram(x, scores=(1, 2, 3, 4, 5)):
+def score_histogram(x, score_domain=(1, 5, 1)):
     """
     Histogram of scores 
 
@@ -129,38 +131,39 @@ def score_histogram(x, scores=(1, 2, 3, 4, 5)):
     ----------
     x : array, shape=(n_samples), dtype=float or int
         A set of scores
-    scores : array, shape=(n_score_levels,) OR int, optional 
-        A sorted sequence of possible rating scores, if array-like.
+    score_domain : array, shape=(3,) OR int, optional 
+        Domain of scores, represented by a triple: start, end, and stride, if
+        array-like.  
         The range between the minimum and the maximum are divided into the
         specified number of bins, if int.
-        default=(1, 2, 3, 4, 5)
-
+        default=(1, 5, 1).
     Returns
     -------
     hist : array_like, shape=(n_score_levels,)
         The number of data in each bin
     scores : array_like, shape=(n_score_levels + 1,)
-        If a sequence of scores is explicitly specified return a list of
-        scores.
-        If the number of bins is specified as `scores`, a list of centers of
-        bins.        
+        sequences of possible scores
     """
 
     # check inputs
     assert_all_finite(x)
-    if isinstance(scores, int):
-        bins = scores
+    if isinstance(score_domain, np.integer):
+        bins = score_domain
     else:
-        assert_all_finite(scores)
-        scores = as_float_array(scores)
-        bins = np.r_[-np.inf, (scores[1:] + scores[:-1]) / 2, np.inf]
+        assert_all_finite(score_domain)
+        bins = generate_score_bins(score_domain)
 
     # making histogram
     hist, bins = np.histogram(x, bins=bins)
 
     # candidates of possible scores
-    if isinstance(scores, int):
+    if isinstance(score_domain, np.integer):
         scores = (bins[1:] + bins[:-1]) / 2
+    else:
+        scores = np.hstack(
+            [np.arange(score_domain[0], score_domain[1], score_domain[2],
+                       dtype=float),
+             score_domain[1]])
 
     # return statistics
     return hist, scores
