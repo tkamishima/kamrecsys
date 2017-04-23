@@ -141,6 +141,11 @@ def score_predictor_statistics(y_true, y_pred, score_domain=(1, 5, 1)):
     # dataset size
     stats['n_samples'] = y_true.size
 
+    # a list of possible score levels
+    stats['score_levels'] = np.hstack([
+        np.arange(score_domain[0], score_domain[1], score_domain[2],
+                  dtype=float), score_domain[1]])
+
     # mean absolute error
     mean, stdev = mean_absolute_error(y_true, y_pred)
     stats['mean_absolute_error'] = {'mean': mean, 'stdev':stdev}
