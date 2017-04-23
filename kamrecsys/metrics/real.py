@@ -168,6 +168,7 @@ def score_histogram(x, score_domain=(1, 5, 1)):
     # return statistics
     return hist, scores
 
+
 def variance_with_gamma_prior(
         x, a=1e-8, b=1e-24, full_output=False, force_all_finite=False):
     """
@@ -189,9 +190,11 @@ def variance_with_gamma_prior(
     x : array-like, dtype=np.number
         input data.
     a : int or float
-        parameter of gamma prior. It should be a << n_data. 
+        parameter of gamma prior. It should be a << n_samples .
+        (default=1e-8)
     b : int or float
-        parameter of gamma prior. It should be b << n_data \times var(data)
+        parameter of gamma prior. It should be b << var(data) n_samples .
+        (default=1e-24)
     full_output : bool
         this function returns only a variance, if False.  Otherwise, additional
         information is returned.

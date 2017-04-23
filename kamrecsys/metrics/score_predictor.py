@@ -114,9 +114,9 @@ def score_predictor_statistics(y_true, y_pred, score_domain=(1, 5, 1)):
 
     Parameters
     ----------
-    y_true : array, shape(n_samples,)
+    y_true : array, shape=(n_samples,)
         Ground truth scores
-    y_pred : array, shape(n_samples,)
+    y_pred : array, shape=(n_samples,)
         Predicted scores
     score_domain : array, shape=(3,)
         Domain of scores, represented by a triple: start, end, and stride
@@ -125,7 +125,7 @@ def score_predictor_statistics(y_true, y_pred, score_domain=(1, 5, 1)):
     Returns
     -------
     stats : dict
-        belief summary of prediction performance
+        Full statistics of prediction performance
     """
 
     # check inputs
@@ -152,21 +152,19 @@ def score_predictor_statistics(y_true, y_pred, score_domain=(1, 5, 1)):
     # descriptive statistics of ground truth scores
     stats['true'] = {'mean': np.mean(y_true), 'stdev':np.std(y_true)}
 
-    hist, scores = score_histogram(y_true, score_domain=score_domain)
-    # NOTE: if scores is int, it is replaced with estimated scores
-    stats['scores'] = scores.tolist()
+    hist, _ = score_histogram(y_true, score_domain=score_domain)
     stats['true']['histogram'] = hist
     stats['true']['histogram_density'] = (hist / hist.sum())
 
     # descriptive statistics of ground predicted scores
     stats['predicted'] = {'mean': np.mean(y_pred), 'stdev': np.std(y_pred)}
 
-    # NOTE: the same bin boundaries are used for predicted scores
-    hist, scores = score_histogram(y_pred, score_domain=score_domain)
+    hist, _ = score_histogram(y_pred, score_domain=score_domain)
     stats['predicted']['histogram'] = hist
     stats['predicted']['histogram_density'] = (hist / hist.sum())
 
     return stats
+
 
 # =============================================================================
 # Classes
