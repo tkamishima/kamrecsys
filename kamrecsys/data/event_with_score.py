@@ -21,7 +21,7 @@ from abc import ABCMeta
 from six import with_metaclass
 
 from . import EventData
-from metrics import generate_score_bins
+from ..metrics import generate_score_bins
 
 
 # =============================================================================
