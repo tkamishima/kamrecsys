@@ -70,6 +70,7 @@ class TestScorePredictorStatistics(TestCase):
             y_true, y_pred, score_domain=(1, 5, 1))
 
         self.assertEqual(stats['n_samples'], 10)
+        assert_array_equal(stats['score_levels'], (1, 2, 3, 4, 5))
 
         sub_stats = stats['mean_absolute_error']
         self.assertAlmostEqual(
@@ -109,6 +110,7 @@ class TestScorePredictorStatistics(TestCase):
 
         # check predicted scores
         stats = score_predictor_statistics(y_true, y_pred)
+        assert_allclose(stats['score_levels'], [1, 2, 3, 4, 5], rtol=1e-5)
         assert_array_equal(stats['true']['histogram'], [0, 1, 2, 2, 5])
         assert_array_equal(stats['predicted']['histogram'], [0, 0, 2, 7, 1])
 
