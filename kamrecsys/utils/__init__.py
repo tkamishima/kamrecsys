@@ -20,6 +20,10 @@ import logging
 from .base import (
     fit_status_message,
     get_fit_status_message)
+from .kamexputils import (
+    json_decodable,
+    get_system_info,
+    get_version_info)
 
 # =============================================================================
 # Metadata variables
@@ -31,7 +35,10 @@ from .base import (
 
 __all__ = [
     'fit_status_message',
-    'get_fit_status_message']
+    'get_fit_status_message',
+    'json_decodable',
+    'get_system_info',
+    'get_version_info']
 
 # =============================================================================
 # Constants
