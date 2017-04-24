@@ -44,19 +44,18 @@ from __future__ import (
     absolute_import)
 from six.moves import xrange
 
+import argparse
+import json
+import sys
+
+import numpy as np
+
+from kamrecsys.metrics import score_predictor_statistics
+from kamrecsys.utils import json_decodable
+
 # =============================================================================
 # Imports
 # =============================================================================
-
-import sys
-import argparse
-import os
-import json
-
-import numpy as np
-from scipy.sparse import issparse
-
-from kamrecsys.metrics import score_predictor_statistics
 
 # =============================================================================
 # Module metadata variables
@@ -85,57 +84,6 @@ __all__ = ['do_task']
 # =============================================================================
 # Functions
 # =============================================================================
-
-
-def json_decodable(x):
-    """
-    convert to make serializable type
-
-    Parameters
-    ----------
-    x : dict, list
-        container to convert
-
-    Notes
-    -----
-    `long` type of Python2 is not supported 
-    """
-    if isinstance(x, dict):
-        for k, v in x.items():
-            if isinstance(v, (dict, list)):
-                json_decodable(v)
-            elif isinstance(v, np.ndarray):
-                x[k] = v.tolist()
-                json_decodable(x[k])
-            elif issparse(v):
-                x[k] = v.toarray().tolist()
-                json_decodable(x[k])
-            elif isinstance(v, np.integer):
-                x[k] = int(v)
-            elif isinstance(v, np.floating):
-                x[k] = float(v)
-            elif isinstance(v, np.complexfloating):
-                x[k] = complex(v)
-            elif not isinstance(v, (bool, int, float, complex)):
-                x[k] = str(v)
-    elif isinstance(x, list):
-        for k, v in enumerate(x):
-            if isinstance(v, (dict, list)):
-                json_decodable(v)
-            elif isinstance(v, np.ndarray):
-                x[k] = v.tolist()
-                json_decodable(x[k])
-            elif issparse(v):
-                x[k] = v.toarray().tolist()
-                json_decodable(x[k])
-            elif isinstance(v, np.integer):
-                x[k] = int(v)
-            elif isinstance(v, np.floating):
-                x[k] = float(v)
-            elif isinstance(v, np.complexfloating):
-                x[k] = complex(v)
-            elif not isinstance(v, (bool, int, float, complex)):
-                x[k] = str(v)
 
 
 def do_task(opt):
