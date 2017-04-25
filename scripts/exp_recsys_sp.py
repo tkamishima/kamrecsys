@@ -20,12 +20,12 @@ of the outputs are as follows:
 
 * `data` : the data, such as a domain of rating scores and availability of 
   timestamp. 
+* `environment` : hardware, system software, and experimental script 
 * `model` : model and its parameters used for prediction 
 * `prediction` : predicted results, user-item pairs and predicted and true 
   rating scores. 
-* `script` : an experimental script used in an experiment 
-* `test` : environments, conditions, time information in test
-* `training` : environments, conditions, time information in training
+* `test` : conditions, time information in test
+* `training` : conditions, time information in training
 
 Options
 =======
@@ -94,6 +94,7 @@ import sys
 import numpy as np
 from sklearn.model_selection import LeaveOneGroupOut
 
+from kamrecsys import __version__ as kamrecsys_version
 from kamrecsys.data import EventWithScoreData
 from kamrecsys.datasets import event_dtype_timestamp
 from kamrecsys.model_selection import interlace_group
@@ -332,9 +333,6 @@ def holdout_test(info):
     train_x = load_data(
         info['training']['file'],
         info['data']['has_timestamp'])
-    info['training']['version'] = get_version_info()
-    info['training']['system'] = get_system_info()
-    info['training']['random_seed'] = info['model']['options']['random_state']
 
     # prepare test data
     if info['test']['file'] is None:
@@ -342,9 +340,6 @@ def holdout_test(info):
     test_x = load_data(
         info['test']['file'],
         info['data']['has_timestamp'])
-    info['test']['version'] = get_version_info()
-    info['test']['system'] = get_system_info()
-    info['test']['random_seed'] = info['model']['options']['random_state']
     if info['data']['has_timestamp']:
         ef = train_x['event_feature']
     else:
@@ -379,13 +374,7 @@ def cv_test(info):
     x = load_data(
         info['training']['file'],
         info['data']['has_timestamp'])
-    info['training']['version'] = get_version_info()
-    info['training']['system'] = get_system_info()
-    info['training']['random_seed'] = info['model']['options']['random_state']
     info['test']['file'] = info['training']['file']
-    info['test']['version'] = get_version_info()
-    info['test']['system'] = get_system_info()
-    info['test']['random_seed'] = info['model']['options']['random_state']
     n_events = x.shape[0]
     ev = x['event']
     tsc = x['score']
@@ -433,11 +422,15 @@ def do_task(info):
     np.seterr(all='ignore')
 
     # update information dictionary
-    info['script']['name'] = os.path.basename(sys.argv[0])
-    info['script']['version'] = __version__
     info['model']['type'] = 'score_predictor'
     info['model']['name'] = info['model']['recommender'].__name__
     info['model']['module'] = info['model']['recommender'].__module__
+
+    info['environment']['script'] = {
+        'name': os.path.basename(sys.argv[0]), 'version': __version__}
+    info['environment']['system'] = get_system_info()
+    info['environment']['version'] = get_version_info()
+    info['environment']['version']['kamrecsys'] = kamrecsys_version
 
     # select validation scheme
     if info['test']['scheme'] == 'holdout':
@@ -569,7 +562,7 @@ def init_info(opt):
         Information about the target task
     """
 
-    info = {'script': {}, 'data': {}, 'training': {}, 'test': {},
+    info = {'data': {}, 'environment': {}, 'training': {}, 'test': {},
             'model': {'options': {}}, 'prediction': {}}
 
     # files
