@@ -15,11 +15,17 @@ from numpy.testing import (
     TestCase,
     run_module_suite,
     assert_,
+    assert_almost_equal,
+    assert_allclose,
+    assert_array_almost_equal_nulp,
+    assert_array_max_ulp,
     assert_array_equal,
     assert_array_less,
-    assert_allclose,
-    assert_array_max_ulp,
-    assert_array_almost_equal_nulp)
+    assert_equal,
+    assert_raises,
+    assert_raises_regex,
+    assert_warns,
+    assert_string_equal)
 
 import os
 import numpy as np
@@ -99,6 +105,24 @@ class TestEventWithScoreData(TestCase):
 
         score_levels = data.get_score_levels()
         assert_allclose(score_levels, [1., 2., 3., 4., 5])
+
+    def test_binarize_score(self):
+        data = load_movielens_mini()
+
+        data.binarize_score(2)
+        assert_array_equal(data.score_domain, [0, 1, 1])
+        assert_array_equal(
+            data.score,
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+             0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1])
+        assert_equal(data.n_score_levels, 2)
+
+        data = load_movielens_mini()
+        data.binarize_score()
+        assert_array_equal(
+            data.score,
+            [0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 1,
+             0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1])
 
 
 # =============================================================================
