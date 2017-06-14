@@ -20,7 +20,7 @@ from six.moves import xrange
 
 import logging
 
-from .base import BaseImplicitItemFinder
+from .base import BaseImplicitItemFinder, BaseExplicitItemFinder
 from .matrix_factorization import ImplicitLogisticPMF
 
 # =============================================================================
@@ -31,7 +31,10 @@ from .matrix_factorization import ImplicitLogisticPMF
 # Public symbols
 # =============================================================================
 
-__all__ = ['BaseImplicitItemFinder', 'ImplicitLogisticPMF']
+__all__ = [
+    'BaseExplicitItemFinder',
+    'BaseImplicitItemFinder',
+    'ImplicitLogisticPMF']
 
 # =============================================================================
 # Constants
