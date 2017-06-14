@@ -27,7 +27,7 @@ from scipy import sparse as sparse
 from sklearn.utils import check_random_state
 
 from kamrecsys.datasets import load_movielens_mini
-from kamrecsys.item_finder import LogisticPMF
+from kamrecsys.item_finder import ImplicitLogisticPMF
 
 # =============================================================================
 # Module variables
@@ -46,7 +46,7 @@ class TestLogisticPMF(TestCase):
 
     def test_logistic(self):
 
-        rec = LogisticPMF()
+        rec = ImplicitLogisticPMF()
         self.assertAlmostEqual(rec.sigmoid(0.), 0.5)
         self.assertAlmostEqual(rec.sigmoid(1.), 1 / (1 + 1 / np.e))
         self.assertAlmostEqual(rec.sigmoid(-1.), 1 / (1 + np.e))
@@ -57,7 +57,7 @@ class TestLogisticPMF(TestCase):
 
         # setup
         data = load_movielens_mini()
-        rec = LogisticPMF(C=0.1, k=2, tol=1e-03, random_state=1234)
+        rec = ImplicitLogisticPMF(C=0.1, k=2, tol=1e-03, random_state=1234)
 
         rec._rng = check_random_state(rec.random_state)
         n_objects = data.n_objects
@@ -120,7 +120,7 @@ class TestLogisticPMF(TestCase):
 
         # setup
         data = load_movielens_mini()
-        rec = LogisticPMF(C=0.1, k=2, tol=1e-03, random_state=1234)
+        rec = ImplicitLogisticPMF(C=0.1, k=2, tol=1e-03, random_state=1234)
 
         rec._rng = check_random_state(rec.random_state)
         n_objects = data.n_objects
@@ -263,7 +263,7 @@ class TestLogisticPMF(TestCase):
 
         # setup
         data = load_movielens_mini()
-        rec = LogisticPMF(C=0.1, k=2, tol=1e-03, random_state=1234)
+        rec = ImplicitLogisticPMF(C=0.1, k=2, tol=1e-03, random_state=1234)
 
         rec.fit(data, disp=False)
         self.assertAlmostEqual(rec.fit_results_['initial_loss'],

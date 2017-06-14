@@ -25,7 +25,7 @@ from numpy.testing import (
 import numpy as np
 
 from kamrecsys.datasets import load_movielens_mini
-from kamrecsys.item_finder import BaseItemFinder
+from kamrecsys.item_finder import BaseImplicitItemFinder
 
 # =============================================================================
 # Variables
@@ -40,19 +40,19 @@ from kamrecsys.item_finder import BaseItemFinder
 # =============================================================================
 
 
-class ItemFinder(BaseItemFinder):
+class ImplicitItemFinder(BaseImplicitItemFinder):
 
     def __init__(self):
-        super(ItemFinder, self).__init__(random_state=1234)
+        super(ImplicitItemFinder, self).__init__(random_state=1234)
 
     def raw_predict(self):
         pass
 
 
-class TestBaseItemFinder(TestCase):
+class TestBaseImplicitItemFinder(TestCase):
 
     def test__get_event_array(self):
-        rec = ItemFinder()
+        rec = ImplicitItemFinder()
         data = load_movielens_mini()
         data.filter_event(
             np.logical_and(data.event[:, 0] < 5, data.event[:, 1] < 5))

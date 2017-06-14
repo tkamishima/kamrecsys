@@ -52,13 +52,13 @@ __all__ = []
 # =============================================================================
 
 
-class BaseItemFinder(with_metaclass(ABCMeta, BaseEventRecommender)):
+class BaseImplicitItemFinder(with_metaclass(ABCMeta, BaseEventRecommender)):
     """
     Recommenders to find good items from event data
     """
 
     def __init__(self, random_state=None):
-        super(BaseItemFinder, self).__init__(random_state=random_state)
+        super(BaseImplicitItemFinder, self).__init__(random_state=random_state)
 
     def fit(self, data, event_index=(0, 1), random_state=None):
         """
@@ -74,7 +74,7 @@ class BaseItemFinder(with_metaclass(ABCMeta, BaseEventRecommender)):
         random_state: RandomState or an int seed (None by default)
             A random number generator instance
         """
-        super(BaseItemFinder, self).fit(data, event_index, random_state)
+        super(BaseImplicitItemFinder, self).fit(data, event_index, random_state)
 
     def get_event_array(self, sparse_type='csr'):
         """

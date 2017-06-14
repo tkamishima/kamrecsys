@@ -24,7 +24,7 @@ import numpy as np
 from scipy.optimize import fmin_cg
 from sklearn.utils import check_random_state
 
-from . import BaseItemFinder
+from . import BaseImplicitItemFinder
 
 # =============================================================================
 # Public symbols
@@ -45,7 +45,7 @@ __all__ = []
 # =============================================================================
 
 
-class LogisticPMF(BaseItemFinder):
+class ImplicitLogisticPMF(BaseImplicitItemFinder):
     """
     A probabilistic matrix factorization model proposed in [1]_.
     A method of handling bias terms is defined by equation (5) in [2]_.
@@ -120,7 +120,7 @@ class LogisticPMF(BaseItemFinder):
     sigmoid_range = 34.538776394910684
 
     def __init__(self, C=1.0, k=1, tol=None, maxiter=200, random_state=None):
-        super(LogisticPMF, self).__init__(random_state=random_state)
+        super(ImplicitLogisticPMF, self).__init__(random_state=random_state)
 
         self.C = float(C)
         self.k = int(k)
@@ -342,7 +342,7 @@ class LogisticPMF(BaseItemFinder):
         """
 
         # call super class
-        super(LogisticPMF, self).fit(
+        super(ImplicitLogisticPMF, self).fit(
             data, event_index, random_state=random_state)
 
         # get input data
