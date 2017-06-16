@@ -21,7 +21,7 @@ from six.moves import xrange
 import logging
 
 from .base import BaseImplicitItemFinder, BaseExplicitItemFinder
-from .matrix_factorization import ImplicitLogisticPMF
+from .matrix_factorization import LogisticPMF, ImplicitLogisticPMF
 
 # =============================================================================
 # Metadata variables
@@ -34,6 +34,7 @@ from .matrix_factorization import ImplicitLogisticPMF
 __all__ = [
     'BaseExplicitItemFinder',
     'BaseImplicitItemFinder',
+    'LogisticPMF',
     'ImplicitLogisticPMF']
 
 # =============================================================================
