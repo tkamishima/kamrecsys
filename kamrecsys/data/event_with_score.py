@@ -176,6 +176,29 @@ class EventWithScoreData(EventData, ScoreUtilMixin):
 
         return digitized_scores
 
+    def binarize_score(self, score_thresh=None):
+        """
+        Convert multi-level scores into binary scores
+
+        Parameters
+        ----------
+        score_thresh : number or None
+            Each score is converted to 0 if it is equal or less than
+            `score_thresh`; otherwise it is converted to 1.
+            If None, `score_thresh` is set to the center value of the
+            `score_domain`.
+        """
+
+        # default threshold
+        if score_thresh is None:
+            score_thresh = (
+                (self.score_domain[1] - self.score_domain[0]) / 2 +
+                self.score_domain[0])
+
+        self.score = np.where(self.score <= score_thresh, 0, 1)
+        self.score_domain = np.array([0, 1, 1])
+        self.n_score_levels = 2
+
     def filter_event(self, filter_cond):
         """
         replace event data with those consisting of events whose corresponding
