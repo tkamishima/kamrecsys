@@ -37,7 +37,7 @@ Algorithms
 
 * Matrix Factorization
 
-    * Logistic Probabilistic Matrix Factorization
+    * Logistic Probabilistic Matrix Factorization (Explicit / Implicit Ratings)
 
 ### Score Predictor
 
