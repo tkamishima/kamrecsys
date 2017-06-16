@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Utilities for Recommenders
+Summary of Mathematical Functions
 """
 
 from __future__ import (
@@ -17,14 +17,8 @@ from six.moves import xrange
 
 import logging
 
-from .base import (
-    fit_status_message,
-    get_fit_status_message)
-from .kammath import safe_sigmoid
-from .kamexputils import (
-    json_decodable,
-    get_system_info,
-    get_version_info)
+from scipy.special import expit
+import numpy as np
 
 # =============================================================================
 # Metadata variables
@@ -34,13 +28,7 @@ from .kamexputils import (
 # Public symbols
 # =============================================================================
 
-__all__ = [
-    'fit_status_message',
-    'get_fit_status_message',
-    'safe_sigmoid',
-    'json_decodable',
-    'get_system_info',
-    'get_version_info']
+__all__ = []
 
 # =============================================================================
 # Constants
@@ -53,6 +41,33 @@ __all__ = [
 # =============================================================================
 # Functions
 # =============================================================================
+
+def safe_sigmoid(x):
+    """
+    safe_sigmoid function
+
+    To restrict the range of sigmoid function within [1e-15, 1 - 1e-15],
+    domain of inputs is clipped into [-SIGMOID_DOM,+SIGMOID_DOM], where
+    SIGMOID_DOM = :math:`log( (1 - 10^{-15}) / 10^{-15})` =
+    34.538776394910684
+
+    Parameters
+    ----------
+    x : array_like, shape=(n_data), dtype=float
+        arguments of function
+
+    Returns
+    -------
+    sig : array, shape=(n_data), dtype=float
+        1.0 / (1.0 + exp(- x))
+    """
+    # import numpy as np
+    # from scipy.special import expit
+
+    x = np.clip(x, -34.538776394910684, 34.538776394910684)
+
+    return expit(x)
+
 
 # =============================================================================
 # Classes

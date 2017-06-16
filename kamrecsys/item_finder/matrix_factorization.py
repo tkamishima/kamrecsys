@@ -25,6 +25,7 @@ from scipy.optimize import fmin_cg
 from sklearn.utils import check_random_state
 
 from . import BaseExplicitItemFinder, BaseImplicitItemFinder
+from ..utils import safe_sigmoid as sigmoid
 
 # =============================================================================
 # Public symbols
@@ -118,9 +119,6 @@ class LogisticPMF(BaseExplicitItemFinder):
         Collaborative Filtering Model", KDD2008
     """
 
-    # constant for clipping inputs in a logistic function
-    sigmoid_range = 34.538776394910684
-
     def __init__(self, C=1.0, k=1, tol=None, maxiter=200, random_state=None):
         super(LogisticPMF, self).__init__(random_state=random_state)
 
@@ -201,26 +199,6 @@ class LogisticPMF(BaseExplicitItemFinder):
         # scale a regularization term by the number of parameters
         self._reg = self.C / (1 + (k + 1) * (n_users + n_items))
 
-    def sigmoid(self, x):
-        """
-        sigmoid function
-
-        Parameters
-        ----------
-        x : array_like, shape=(n_data), dtype=float
-            arguments of function
-
-        Returns
-        -------
-        sig : array, shape=(n_data), dtype=float
-            1.0 / (1.0 + exp(- x))
-        """
-
-        # restrict domain of sigmoid function within [1e-15, 1 - 1e-15]
-        x = np.clip(x, -self.sigmoid_range, self.sigmoid_range)
-
-        return 1.0 / (1.0 + np.exp(-x))
-
     def loss(self, coef, ev, sc, n_objects):
         """
         loss function to optimize
@@ -252,7 +230,7 @@ class LogisticPMF(BaseExplicitItemFinder):
         q = coef.view(self._dt)['q'][0]
 
         # loss term
-        esc = self.sigmoid(
+        esc = sigmoid(
             mu[0] + bu[ev[:, 0]] + bi[ev[:, 1]] +
             np.sum(p[ev[:, 0], :] * q[ev[:, 1], :], axis=1))
         loss = - np.sum(sc * np.log(esc) + (1 - sc) * np.log(1 - esc))
@@ -304,7 +282,7 @@ class LogisticPMF(BaseExplicitItemFinder):
         grad_q = grad.view(self._dt)['q'][0]
 
         # gradient of loss term
-        esc = self.sigmoid(
+        esc = sigmoid(
             mu[0] + bu[ev[:, 0]] + bi[ev[:, 1]] +
             np.sum(p[ev[:, 0], :] * q[ev[:, 1], :], axis=1))
         common_term = esc - sc
@@ -443,7 +421,7 @@ class LogisticPMF(BaseExplicitItemFinder):
             shape of an input array is illegal
         """
 
-        sc = self.sigmoid(
+        sc = sigmoid(
             self.mu_[0] + self.bu_[ev[:, 0]] + self.bi_[ev[:, 1]] +
             np.sum(self.p_[ev[:, 0], :] * self.q_[ev[:, 1], :], axis=1))
 
@@ -524,9 +502,6 @@ class ImplicitLogisticPMF(BaseImplicitItemFinder):
         Collaborative Filtering Model", KDD2008
     """
 
-    # constant for clipping inputs in a logistic function
-    sigmoid_range = 34.538776394910684
-
     def __init__(self, C=1.0, k=1, tol=None, maxiter=200, random_state=None):
         super(ImplicitLogisticPMF, self).__init__(random_state=random_state)
 
@@ -597,26 +572,6 @@ class ImplicitLogisticPMF(BaseImplicitItemFinder):
         # scale a regularization term by the number of parameters
         self._reg = self.C / (1 + (k + 1) * (n_users + n_items))
 
-    def sigmoid(self, x):
-        """
-        sigmoid function
-
-        Parameters
-        ----------
-        x : array_like, shape=(n_data), dtype=float
-            arguments of function
-
-        Returns
-        -------
-        sig : array, shape=(n_data), dtype=float
-            1.0 / (1.0 + exp(- x))
-        """
-
-        # restrict domain of sigmoid function within [1e-15, 1 - 1e-15]
-        x = np.clip(x, -self.sigmoid_range, self.sigmoid_range)
-
-        return 1.0 / (1.0 + np.exp(-x))
-
     def loss(self, coef, ev, n_objects):
         """
         loss function to optimize
@@ -650,7 +605,7 @@ class ImplicitLogisticPMF(BaseImplicitItemFinder):
         loss = 0.0
         for i in xrange(n_users):
             evi = ev.getrow(i).toarray().reshape(-1)
-            esc = self.sigmoid(
+            esc = sigmoid(
                 mu[0] + bu[i] + bi[:] +
                 np.sum(p[i, :][np.newaxis, :] * q, axis=1))
             loss = loss - np.sum(
@@ -703,7 +658,7 @@ class ImplicitLogisticPMF(BaseImplicitItemFinder):
         # gradient of loss term
         for i in xrange(n_users):
             evi = ev.getrow(i).toarray().reshape(-1)
-            esc = self.sigmoid(
+            esc = sigmoid(
                 mu[0] + bu[i] + bi[:] +
                 np.sum(p[i, :][np.newaxis, :] * q, axis=1))
             common_term = esc - evi
@@ -833,7 +788,7 @@ class ImplicitLogisticPMF(BaseImplicitItemFinder):
             shape of an input array is illegal
         """
 
-        sc = self.sigmoid(
+        sc = sigmoid(
             self.mu_[0] + self.bu_[ev[:, 0]] + self.bi_[ev[:, 1]] +
             np.sum(self.p_[ev[:, 0], :] * self.q_[ev[:, 1], :], axis=1))
 
