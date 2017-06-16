@@ -295,15 +295,6 @@ class TestLogisticPMF(TestCase):
 
 class TestImplicitLogisticPMF(TestCase):
 
-    def test_logistic(self):
-
-        rec = ImplicitLogisticPMF()
-        self.assertAlmostEqual(rec.sigmoid(0.), 0.5)
-        self.assertAlmostEqual(rec.sigmoid(1.), 1 / (1 + 1 / np.e))
-        self.assertAlmostEqual(rec.sigmoid(-1.), 1 / (1 + np.e))
-        self.assertAlmostEqual(rec.sigmoid(1000.), 1. - 1e-15)
-        self.assertAlmostEqual(rec.sigmoid(-1000.), 1e-15)
-
     def test_loss(self):
 
         # setup
