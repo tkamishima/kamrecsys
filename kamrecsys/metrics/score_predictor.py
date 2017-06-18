@@ -52,10 +52,13 @@ __all__ = []
 
 def score_predictor_report(y_true, y_pred, disp=True):
     """
-    Report belief summary of prediction performance
+    Report brief summary of prediction performance
     
     * mean absolute error
     * root mean squared error
+    * number of data
+    * mean and standard dev. of true scores
+    * mean and standard dev. of predicted scores
 
     Parameters
     ----------
