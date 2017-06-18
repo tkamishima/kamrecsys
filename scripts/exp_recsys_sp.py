@@ -603,6 +603,7 @@ def init_info(opt):
     # data
     info['data']['score_domain'] = list(opt.domain)
     info['data']['has_timestamp'] = opt.timestamp
+    info['data']['explicit_rating'] = True
 
     return info
 
