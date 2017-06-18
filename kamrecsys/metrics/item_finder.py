@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Evaluation Metrics
+Summary of ModuleName
 """
 
 from __future__ import (
@@ -15,20 +15,18 @@ from six.moves import xrange
 # Imports
 # =============================================================================
 
+import sys
 import logging
+import json
 
-from .base import (
-    generate_score_bins)
-from .real import (
-    mean_absolute_error,
-    mean_squared_error,
-    score_histogram,
-    variance_with_gamma_prior)
-from .score_predictor import (
-    score_predictor_report,
-    score_predictor_statistics)
-from .item_finder import (
-    item_finder_report)
+import numpy as np
+
+from sklearn.utils import (
+    as_float_array, assert_all_finite, check_consistent_length)
+import sklearn.metrics as skm
+
+from . import mean_absolute_error
+from ..utils import is_binary_score
 
 # =============================================================================
 # Metadata variables
@@ -38,15 +36,7 @@ from .item_finder import (
 # Public symbols
 # =============================================================================
 
-__all__ = [
-    'generate_score_bins',
-    'mean_absolute_error',
-    'mean_squared_error',
-    'score_histogram',
-    'variance_with_gamma_prior',
-    'score_predictor_report',
-    'score_predictor_statistics',
-    'item_finder_report']
+__all__ = []
 
 # =============================================================================
 # Constants
@@ -59,6 +49,58 @@ __all__ = [
 # =============================================================================
 # Functions
 # =============================================================================
+
+
+def item_finder_report(y_true, y_pred, disp=True):
+    """
+    Report brief summary of prediction performance
+
+    * AUC
+    * number of data
+    * mean and standard dev. of true scores
+    * mean and standard dev. of predicted scores
+
+    Parameters
+    ----------
+    y_true : array, shape(n_samples,)
+        Ground truth scores
+    y_pred : array, shape(n_samples,)
+        Predicted scores
+    disp : bool, optional, default=True
+        if True, print report
+
+    Returns
+    -------
+    stats : dict
+        belief summary of prediction performance
+    """
+
+    # check inputs
+    assert_all_finite(y_true)
+    if not is_binary_score(y_true):
+        raise ValueError('True scores must be binary')
+    y_true = as_float_array(y_true)
+    assert_all_finite(y_pred)
+    y_pred = as_float_array(y_pred)
+    check_consistent_length(y_true, y_pred)
+
+    # calc statistics
+    stats = {}
+
+    stats['area_under_the_curve'] = skm.roc_auc_score(y_true, y_pred)
+
+    stats['n_samples'] = y_true.size
+    stats['true'] = {'mean': np.mean(y_true), 'stdev': np.std(y_true)}
+    stats['predicted'] = {'mean': np.mean(y_pred), 'stdev': np.std(y_pred)}
+
+    # display statistics
+    if disp:
+        print(
+            json.dumps(stats, sort_keys=True, indent=4, separators=(',', ': '),
+                ensure_ascii=False), file=sys.stderr)
+
+    return stats
+
 
 # =============================================================================
 # Classes
