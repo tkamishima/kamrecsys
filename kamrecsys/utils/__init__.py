@@ -19,7 +19,8 @@ import logging
 
 from .base import (
     fit_status_message,
-    get_fit_status_message)
+    get_fit_status_message,
+    is_binary_score)
 from .kammath import safe_sigmoid
 from .kamexputils import (
     json_decodable,
@@ -37,6 +38,7 @@ from .kamexputils import (
 __all__ = [
     'fit_status_message',
     'get_fit_status_message',
+    'is_binary_score',
     'safe_sigmoid',
     'json_decodable',
     'get_system_info',
