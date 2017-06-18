@@ -1,5 +1,5 @@
 """
-Experimentation script for Score Predictors
+Experimentation script for Item Finders with Explicit Ratings
 
 Input Format
 ------------
@@ -11,6 +11,9 @@ rating behavior. Each column represents is as follows:
 * 2. An item rated by the user, represented by External-ID,
 * 3. A rating score given by the user to the item
 * 4. A timestamp of rating behavior, optional.
+
+Ratings are assumed to be 0 or 1; otherwise, ratings are binarized by a method
+:meth:`binnarize` .
 
 Output Format
 -------------
@@ -39,9 +42,7 @@ Options
 -m <METHOD>, --method <METHOD>
     specify algorithm: default=pmf
 
-    * pmf : probabilistic matrix factorization
-    * plsam : pLSA (multinomial / use expectation in prediction)
-    * plsamm : pLSA (multinomial / use mode in prediction)
+    * lpmf : logistic probabilistic matrix factorization
 
 -v <VALIDATION>, --validation <VALIDATION>
     validation scheme: default=holdout
@@ -55,7 +56,8 @@ Options
     specify whether .event files has 'timestamp' information,
     default=timestamp
 -d <DOMAIN>, --domain <DOMAIN>
-    The domain of scores specified by three floats: min, max, increment
+    The domain of scores in original filespecified by three floats: min, max,
+    increment.  Unless scores are not binary, these scores are binarized.
     default=auto
 -C <C>, --lambda <C>
     regularization parameter, default=0.01.
@@ -109,8 +111,8 @@ from kamrecsys.utils import get_system_info, get_version_info, json_decodable
 # =============================================================================
 
 __author__ = "Toshihiro Kamishima ( http://www.kamishima.net/ )"
-__date__ = "2014/07/06"
-__version__ = "3.1.0"
+__date__ = "2017-06-18"
+__version__ = "1.0.0"
 __copyright__ = "Copyright (c) 2014 Toshihiro Kamishima all rights reserved."
 __license__ = "MIT License: http://www.opensource.org/licenses/mit-license.php"
 
@@ -133,9 +135,12 @@ __all__ = ['do_task']
 # =============================================================================
 
 
-def load_data(fp, ts):
+def load_data(fp, ts, orig_score_domain):
     """
     load event with scores data
+
+    if scores of the loaded events are not binary type, these are discretized
+    into binary scores.
 
     Parameters
     ----------
@@ -143,6 +148,8 @@ def load_data(fp, ts):
         input file pointer
     ts : bool
         has timestamp field
+    orig_score_domain : array, shape=(3,)
+        the domain of scores in an original dataset
 
     Returns
     -------
@@ -169,6 +176,18 @@ def load_data(fp, ts):
     # close file
     if fp is not sys.stdin:
         fp.close()
+
+    # estimate the domain of scores in an original dataset, unless available
+    tsc = x['score']
+    if np.all(np.array(orig_score_domain) == 0):
+        orig_score_domain = [
+            np.min(tsc), np.max(tsc), np.min(np.diff(np.unique(tsc)))]
+
+    # binarize scores
+    if not np.array_equal(orig_score_domain, [0, 1, 1]):
+        score_thresh = ((orig_score_domain[1] - orig_score_domain[0]) / 2 +
+                        orig_score_domain[0])
+        x['score'] = np.where(x['score'] <= score_thresh, 0, 1)
 
     return x
 
@@ -203,11 +222,6 @@ def training(info, ev, tsc, event_feature=None, fold=0):
     # generate event data
     data = EventWithScoreData(n_otypes=2)
     score_domain = info['data']['score_domain']
-    if np.all(np.array(score_domain) == 0):
-        score_domain = [
-            np.min(tsc), np.max(tsc), np.min(np.diff(np.unique(tsc)))]
-        info['data']['score_domain'] = score_domain
-        logger.info("score domain is changed to " + str(score_domain))
     data.set_event(
         ev, tsc, score_domain=score_domain, event_feature=event_feature)
 
@@ -332,14 +346,16 @@ def holdout_test(info):
     # prepare training data
     train_x = load_data(
         info['training']['file'],
-        info['data']['has_timestamp'])
+        info['data']['has_timestamp'],
+        info['data']['original_score_domain'])
 
     # prepare test data
     if info['test']['file'] is None:
         raise IOError('hold-out test data is required')
     test_x = load_data(
         info['test']['file'],
-        info['data']['has_timestamp'])
+        info['data']['has_timestamp'],
+        info['data']['original_score_domain'])
     if info['data']['has_timestamp']:
         ef = train_x['event_feature']
     else:
@@ -373,7 +389,8 @@ def cv_test(info):
     # prepare training data
     x = load_data(
         info['training']['file'],
-        info['data']['has_timestamp'])
+        info['data']['has_timestamp'],
+        info['data']['original_score_domain'])
     info['test']['file'] = info['training']['file']
     n_events = x.shape[0]
     ev = x['event']
@@ -422,7 +439,7 @@ def do_task(info):
     np.seterr(all='ignore')
 
     # update information dictionary
-    info['model']['type'] = 'score_predictor'
+    info['model']['type'] = 'item_finder'
     info['model']['name'] = info['model']['recommender'].__name__
     info['model']['module'] = info['model']['recommender'].__module__
 
@@ -502,8 +519,8 @@ def command_line_parser():
                     type=argparse.FileType('rb'))
 
     # script specific options
-    ap.add_argument('-m', '--method', type=str, default='pmf',
-                    choices=['pmf', 'plsam', 'plsamm'])
+    ap.add_argument('-m', '--method', type=str, default='lpmf',
+                    choices=['lpmf'])
     ap.add_argument('-v', '--validation', type=str, default='holdout',
                     choices=['holdout', 'cv'])
     ap.add_argument('-f', '--fold', type=int, default=5)
@@ -571,26 +588,12 @@ def init_info(opt):
     info['test']['file'] = opt.testfile
 
     # model
-    if opt.method == 'pmf':
-        from kamrecsys.score_predictor import PMF
-        info['model']['method'] = 'probabilistic matrix factorization'
-        info['model']['recommender'] = PMF
+    if opt.method == 'lpmf':
+        from kamrecsys.item_finder import LogisticPMF
+        info['model']['method'] = 'logistic probabilistic matrix factorization'
+        info['model']['recommender'] = LogisticPMF
         info['model']['options'] = {
             'C': opt.C, 'k': opt.k, 'tol': opt.tol, 'maxiter': opt.maxiter}
-    elif opt.method == 'plsam':
-        from kamrecsys.score_predictor import MultinomialPLSA
-        info['model']['method'] = 'multionomial pLSA - expectation'
-        info['model']['recommender'] = MultinomialPLSA
-        info['model']['options'] = {
-            'alpha': opt.alpha, 'k': opt.k, 'use_expectation': True,
-            'tol': opt.tol, 'maxiter': opt.maxiter}
-    elif opt.method == 'plsamm':
-        from kamrecsys.score_predictor import MultinomialPLSA
-        info['model']['recommender'] = MultinomialPLSA
-        info['model']['method'] = 'multionomial pLSA - mode'
-        info['model']['options'] = {
-            'alpha': opt.alpha, 'k': opt.k, 'use_expectation': False,
-            'tol': opt.tol, 'maxiter': opt.maxiter}
     else:
         raise TypeError(
             "Invalid method name: {0:s}".format(info['model']['method']))
@@ -601,7 +604,8 @@ def init_info(opt):
     info['test']['n_folds'] = opt.fold
 
     # data
-    info['data']['score_domain'] = list(opt.domain)
+    info['data']['score_domain'] = [0, 1, 1]
+    info['data']['original_score_domain'] = list(opt.domain)
     info['data']['has_timestamp'] = opt.timestamp
     info['data']['explicit_rating'] = True
 
