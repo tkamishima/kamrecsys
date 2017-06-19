@@ -17,6 +17,8 @@ from six.moves import xrange
 
 import logging
 
+import numpy as np
+
 # =============================================================================
 # Metadata variables
 # =============================================================================
@@ -47,6 +49,7 @@ fit_status_message = {
 # Functions
 # =============================================================================
 
+
 def get_fit_status_message(status):
     """
     Status messages of fitting results. These are compatible with
@@ -76,6 +79,23 @@ def get_fit_status_message(status):
 
     return message
 
+
+def is_binary_score(score):
+    """
+    check
+
+    Parameters
+    ----------
+    score : array
+        array of scores
+
+    Returns
+    -------
+    is_binary
+        True if scores consist of 0 and 1 and contain at least one 0 and 1.
+    """
+
+    return np.array_equal(np.unique(score), [0, 1])
 
 # =============================================================================
 # Classes

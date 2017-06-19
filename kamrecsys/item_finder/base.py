@@ -24,6 +24,7 @@ from six import with_metaclass
 
 from ..base import BaseEventRecommender
 from ..data import EventData, ScoreUtilMixin
+from ..utils import is_binary_score
 
 # =============================================================================
 # Metadata variables
@@ -121,7 +122,7 @@ class BaseExplicitItemFinder(
         # check whether scores are binary
         if (
                 (not np.array_equal(data.score_domain, [0, 1, 1])) or
-                (not np.array_equal(np.unique(data.score), [0, 1])) or
+                (not is_binary_score(data.score)) or
                 (data.n_score_levels != 2)):
             raise ValueError('Scores are not binary type')
 
