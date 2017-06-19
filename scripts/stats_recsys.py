@@ -50,7 +50,8 @@ import sys
 
 import numpy as np
 
-from kamrecsys.metrics import score_predictor_statistics
+from kamrecsys.metrics import (
+    item_finder_statistics, score_predictor_statistics)
 from kamrecsys.utils import json_decodable
 
 # =============================================================================
@@ -108,6 +109,9 @@ def do_task(opt):
             info['prediction']['true'],
             info['prediction']['predicted'],
             score_domain=info['data']['score_domain'])
+    elif info['model']['type'] == 'item_finder':
+        stats = item_finder_statistics(info['prediction']['true'],
+            info['prediction']['predicted'])
     else:
         raise TypeError('Unsupported type of recommendation models')
     info['statistics'] = stats
