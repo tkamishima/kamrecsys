@@ -59,7 +59,7 @@ def test_item_finder_report():
     assert_allclose(stats['predicted']['stdev'], 0.383771468193, rtol=1e-5)
 
 
-def test_item_finder_statistics(self):
+def test_item_finder_statistics():
     from kamrecsys.metrics import item_finder_statistics
 
     with assert_raises(ValueError):
@@ -67,7 +67,7 @@ def test_item_finder_statistics(self):
 
     stats = item_finder_statistics(y_true, y_pred)
 
-    self.assertEqual(stats['n_samples'], 10)
+    assert_equal(stats['n_samples'], 10)
 
     assert_allclose(stats['area_under_the_curve'], 0.4285714285714286,
                     rtol=1e-5)
