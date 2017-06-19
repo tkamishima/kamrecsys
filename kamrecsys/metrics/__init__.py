@@ -27,6 +27,9 @@ from .real import (
 from .score_predictor import (
     score_predictor_report,
     score_predictor_statistics)
+from .item_finder import (
+    item_finder_report,
+    item_finder_statistics)
 
 # =============================================================================
 # Metadata variables
@@ -43,7 +46,9 @@ __all__ = [
     'score_histogram',
     'variance_with_gamma_prior',
     'score_predictor_report',
-    'score_predictor_statistics']
+    'score_predictor_statistics',
+    'item_finder_report',
+    'item_finder_statistics']
 
 # =============================================================================
 # Constants

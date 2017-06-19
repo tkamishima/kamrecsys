@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Summarizers for Score Predictors
+Summary of ModuleName
 """
 
 from __future__ import (
@@ -20,12 +20,13 @@ import logging
 import json
 
 import numpy as np
+
 from sklearn.utils import (
     as_float_array, assert_all_finite, check_consistent_length)
-
 import sklearn.metrics as skm
 
-from . import mean_absolute_error, mean_squared_error, score_histogram
+from . import mean_absolute_error
+from ..utils import is_binary_score
 
 # =============================================================================
 # Metadata variables
@@ -50,12 +51,11 @@ __all__ = []
 # =============================================================================
 
 
-def score_predictor_report(y_true, y_pred, disp=True):
+def item_finder_report(y_true, y_pred, disp=True):
     """
     Report brief summary of prediction performance
-    
-    * mean absolute error
-    * root mean squared error
+
+    * AUC
     * number of data
     * mean and standard dev. of true scores
     * mean and standard dev. of predicted scores
@@ -77,6 +77,8 @@ def score_predictor_report(y_true, y_pred, disp=True):
 
     # check inputs
     assert_all_finite(y_true)
+    if not is_binary_score(y_true):
+        raise ValueError('True scores must be binary')
     y_true = as_float_array(y_true)
     assert_all_finite(y_pred)
     y_pred = as_float_array(y_pred)
@@ -84,34 +86,29 @@ def score_predictor_report(y_true, y_pred, disp=True):
 
     # calc statistics
     stats = {}
-    stats['mean_absolute_error'] = skm.mean_absolute_error(y_true, y_pred)
-    stats['root_mean_squared_error'] = np.sqrt(
-        np.maximum(skm.mean_squared_error(y_true, y_pred), 0.))
+
+    stats['area_under_the_curve'] = skm.roc_auc_score(y_true, y_pred)
+
     stats['n_samples'] = y_true.size
-    stats['true'] = {
-        'mean': np.mean(y_true),
-        'stdev': np.std(y_true)}
-    stats['predicted'] = {
-        'mean': np.mean(y_pred),
-        'stdev': np.std(y_pred)}
+    stats['true'] = {'mean': np.mean(y_true), 'stdev': np.std(y_true)}
+    stats['predicted'] = {'mean': np.mean(y_pred), 'stdev': np.std(y_pred)}
 
     # display statistics
     if disp:
-        print(json.dumps(
-            stats, sort_keys=True, indent=4, separators=(',', ': '),
-            ensure_ascii=False),
-            file=sys.stderr)
+        print(
+            json.dumps(stats, sort_keys=True, indent=4, separators=(',', ': '),
+                ensure_ascii=False), file=sys.stderr)
 
     return stats
 
 
-def score_predictor_statistics(y_true, y_pred, score_domain=(1, 5, 1)):
+def item_finder_statistics(y_true, y_pred):
     """
     Full Statistics of prediction performance
-    
+
     * n_samples
     * mean_absolute_error: mean, stdev
-    * mean_squared_error: mean, rmse, stdev 
+    * mean_squared_error: mean, rmse, stdev
     * predicted: mean, stdev
     * true: mean, stdev
 
@@ -121,9 +118,6 @@ def score_predictor_statistics(y_true, y_pred, score_domain=(1, 5, 1)):
         Ground truth scores
     y_pred : array, shape=(n_samples,)
         Predicted scores
-    score_domain : array, shape=(3,)
-        Domain of scores, represented by a triple: start, end, and stride
-        default=(1, 5, 1).
 
     Returns
     -------
@@ -133,6 +127,8 @@ def score_predictor_statistics(y_true, y_pred, score_domain=(1, 5, 1)):
 
     # check inputs
     assert_all_finite(y_true)
+    if not is_binary_score(y_true):
+        raise ValueError('True scores must be binary')
     y_true = as_float_array(y_true)
     assert_all_finite(y_pred)
     y_pred = as_float_array(y_pred)
@@ -144,32 +140,14 @@ def score_predictor_statistics(y_true, y_pred, score_domain=(1, 5, 1)):
     # dataset size
     stats['n_samples'] = y_true.size
 
-    # a list of possible score levels
-    stats['score_levels'] = np.hstack([
-        np.arange(score_domain[0], score_domain[1], score_domain[2],
-                  dtype=float), score_domain[1]])
-
-    # mean absolute error
-    mean, stdev = mean_absolute_error(y_true, y_pred)
-    stats['mean_absolute_error'] = {'mean': mean, 'stdev':stdev}
-
-    # root mean squared error
-    rmse, mean, stdev = mean_squared_error(y_true, y_pred)
-    stats['mean_squared_error'] = {'rmse': rmse, 'mean': mean, 'stdev': stdev}
+    # AUC (area undeer the curve)
+    stats['area_under_the_curve'] = skm.roc_auc_score(y_true, y_pred)
 
     # descriptive statistics of ground truth scores
-    stats['true'] = {'mean': np.mean(y_true), 'stdev':np.std(y_true)}
-
-    hist, _ = score_histogram(y_true, score_domain=score_domain)
-    stats['true']['histogram'] = hist
-    stats['true']['histogram_density'] = (hist / hist.sum())
+    stats['true'] = {'mean': np.mean(y_true), 'stdev': np.std(y_true)}
 
     # descriptive statistics of ground predicted scores
     stats['predicted'] = {'mean': np.mean(y_pred), 'stdev': np.std(y_pred)}
-
-    hist, _ = score_histogram(y_pred, score_domain=score_domain)
-    stats['predicted']['histogram'] = hist
-    stats['predicted']['histogram_density'] = (hist / hist.sum())
 
     return stats
 
@@ -208,12 +186,3 @@ def _test():
 
 if __name__ == '__main__':
     _test()
-
-
-
-
-
-
-
-
-
