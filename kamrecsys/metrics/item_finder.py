@@ -102,6 +102,56 @@ def item_finder_report(y_true, y_pred, disp=True):
     return stats
 
 
+def item_finder_statistics(y_true, y_pred):
+    """
+    Full Statistics of prediction performance
+
+    * n_samples
+    * mean_absolute_error: mean, stdev
+    * mean_squared_error: mean, rmse, stdev
+    * predicted: mean, stdev
+    * true: mean, stdev
+
+    Parameters
+    ----------
+    y_true : array, shape=(n_samples,)
+        Ground truth scores
+    y_pred : array, shape=(n_samples,)
+        Predicted scores
+
+    Returns
+    -------
+    stats : dict
+        Full statistics of prediction performance
+    """
+
+    # check inputs
+    assert_all_finite(y_true)
+    if not is_binary_score(y_true):
+        raise ValueError('True scores must be binary')
+    y_true = as_float_array(y_true)
+    assert_all_finite(y_pred)
+    y_pred = as_float_array(y_pred)
+    check_consistent_length(y_true, y_pred)
+
+    # calc statistics
+    stats = {}
+
+    # dataset size
+    stats['n_samples'] = y_true.size
+
+    # AUC (area undeer the curve)
+    stats['area_under_the_curve'] = skm.roc_auc_score(y_true, y_pred)
+
+    # descriptive statistics of ground truth scores
+    stats['true'] = {'mean': np.mean(y_true), 'stdev': np.std(y_true)}
+
+    # descriptive statistics of ground predicted scores
+    stats['predicted'] = {'mean': np.mean(y_pred), 'stdev': np.std(y_pred)}
+
+    return stats
+
+
 # =============================================================================
 # Classes
 # =============================================================================

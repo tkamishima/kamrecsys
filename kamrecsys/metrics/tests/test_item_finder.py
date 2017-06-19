@@ -58,6 +58,26 @@ def test_item_finder_report():
     assert_allclose(stats['predicted']['mean'], 3.99361964567, rtol=1e-5)
     assert_allclose(stats['predicted']['stdev'], 0.383771468193, rtol=1e-5)
 
+
+def test_item_finder_statistics(self):
+    from kamrecsys.metrics import item_finder_statistics
+
+    with assert_raises(ValueError):
+        item_finder_statistics([0], [1])
+
+    stats = item_finder_statistics(y_true, y_pred)
+
+    self.assertEqual(stats['n_samples'], 10)
+
+    assert_allclose(stats['area_under_the_curve'], 0.4285714285714286,
+                    rtol=1e-5)
+
+    assert_allclose(stats['true']['mean'], 0.7, rtol=1e-5)
+    assert_allclose(stats['true']['stdev'], 0.45825756949558405, rtol=1e-5)
+    assert_allclose(stats['predicted']['mean'], 3.99361964567, rtol=1e-5)
+    assert_allclose(stats['predicted']['stdev'], 0.383771468193, rtol=1e-5)
+
+
 # =============================================================================
 # Test Classes
 # =============================================================================
