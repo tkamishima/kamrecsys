@@ -50,7 +50,7 @@ def test_item_finder_report():
         item_finder_report([2], [1])
 
     stats = item_finder_report(y_true, y_pred, disp=False)
-    assert_allclose(stats['area_under_the_curve'], 0.4285714285714286,
+    assert_allclose(stats['area under the curve'], 0.4285714285714286,
                     rtol=1e-5)
 
     assert_equal(stats['n_samples'], 10)
@@ -73,7 +73,7 @@ def test_item_finder_statistics():
 
     assert_equal(stats['n_samples'], 10)
 
-    assert_allclose(stats['area_under_the_curve'], 0.4285714285714286,
+    assert_allclose(stats['area under the curve'], 0.4285714285714286,
                     rtol=1e-5)
 
     assert_allclose(stats['true']['mean'], 0.7, rtol=1e-5)
@@ -82,7 +82,7 @@ def test_item_finder_statistics():
     assert_allclose(stats['predicted']['stdev'], 0.383771468193, rtol=1e-5)
 
     stats = item_finder_statistics(np.zeros(10), y_pred)
-    assert_('area_under_the_curve' not in stats)
+    assert_('area under the curve' not in stats)
 
 
 # =============================================================================

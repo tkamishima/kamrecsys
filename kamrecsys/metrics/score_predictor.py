@@ -84,8 +84,8 @@ def score_predictor_report(y_true, y_pred, disp=True):
 
     # calc statistics
     stats = {}
-    stats['mean_absolute_error'] = skm.mean_absolute_error(y_true, y_pred)
-    stats['root_mean_squared_error'] = np.sqrt(
+    stats['mean absolute error'] = skm.mean_absolute_error(y_true, y_pred)
+    stats['root mean squared error'] = np.sqrt(
         np.maximum(skm.mean_squared_error(y_true, y_pred), 0.))
     stats['n_samples'] = y_true.size
     stats['true'] = {
@@ -145,31 +145,31 @@ def score_predictor_statistics(y_true, y_pred, score_domain=(1, 5, 1)):
     stats['n_samples'] = y_true.size
 
     # a list of possible score levels
-    stats['score_levels'] = np.hstack([
+    stats['score levels'] = np.hstack([
         np.arange(score_domain[0], score_domain[1], score_domain[2],
                   dtype=float), score_domain[1]])
 
     # mean absolute error
     mean, stdev = mean_absolute_error(y_true, y_pred)
-    stats['mean_absolute_error'] = {'mean': mean, 'stdev':stdev}
+    stats['mean absolute error'] = {'mean': mean, 'stdev':stdev}
 
     # root mean squared error
     rmse, mean, stdev = mean_squared_error(y_true, y_pred)
-    stats['mean_squared_error'] = {'rmse': rmse, 'mean': mean, 'stdev': stdev}
+    stats['mean squared error'] = {'rmse': rmse, 'mean': mean, 'stdev': stdev}
 
     # descriptive statistics of ground truth scores
     stats['true'] = {'mean': np.mean(y_true), 'stdev':np.std(y_true)}
 
     hist, _ = score_histogram(y_true, score_domain=score_domain)
     stats['true']['histogram'] = hist
-    stats['true']['histogram_density'] = (hist / hist.sum())
+    stats['true']['histogram density'] = (hist / hist.sum())
 
     # descriptive statistics of ground predicted scores
     stats['predicted'] = {'mean': np.mean(y_pred), 'stdev': np.std(y_pred)}
 
     hist, _ = score_histogram(y_pred, score_domain=score_domain)
     stats['predicted']['histogram'] = hist
-    stats['predicted']['histogram_density'] = (hist / hist.sum())
+    stats['predicted']['histogram density'] = (hist / hist.sum())
 
     return stats
 
