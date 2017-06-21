@@ -27,6 +27,7 @@ from numpy.testing import (
     assert_raises_regex,
     assert_warns,
     assert_string_equal)
+import numpy as np
 
 # =============================================================================
 # Variables
@@ -46,7 +47,7 @@ def test_item_finder_report():
     from kamrecsys.metrics import item_finder_report
 
     with assert_raises(ValueError):
-        item_finder_report([0], [1])
+        item_finder_report([2], [1])
 
     stats = item_finder_report(y_true, y_pred, disp=False)
     assert_allclose(stats['area_under_the_curve'], 0.4285714285714286,
@@ -58,12 +59,15 @@ def test_item_finder_report():
     assert_allclose(stats['predicted']['mean'], 3.99361964567, rtol=1e-5)
     assert_allclose(stats['predicted']['stdev'], 0.383771468193, rtol=1e-5)
 
+    stats = item_finder_report(np.zeros(10), y_pred, disp=False)
+    assert_('area_under_the_curve' not in stats)
+
 
 def test_item_finder_statistics():
     from kamrecsys.metrics import item_finder_statistics
 
     with assert_raises(ValueError):
-        item_finder_statistics([0], [1])
+        item_finder_statistics([3], [1])
 
     stats = item_finder_statistics(y_true, y_pred)
 
@@ -76,6 +80,9 @@ def test_item_finder_statistics():
     assert_allclose(stats['true']['stdev'], 0.45825756949558405, rtol=1e-5)
     assert_allclose(stats['predicted']['mean'], 3.99361964567, rtol=1e-5)
     assert_allclose(stats['predicted']['stdev'], 0.383771468193, rtol=1e-5)
+
+    stats = item_finder_statistics(np.zeros(10), y_pred)
+    assert_('area_under_the_curve' not in stats)
 
 
 # =============================================================================
