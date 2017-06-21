@@ -87,11 +87,13 @@ def item_finder_report(y_true, y_pred, disp=True):
     # calc statistics
     stats = {}
 
-    stats['area_under_the_curve'] = skm.roc_auc_score(y_true, y_pred)
-
     stats['n_samples'] = y_true.size
     stats['true'] = {'mean': np.mean(y_true), 'stdev': np.std(y_true)}
     stats['predicted'] = {'mean': np.mean(y_pred), 'stdev': np.std(y_pred)}
+
+    # statistics at least 0 and 1 must be contained in a score array
+    if is_binary_score(y_true, allow_uniorm=False):
+        stats['area_under_the_curve'] = skm.roc_auc_score(y_true, y_pred)
 
     # display statistics
     if disp:
@@ -140,14 +142,18 @@ def item_finder_statistics(y_true, y_pred):
     # dataset size
     stats['n_samples'] = y_true.size
 
-    # AUC (area undeer the curve)
-    stats['area_under_the_curve'] = skm.roc_auc_score(y_true, y_pred)
 
     # descriptive statistics of ground truth scores
     stats['true'] = {'mean': np.mean(y_true), 'stdev': np.std(y_true)}
 
     # descriptive statistics of ground predicted scores
     stats['predicted'] = {'mean': np.mean(y_pred), 'stdev': np.std(y_pred)}
+
+    # statistics at least 0 and 1 must be contained in a score array
+    if is_binary_score(y_true, allow_uniorm=False):
+
+        # AUC (area undeer the curve)
+        stats['area_under_the_curve'] = skm.roc_auc_score(y_true, y_pred)
 
     return stats
 
