@@ -93,7 +93,7 @@ def item_finder_report(y_true, y_pred, disp=True):
 
     # statistics at least 0 and 1 must be contained in a score array
     if is_binary_score(y_true, allow_uniorm=False):
-        stats['area_under_the_curve'] = skm.roc_auc_score(y_true, y_pred)
+        stats['area under the curve'] = skm.roc_auc_score(y_true, y_pred)
 
     # display statistics
     if disp:
@@ -153,7 +153,7 @@ def item_finder_statistics(y_true, y_pred):
     if is_binary_score(y_true, allow_uniorm=False):
 
         # AUC (area undeer the curve)
-        stats['area_under_the_curve'] = skm.roc_auc_score(y_true, y_pred)
+        stats['area under the curve'] = skm.roc_auc_score(y_true, y_pred)
 
     return stats
 

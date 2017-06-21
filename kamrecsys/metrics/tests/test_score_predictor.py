@@ -48,9 +48,9 @@ class TestScorePredictorReport(TestCase):
         stats = score_predictor_report(y_true, y_pred, disp=False)
         self.assertEqual(stats['n_samples'], 10)
         self.assertAlmostEqual(
-            stats['mean_absolute_error'], 0.9534215971390001, delta=1e-5)
+            stats['mean absolute error'], 0.9534215971390001, delta=1e-5)
         self.assertAlmostEqual(
-            stats['root_mean_squared_error'], 1.1597394143516166, delta=1e-5)
+            stats['root mean squared error'], 1.1597394143516166, delta=1e-5)
         self.assertAlmostEqual(
             stats['true']['mean'], 4.1, delta=1e-5)
         self.assertAlmostEqual(
@@ -70,15 +70,15 @@ class TestScorePredictorStatistics(TestCase):
             y_true, y_pred, score_domain=(1, 5, 1))
 
         self.assertEqual(stats['n_samples'], 10)
-        assert_allclose(stats['score_levels'], (1, 2, 3, 4, 5))
+        assert_allclose(stats['score levels'], (1, 2, 3, 4, 5))
 
-        sub_stats = stats['mean_absolute_error']
+        sub_stats = stats['mean absolute error']
         self.assertAlmostEqual(
             sub_stats['mean'], 0.9534215971390001, delta=1e-5)
         self.assertAlmostEqual(
             sub_stats['stdev'], 0.6602899115612394, delta=1e-5)
 
-        sub_stats = stats['mean_squared_error']
+        sub_stats = stats['mean squared error']
         self.assertAlmostEqual(
             sub_stats['rmse'], 1.1597394143516166, delta=1e-5)
         self.assertAlmostEqual(
@@ -93,7 +93,7 @@ class TestScorePredictorStatistics(TestCase):
             sub_stats['stdev'], 1.04403065089, delta=1e-5)
         assert_array_equal(sub_stats['histogram'], (0, 1, 2, 2, 5))
         assert_allclose(
-            sub_stats['histogram_density'],
+            sub_stats['histogram density'],
             [0.0, 0.1, 0.2, 0.2, 0.5],
             rtol=1e-5)
 
@@ -104,13 +104,13 @@ class TestScorePredictorStatistics(TestCase):
             sub_stats['stdev'], 0.383771468193, delta=1e-5)
         assert_array_equal(sub_stats['histogram'], (0, 0, 2, 7, 1))
         assert_allclose(
-            sub_stats['histogram_density'],
+            sub_stats['histogram density'],
             [0.0, 0.0, 0.2, 0.7, 0.1],
             rtol=1e-5)
 
         # check predicted scores
         stats = score_predictor_statistics(y_true, y_pred)
-        assert_allclose(stats['score_levels'], [1, 2, 3, 4, 5], rtol=1e-5)
+        assert_allclose(stats['score levels'], [1, 2, 3, 4, 5], rtol=1e-5)
         assert_array_equal(stats['true']['histogram'], [0, 1, 2, 2, 5])
         assert_array_equal(stats['predicted']['histogram'], [0, 0, 2, 7, 1])
 
