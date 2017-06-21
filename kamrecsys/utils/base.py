@@ -80,7 +80,7 @@ def get_fit_status_message(status):
     return message
 
 
-def is_binary_score(score):
+def is_binary_score(score, allow_uniorm=True):
     """
     check
 
@@ -88,14 +88,25 @@ def is_binary_score(score):
     ----------
     score : array
         array of scores
+    allow_uniform : bool
+        allow an array containing only one or zero (default=True)
 
     Returns
     -------
     is_binary
         True if scores consist of 0 and 1 and contain at least one 0 and 1.
     """
+    elements = np.unique(score)
 
-    return np.array_equal(np.unique(score), [0, 1])
+    if allow_uniorm:
+        is_binary = (
+            np.array_equal(elements, [0, 1]) or
+            np.array_equal(elements, [0]) or
+            np.array_equal(elements, [1]))
+    else:
+        is_binary = np.array_equal(elements, [0, 1])
+
+    return is_binary
 
 # =============================================================================
 # Classes
