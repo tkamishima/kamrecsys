@@ -188,7 +188,7 @@ def get_version_info():
 # =============================================================================
 
 # init logging system
-logger = logging.getLogger('kamiers')
+logger = logging.getLogger('kamrecsys')
 if not logger.handlers:
     logger.addHandler(logging.NullHandler())
 
