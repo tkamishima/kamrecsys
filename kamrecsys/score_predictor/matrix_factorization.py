@@ -59,7 +59,7 @@ class PMF(BaseScorePredictor):
         :math:`\mathbf{q}_i`), default=1
     tol : optional, float
         tolerance parameter for optimizer
-    maxiter : int, default=200
+    maxiter : int, default=optimizer's default
         maximum number of iterations is maxiter times the number of parameters
 
     Attributes
@@ -109,7 +109,7 @@ class PMF(BaseScorePredictor):
         Collaborative Filtering Model", KDD2008
     """
 
-    def __init__(self, C=1.0, k=1, tol=None, maxiter=200, random_state=None):
+    def __init__(self, C=1.0, k=1, tol=None, maxiter=None, random_state=None):
         super(PMF, self).__init__(random_state=random_state)
 
         self.C = float(C)
@@ -349,9 +349,9 @@ class PMF(BaseScorePredictor):
         elif self.tol is not None:
             kwargs['gtol'] = self.tol
         if maxiter is not None:
-            kwargs['maxiter'] = int(maxiter * self._coef.shape[0])
+            kwargs['maxiter'] = int(maxiter)
         elif self.maxiter is not None:
-            kwargs['maxiter'] = int(self.maxiter * self._coef.shape[0])
+            kwargs['maxiter'] = int(self.maxiter)
 
         # get initial loss
         self.fit_results_['initial_loss'] = self.loss(

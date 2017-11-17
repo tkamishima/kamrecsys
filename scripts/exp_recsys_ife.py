@@ -69,7 +69,6 @@ Options
     optimization parameter. the size of norm of gradient. default=1e-05.
 --maxiter <MAXITER>
     maximum number of iterations is maxiter times the number of parameters.
-    default=200
 -q, --quiet
     set logging level to ERROR, no messages unless errors
 --rseed <RSEED>
@@ -112,7 +111,7 @@ from kamrecsys.utils import get_system_info, get_version_info, json_decodable
 
 __author__ = "Toshihiro Kamishima ( http://www.kamishima.net/ )"
 __date__ = "2017-06-18"
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 __copyright__ = "Copyright (c) 2014 Toshihiro Kamishima all rights reserved."
 __license__ = "MIT License: http://www.opensource.org/licenses/mit-license.php"
 
@@ -537,7 +536,7 @@ def command_line_parser():
     ap.add_argument('-k', '--dim', dest='k', type=int, default=1)
     ap.add_argument('--alpha', dest='alpha', type=float, default=1.0)
     ap.add_argument('--tol', type=float, default=1e-05)
-    ap.add_argument('--maxiter', type=float, default=200)
+    ap.add_argument('--maxiter', type=int, default=None)
 
     # parsing
     opt = ap.parse_args()
