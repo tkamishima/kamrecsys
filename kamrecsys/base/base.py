@@ -83,7 +83,7 @@ class BaseRecommender(with_metaclass(ABCMeta, BaseEstimator, ObjectUtilMixin)):
         self._rng = None
         self.fit_results_ = {}
 
-    def fit(self, data, random_state=None):
+    def fit(self, data):
         """
         fitting model
 
@@ -91,14 +91,10 @@ class BaseRecommender(with_metaclass(ABCMeta, BaseEstimator, ObjectUtilMixin)):
         ----------
         data : :class:`kamrecsys.data.BaseData`
             input data
-        random_state: RandomState or an int seed (None by default)
-            A random number generator instance
         """
 
         # set random state
-        if random_state is None:
-            random_state = self.random_state
-        self._rng = check_random_state(random_state)
+        self._rng = check_random_state(self.random_state)
 
         # set object information in data
         self._set_object_info(data)
@@ -184,7 +180,7 @@ class BaseEventRecommender(
         self.event = None
         self.event_feature = None
 
-    def fit(self, data, event_index=None, random_state=None):
+    def fit(self, data, event_index=None):
         """
         fitting model
 
@@ -195,10 +191,8 @@ class BaseEventRecommender(
         event_index : array_like, shape=(variable,)
             a set of indexes to specify the elements in events that are used
             in a recommendation model
-        random_state: RandomState or an int seed (None by default)
-            A random number generator instance
         """
-        super(BaseEventRecommender, self).fit(data, random_state)
+        super(BaseEventRecommender, self).fit(data)
 
         # set object information in data
         self._set_event_info(data)

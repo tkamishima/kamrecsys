@@ -94,7 +94,7 @@ class BaseScorePredictor(
         super(BaseScorePredictor, self).remove_data()
         self.score = None
 
-    def fit(self, data, event_index=(0, 1), random_state=None):
+    def fit(self, data, event_index=(0, 1)):
         """
         fitting model
 
@@ -105,11 +105,8 @@ class BaseScorePredictor(
         event_index : array_like, shape=(variable,)
             a set of indexes to specify the elements in events that are used
             in a recommendation model
-        random_state: RandomState or an int seed (None by default)
-            A random number generator instance
         """
-        super(BaseScorePredictor, self).fit(
-            data, event_index, random_state)
+        super(BaseScorePredictor, self).fit(data, event_index)
 
         # set object information in data
         self._set_score_info(data)
