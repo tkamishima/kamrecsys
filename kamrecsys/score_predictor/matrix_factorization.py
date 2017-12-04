@@ -307,8 +307,7 @@ class PMF(BaseScorePredictor):
 
         return grad
 
-    def fit(self, data, event_index=(0, 1), tol=None,
-            maxiter=None, random_state=None, **kwargs):
+    def fit(self, data, event_index=(0, 1), tol=None, maxiter=None, **kwargs):
         """
         fitting model
 
@@ -320,9 +319,6 @@ class PMF(BaseScorePredictor):
             Index to specify the column numbers specifing a user and an item
             in an event array 
             (default=(0, 1))
-        random_state: RandomState or an int seed (None by default)
-            A random number generator instance. If None is given, the
-            object's random_state is used
         tol : float
             Tolerance of optimizer's convergence
         maxiter : int
@@ -332,7 +328,7 @@ class PMF(BaseScorePredictor):
         """
 
         # call super class
-        super(PMF, self).fit(data, event_index, random_state)
+        super(PMF, self).fit(data, event_index)
 
         # get input data
         ev, n_objects = self.get_event()
