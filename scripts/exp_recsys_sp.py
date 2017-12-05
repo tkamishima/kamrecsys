@@ -109,7 +109,7 @@ from kamrecsys.utils import get_system_info, get_version_info, json_decodable
 
 __author__ = "Toshihiro Kamishima ( http://www.kamishima.net/ )"
 __date__ = "2014/07/06"
-__version__ = "3.2.0"
+__version__ = "3.4.0"
 __copyright__ = "Copyright (c) 2014 Toshihiro Kamishima all rights reserved."
 __license__ = "MIT License: http://www.opensource.org/licenses/mit-license.php"
 
@@ -574,8 +574,9 @@ def init_info(opt):
         from kamrecsys.score_predictor import PMF
         info['model']['method'] = 'probabilistic matrix factorization'
         info['model']['recommender'] = PMF
-        info['model']['options'] = {
-            'C': opt.C, 'k': opt.k, 'tol': opt.tol, 'maxiter': opt.maxiter}
+        info['model']['options'] = {'C': opt.C, 'k': opt.k, 'tol': opt.tol}
+        if opt.maxiter is not None:
+            info['model']['options']['maxiter'] = opt.maxiter
     elif opt.method == 'plsam':
         from kamrecsys.score_predictor import MultinomialPLSA
         info['model']['method'] = 'multionomial pLSA - expectation'
