@@ -334,6 +334,9 @@ class PMF(BaseScorePredictor):
         optimizer_kwargs['options'] = optimizer_kwargs.get('options', {})
         optimizer_kwargs['options']['disp'] = (
             optimizer_kwargs['options'].get('disp', False))
+        opt_maxiter = optimizer_kwargs.pop('maxiter', None)
+        if opt_maxiter is not None:
+            optimizer_kwargs['options']['maxiter'] = opt_maxiter
 
         # get initial loss
         self.fit_results_['initial_loss'] = self.loss(
