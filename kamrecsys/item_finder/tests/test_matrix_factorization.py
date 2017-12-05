@@ -49,7 +49,7 @@ class TestLogisticPMF(TestCase):
         # setup
         data = load_movielens_mini()
         data.binarize_score(3)
-        rec = LogisticPMF(C=0.1, k=2, tol=1e-03, random_state=1234)
+        rec = LogisticPMF(C=0.1, k=2, random_state=1234, tol=1e-03)
 
         rec._rng = check_random_state(rec.random_state)
         ev = data.event
@@ -111,7 +111,7 @@ class TestLogisticPMF(TestCase):
         # setup
         data = load_movielens_mini()
         data.binarize_score()
-        rec = LogisticPMF(C=0.1, k=2, tol=1e-03, random_state=1234)
+        rec = LogisticPMF(C=0.1, k=2, random_state=1234, tol=1e-03)
         rec._rng = check_random_state(rec.random_state)
         ev = data.event
         sc = data.score
@@ -252,8 +252,8 @@ class TestLogisticPMF(TestCase):
         data = load_movielens_mini()
         data.binarize_score()
 
-        rec = LogisticPMF(C=0.1, k=2, tol=1e-03, random_state=1234)
-        rec.fit(data, disp=False)
+        rec = LogisticPMF(C=0.1, k=2, random_state=1234, tol=1e-03)
+        rec.fit(data)
 
         self.assertAlmostEqual(rec.fit_results_['initial_loss'],
                                0.79866250328432664, delta=1e-5)

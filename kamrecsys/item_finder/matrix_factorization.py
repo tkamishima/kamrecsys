@@ -21,7 +21,7 @@ from six.moves import xrange
 import logging
 import sys
 import numpy as np
-from scipy.optimize import fmin_cg
+from scipy.optimize import minimize
 from sklearn.utils import check_random_state
 
 from . import BaseExplicitItemFinder, BaseImplicitItemFinder
@@ -62,10 +62,8 @@ class LogisticPMF(BaseExplicitItemFinder):
     k : int, optional
         the number of latent factors (= sizes of :math:`\mathbf{p}_u` or
         :math:`\mathbf{q}_i`), default=1
-    tol : optional, float
-        tolerance parameter for optimizer
-    maxiter : int, default=200
-        maximum number of iterations is maxiter times the number of parameters
+    optimizer_kwargs : dict
+        keyword arguments passed to optimizer
 
     Attributes
     ----------
@@ -119,13 +117,13 @@ class LogisticPMF(BaseExplicitItemFinder):
         Collaborative Filtering Model", KDD2008
     """
 
-    def __init__(self, C=1.0, k=1, tol=None, maxiter=None, random_state=None):
+    def __init__(self, C=1.0, k=1, random_state=None, **optimizer_kwargs):
+
         super(LogisticPMF, self).__init__(random_state=random_state)
 
         self.C = float(C)
         self.k = int(k)
-        self.tol = tol
-        self.maxiter = maxiter
+        self.optimizer_kwargs = optimizer_kwargs
         self.mu_ = None
         self.bu_ = None
         self.bi_ = None
@@ -312,7 +310,7 @@ class LogisticPMF(BaseExplicitItemFinder):
 
         return grad
 
-    def fit(self, data, event_index=(0, 1), tol=None, maxiter=None, **kwargs):
+    def fit(self, data, event_index=(0, 1)):
         """
         fitting model
 
@@ -324,12 +322,6 @@ class LogisticPMF(BaseExplicitItemFinder):
             Index to specify the column numbers specifing a user and an item
             in an event array
             (default=(0, 1))
-        tol : float
-            Tolerance of optimizer's convergence
-        maxiter : int
-            Maximum number of iterations in optimization
-        kwargs : keyword arguments
-            Keyword arguments passed to optimizers
         """
 
         # call super class
@@ -343,16 +335,11 @@ class LogisticPMF(BaseExplicitItemFinder):
         self._init_coef(ev, sc, n_objects)
 
         # check optimization parameters
-        if 'disp' not in kwargs:
-            kwargs['disp'] = False
-        if tol is not None:
-            kwargs['gtol'] = tol
-        elif self.tol is not None:
-            kwargs['gtol'] = self.tol
-        if maxiter is not None:
-            kwargs['maxiter'] = int(maxiter)
-        elif self.maxiter is not None:
-            kwargs['maxiter'] = int(self.maxiter)
+        optimizer_kwargs = self.optimizer_kwargs.copy()
+        optimizer_method = optimizer_kwargs.pop('method', 'CG')
+        optimizer_kwargs['options'] = optimizer_kwargs.get('options', {})
+        optimizer_kwargs['options']['disp'] = (
+            optimizer_kwargs['options'].get('disp', False))
 
         # get initial loss
         self.fit_results_['initial_loss'] = self.loss(
@@ -361,15 +348,16 @@ class LogisticPMF(BaseExplicitItemFinder):
         # optimize model
         # fmin_bfgs is slow for large data, maybe because due to the
         # computation cost for the Hessian matrices.
-        res = fmin_cg(self.loss,
-                      self._coef,
-                      fprime=self.grad_loss,
-                      args=(ev, sc, n_objects),
-                      full_output=True,
-                      **kwargs)
+        res = minimize(
+            fun=self.loss,
+            x0=self._coef,
+            args=(ev, sc, n_objects),
+            method=optimizer_method,
+            jac=self.grad_loss,
+            **optimizer_kwargs)
 
         # get parameters
-        self._coef[:] = res[0]
+        self._coef[:] = res.x
 
         # add parameters for unknown users and items
         self.mu_ = self._coef.view(self._dt)['mu'][0].copy()
@@ -384,10 +372,15 @@ class LogisticPMF(BaseExplicitItemFinder):
         self.fit_results_['n_users'] = n_objects[0]
         self.fit_results_['n_items'] = n_objects[1]
         self.fit_results_['n_events'] = self.n_events
-        self.fit_results_['final_loss'] = res[1]
-        self.fit_results_['func_calls'] = res[2]
-        self.fit_results_['grad_calls'] = res[3]
-        self.fit_results_['warnflag'] = res[4]
+        self.fit_results_['optimizer_success'] = res.success
+        self.fit_results_['termination_status'] = res.status
+        self.fit_results_['termination_message'] = res.message
+        self.fit_results_['final_loss'] = res.fun
+        self.fit_results_['n_optimizer_iterations'] = res.nit
+        self.fit_results_['func_calls'] = res.nfev
+        self.fit_results_['grad_calls'] = res.njev
+        self.fit_results_['optimizer_method'] = optimizer_method
+        self.fit_results_['optimizer_kwargs'] = optimizer_kwargs
 
         # clean up temporary instance variables
         self.remove_data()
