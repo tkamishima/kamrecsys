@@ -478,8 +478,8 @@ class ImplicitLogisticPMF(BaseImplicitItemFinder):
     .. math::
 
         \sum_{(x,y)}
-        \frac{1}{N_x N_y}
-        - \Big( r_{xy} \log \hat{r}_{xy} + 
+        -\frac{1}{N_x N_y}
+        \Big( r_{xy} \log \hat{r}_{xy} +
                 (1 - r_{xy}) \log(1 - \hat{r}_{xy})\Big) 
         + \lambda \Big(
         \|\mathbf{b}\|_2^2 + \|\mathbf{c}\|_2^2 +
