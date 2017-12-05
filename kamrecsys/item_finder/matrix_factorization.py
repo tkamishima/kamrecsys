@@ -114,7 +114,7 @@ class LogisticPMF(BaseExplicitItemFinder):
     References
     ----------
     .. [1] R. Salakhutdinov and A. Mnih. "Probabilistic matrix factorization"
-        NIPS 20
+        NIPS2007
     .. [2] Y. Koren, "Factorization Meets the Neighborhood: A Multifaceted
         Collaborative Filtering Model", KDD2008
     """
