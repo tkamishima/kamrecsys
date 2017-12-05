@@ -95,7 +95,7 @@ class BaseExplicitItemFinder(
         super(BaseExplicitItemFinder, self).remove_data()
         self.score = None
 
-    def fit(self, data, event_index=(0, 1), random_state=None):
+    def fit(self, data, event_index=(0, 1)):
         """
         fitting model
 
@@ -106,8 +106,6 @@ class BaseExplicitItemFinder(
         event_index : array_like, shape=(variable,)
             a set of indexes to specify the elements in events that are used
             in a recommendation model
-        random_state: RandomState or an int seed (None by default)
-            A random number generator instance
 
         Raises
         ------
@@ -116,8 +114,7 @@ class BaseExplicitItemFinder(
             only 0 or 1, at least one 0 or 1 must be contained, and the
             number of score levels are 2
         """
-        super(BaseExplicitItemFinder, self).fit(
-            data, event_index, random_state)
+        super(BaseExplicitItemFinder, self).fit(data, event_index)
 
         # check whether scores are binary
         if (
@@ -138,7 +135,7 @@ class BaseImplicitItemFinder(with_metaclass(ABCMeta, BaseEventRecommender)):
     def __init__(self, random_state=None):
         super(BaseImplicitItemFinder, self).__init__(random_state=random_state)
 
-    def fit(self, data, event_index=(0, 1), random_state=None):
+    def fit(self, data, event_index=(0, 1)):
         """
         fitting model
 
@@ -149,11 +146,8 @@ class BaseImplicitItemFinder(with_metaclass(ABCMeta, BaseEventRecommender)):
         event_index : array_like, shape=(variable,)
             a set of indexes to specify the elements in events that are used
             in a recommendation model
-        random_state: RandomState or an int seed (None by default)
-            A random number generator instance
         """
-        super(BaseImplicitItemFinder, self).fit(
-            data, event_index, random_state)
+        super(BaseImplicitItemFinder, self).fit(data, event_index)
 
     def get_event_array(self, sparse_type='csr'):
         """

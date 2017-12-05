@@ -49,7 +49,7 @@ class TestLogisticPMF(TestCase):
         # setup
         data = load_movielens_mini()
         data.binarize_score(3)
-        rec = LogisticPMF(C=0.1, k=2, tol=1e-03, random_state=1234)
+        rec = LogisticPMF(C=0.1, k=2, random_state=1234, tol=1e-03)
 
         rec._rng = check_random_state(rec.random_state)
         ev = data.event
@@ -111,7 +111,7 @@ class TestLogisticPMF(TestCase):
         # setup
         data = load_movielens_mini()
         data.binarize_score()
-        rec = LogisticPMF(C=0.1, k=2, tol=1e-03, random_state=1234)
+        rec = LogisticPMF(C=0.1, k=2, random_state=1234, tol=1e-03)
         rec._rng = check_random_state(rec.random_state)
         ev = data.event
         sc = data.score
@@ -232,7 +232,7 @@ class TestLogisticPMF(TestCase):
         self.assertAlmostEqual(grad[0], 0.29999005844, delta=1e-5)
         assert_allclose(
             grad[1:5],
-            [ 0.1681171557, 0.0346052024, 0.0344230632, 0.0342412342],
+            [0.1681171557, 0.0346052024, 0.0344230632, 0.0342412342],
             rtol=1e-5)
         assert_allclose(
             grad[15:19],
@@ -252,8 +252,8 @@ class TestLogisticPMF(TestCase):
         data = load_movielens_mini()
         data.binarize_score()
 
-        rec = LogisticPMF(C=0.1, k=2, tol=1e-03, random_state=1234)
-        rec.fit(data, disp=False)
+        rec = LogisticPMF(C=0.1, k=2, random_state=1234, tol=1e-03)
+        rec.fit(data)
 
         self.assertAlmostEqual(rec.fit_results_['initial_loss'],
                                0.79866250328432664, delta=1e-5)
@@ -299,7 +299,7 @@ class TestImplicitLogisticPMF(TestCase):
 
         # setup
         data = load_movielens_mini()
-        rec = ImplicitLogisticPMF(C=0.1, k=2, tol=1e-03, random_state=1234)
+        rec = ImplicitLogisticPMF(C=0.1, k=2, random_state=1234, tol=1e-03)
 
         rec._rng = check_random_state(rec.random_state)
         n_objects = data.n_objects
@@ -362,7 +362,7 @@ class TestImplicitLogisticPMF(TestCase):
 
         # setup
         data = load_movielens_mini()
-        rec = ImplicitLogisticPMF(C=0.1, k=2, tol=1e-03, random_state=1234)
+        rec = ImplicitLogisticPMF(C=0.1, k=2, random_state=1234, tol=1e-03)
 
         rec._rng = check_random_state(rec.random_state)
         n_objects = data.n_objects
@@ -505,9 +505,9 @@ class TestImplicitLogisticPMF(TestCase):
 
         # setup
         data = load_movielens_mini()
-        rec = ImplicitLogisticPMF(C=0.1, k=2, tol=1e-03, random_state=1234)
+        rec = ImplicitLogisticPMF(C=0.1, k=2, random_state=1234, tol=1e-03)
 
-        rec.fit(data, disp=False)
+        rec.fit(data)
         self.assertAlmostEqual(rec.fit_results_['initial_loss'],
                                1.3445493746, delta=1e-5)
         self.assertAlmostEqual(rec.fit_results_['final_loss'],
@@ -544,6 +544,7 @@ class TestImplicitLogisticPMF(TestCase):
              0.590183096344, 0.202161811915, 0.22899801898,
              0.000727177442114, 0.0399527433316, 0.08288774155],
             rtol=1e-5)
+
 
 # =============================================================================
 # Main Routines
