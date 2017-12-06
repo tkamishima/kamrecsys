@@ -66,6 +66,9 @@ class BaseScorePredictor(
         the number of score levels
     """
 
+    task_type = 'score_predictor'
+    explicit_ratings = True
+
     def __init__(self, random_state=None):
         super(BaseScorePredictor, self).__init__(
             random_state=random_state)
