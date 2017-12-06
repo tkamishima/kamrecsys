@@ -95,7 +95,7 @@ from sklearn.model_selection import LeaveOneGroupOut
 
 from kamrecsys import __version__ as kamrecsys_version
 from kamrecsys.data import EventWithScoreData
-from kamrecsys.datasets import event_dtype_timestamp
+from kamrecsys.datasets import event_dtype_timestamp, load_event_with_score
 from kamrecsys.model_selection import interlace_group
 from kamrecsys.utils import get_system_info, get_version_info, json_decodable
 
@@ -132,7 +132,7 @@ __all__ = ['do_task']
 # =============================================================================
 
 
-def load_data(fp, ts):
+def load_data(fp, has_timestamp, score_domain):
     """
     load event with scores data
 
@@ -140,39 +140,31 @@ def load_data(fp, ts):
     ----------
     fp : string
         input file pointer
-    ts : bool
+    has_timestamp : bool
         has timestamp field
+    score_domain : array, shape=(3,), dtype=float
+        score_domain: minimum, maximum, interval
 
     Returns
     -------
-    x : array
-        structured array containing event and related information
+    data : :class:`kamrecsys.data.EventWithScoreData`
+        loaded data
     """
 
-    # have timestamp?
-    if ts:
-        dt = np.dtype([
-            ('event', int, 2),
-            ('score', float),
-            ('event_feature', event_dtype_timestamp)
-        ])
-    else:
-        dt = np.dtype([
-            ('event', int, 2),
-            ('score', float)
-        ])
+    # score_domain is explicitly specified?
+    if np.all(np.array(score_domain) == 0):
+        score_domain = None
 
-    # load training data
-    x = np.genfromtxt(fname=fp, delimiter='\t', dtype=dt)
+    # load data
+    data = load_event_with_score(
+        fp,
+        event_dtype=event_dtype_timestamp if has_timestamp else None,
+        score_domain=score_domain)
 
-    # close file
-    if fp is not sys.stdin:
-        fp.close()
-
-    return x
+    return data
 
 
-def training(info, ev, tsc, event_feature=None, fold=0):
+def training(info, data, fold=0):
     """
     training model
 
@@ -180,12 +172,8 @@ def training(info, ev, tsc, event_feature=None, fold=0):
     ----------
     info : dict
         Information about the target task
-    ev : array, size=(n_events, 2), dtype=int
-        array of events in external ids
-    tsc : array, size=(n_events,), dtype=float
-        true scores
-    event_feature : optional, structured array
-        structured array of event features
+    data : :class:`kamrecsys.data.EventWithScoreData`
+        training data
     fold : int, default=0
         fold No.
 
@@ -198,17 +186,6 @@ def training(info, ev, tsc, event_feature=None, fold=0):
     # start new fold
     n_folds = info['test']['n_folds']
     logger.info("training fold = " + str(fold + 1) + " / " + str(n_folds))
-
-    # generate event data
-    data = EventWithScoreData(n_otypes=2)
-    score_domain = info['data']['score_domain']
-    if np.all(np.array(score_domain) == 0):
-        score_domain = [
-            np.min(tsc), np.max(tsc), np.min(np.diff(np.unique(tsc)))]
-        info['data']['score_domain'] = score_domain
-        logger.info("score domain is changed to " + str(score_domain))
-    data.set_event(
-        ev, tsc, score_domain=score_domain, event_feature=event_feature)
 
     # set starting time
     start_time = datetime.datetime.now()
@@ -261,8 +238,6 @@ def testing(rec, info, ev, fold=0):
     ----------
     rec : EventScorePredictor
         trained recommender
-    info : dict
-        Information about the target task
     ev : array, size=(n_events, 2), dtype=int
         array of events in external ids
     fold : int, default=0
@@ -329,34 +304,34 @@ def holdout_test(info):
     """
 
     # prepare training data
-    train_x = load_data(
+    train_data = load_data(
         info['training']['file'],
-        info['data']['has_timestamp'])
+        info['data']['has_timestamp'],
+        info['data']['score_domain'])
+    info['data']['score_domain'] = train_data.score_domain
 
     # prepare test data
     if info['test']['file'] is None:
         raise IOError('hold-out test data is required')
-    test_x = load_data(
+    test_data = load_data(
         info['test']['file'],
-        info['data']['has_timestamp'])
-    if info['data']['has_timestamp']:
-        ef = train_x['event_feature']
-    else:
-        ef = None
+        info['data']['has_timestamp'],
+        info['data']['score_domain'])
+    test_ev = test_data.to_eid_event(test_data.event)
 
     # training
-    rec = training(info, train_x['event'], train_x['score'], event_feature=ef)
+    rec = training(info, train_data)
 
     # test
-    esc = testing(rec, info, test_x['event'])
+    esc = testing(rec, info, test_ev)
 
     # set predicted result
-    info['prediction']['event'] = test_x['event']
-    info['prediction']['true'] = test_x['score']
+    info['prediction']['event'] = test_data.to_eid_event(test_data.event)
+    info['prediction']['true'] = test_data.score
     info['prediction']['predicted'] = esc
     if info['data']['has_timestamp']:
         info['prediction']['event_feature'] = (
-            {'timestamp': test_x['event_feature']['timestamp']})
+            {'timestamp': test_data.event_feature['timestamp']})
 
 
 def cv_test(info):
@@ -383,6 +358,8 @@ def cv_test(info):
     cv = LeaveOneGroupOut()
     for train_i, test_i in cv.split(
             ev, groups=interlace_group(n_events, info['test']['n_folds'])):
+
+        print(train_i, test_i)
 
         # training
         if info['data']['has_timestamp']:
