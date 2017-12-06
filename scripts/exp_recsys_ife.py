@@ -399,9 +399,11 @@ def do_task(info):
     np.seterr(all='ignore')
 
     # update information dictionary
-    info['model']['type'] = 'item_finder'
-    info['model']['name'] = info['model']['recommender'].__name__
-    info['model']['module'] = info['model']['recommender'].__module__
+    rec = info['model']['recommender']
+    info['model']['task_type'] = rec.task_type
+    info['model']['explicit_ratings'] = rec.explicit_ratings
+    info['model']['name'] = rec.__name__
+    info['model']['module'] = rec.__module__
 
     info['environment']['script'] = {
         'name': os.path.basename(sys.argv[0]), 'version': __version__}
