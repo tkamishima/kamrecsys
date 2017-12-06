@@ -95,7 +95,6 @@ import numpy as np
 from sklearn.model_selection import LeaveOneGroupOut
 
 from kamrecsys import __version__ as kamrecsys_version
-from kamrecsys.data import EventWithScoreData
 from kamrecsys.datasets import event_dtype_timestamp, load_event_with_score
 from kamrecsys.model_selection import interlace_group
 from kamrecsys.utils import get_system_info, get_version_info, json_decodable
@@ -133,7 +132,7 @@ __all__ = ['do_task']
 # =============================================================================
 
 
-def load_data(fp, has_timestamp, score_domain):
+def load_data(fp, info):
     """
     load event with scores data
 
@@ -141,16 +140,17 @@ def load_data(fp, has_timestamp, score_domain):
     ----------
     fp : string
         input file pointer
-    has_timestamp : bool
-        has timestamp field
-    score_domain : array, shape=(3,), dtype=float
-        score_domain: minimum, maximum, interval
+    info : dict
+        Information about the target task
 
     Returns
     -------
     data : :class:`kamrecsys.data.EventWithScoreData`
         loaded data
     """
+
+    has_timestamp = info['data']['has_timestamp']
+    score_domain = info['data']['score_domain']
 
     # score_domain is explicitly specified?
     if np.all(np.array(score_domain) == 0):
@@ -161,6 +161,7 @@ def load_data(fp, has_timestamp, score_domain):
         fp,
         event_dtype=event_dtype_timestamp if has_timestamp else None,
         score_domain=score_domain)
+    info['data']['score_domain'] = data.score_domain
 
     return data
 
@@ -307,19 +308,12 @@ def holdout_test(info):
     """
 
     # prepare training data
-    train_data = load_data(
-        info['training']['file'],
-        info['data']['has_timestamp'],
-        info['data']['score_domain'])
-    info['data']['score_domain'] = train_data.score_domain
+    train_data = load_data(info['training']['file'], info)
 
     # prepare test data
     if info['test']['file'] is None:
         raise IOError('hold-out test data is required')
-    test_data = load_data(
-        info['test']['file'],
-        info['data']['has_timestamp'],
-        info['data']['score_domain'])
+    test_data = load_data(info['test']['file'], info)
     test_ev = test_data.to_eid_event(test_data.event)
 
     # training
@@ -348,11 +342,7 @@ def cv_test(info):
     """
 
     # prepare training data
-    data = load_data(
-        info['training']['file'],
-        info['data']['has_timestamp'],
-        info['data']['score_domain'])
-    info['data']['score_domain'] = data.score_domain
+    data = load_data(info['training']['file'], info)
     info['test']['file'] = info['training']['file']
     n_events = data.n_events
     ev = data.to_eid_event(data.event)
