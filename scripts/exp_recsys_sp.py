@@ -89,6 +89,7 @@ import json
 import logging
 import os
 import sys
+from copy import copy
 
 import numpy as np
 from sklearn.model_selection import LeaveOneGroupOut
@@ -108,7 +109,7 @@ from kamrecsys.utils import get_system_info, get_version_info, json_decodable
 # =============================================================================
 
 __author__ = "Toshihiro Kamishima ( http://www.kamishima.net/ )"
-__date__ = "2014/07/06"
+__date__ = "2014-07-06"
 __version__ = "3.4.0"
 __copyright__ = "Copyright (c) 2014 Toshihiro Kamishima all rights reserved."
 __license__ = "MIT License: http://www.opensource.org/licenses/mit-license.php"
@@ -238,6 +239,8 @@ def testing(rec, info, ev, fold=0):
     ----------
     rec : EventScorePredictor
         trained recommender
+    info : dict
+        Information about the target task
     ev : array, size=(n_events, 2), dtype=int
         array of events in external ids
     fold : int, default=0
@@ -345,30 +348,25 @@ def cv_test(info):
     """
 
     # prepare training data
-    x = load_data(
+    data = load_data(
         info['training']['file'],
-        info['data']['has_timestamp'])
+        info['data']['has_timestamp'],
+        info['data']['score_domain'])
+    info['data']['score_domain'] = data.score_domain
     info['test']['file'] = info['training']['file']
-    n_events = x.shape[0]
-    ev = x['event']
-    tsc = x['score']
+    n_events = data.n_events
+    ev = data.to_eid_event(data.event)
 
     fold = 0
-    esc = np.empty(n_events, dtype=float)
+    esc = np.zeros(n_events, dtype=float)
     cv = LeaveOneGroupOut()
     for train_i, test_i in cv.split(
             ev, groups=interlace_group(n_events, info['test']['n_folds'])):
 
-        print(train_i, test_i)
-
         # training
-        if info['data']['has_timestamp']:
-            rec = training(
-                info, ev[train_i], tsc[train_i],
-                event_feature=x['event_feature'][train_i], fold=fold)
-        else:
-            rec = training(
-                info, ev[train_i], tsc[train_i], fold=fold)
+        training_data = copy(data)
+        training_data.filter_event(train_i)
+        rec = training(info, training_data, fold)
 
         # test
         esc[test_i] = testing(rec, info, ev[test_i], fold=fold)
@@ -377,11 +375,11 @@ def cv_test(info):
 
     # set predicted result
     info['prediction']['event'] = ev
-    info['prediction']['true'] = tsc
+    info['prediction']['true'] = data.score
     info['prediction']['predicted'] = esc
     if info['data']['has_timestamp']:
         info['prediction']['event_feature'] = {
-            'timestamp': x['event_feature']['timestamp']}
+            'timestamp': data.event_feature['timestamp']}
 
 
 def do_task(info):
@@ -596,6 +594,7 @@ def main():
 
     # do main task
     do_task(info)
+
 
 # top level -------------------------------------------------------------------
 # init logging system
