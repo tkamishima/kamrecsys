@@ -139,7 +139,8 @@ class EventWithScoreData(EventData, ScoreUtilMixin):
         score : array_like, shape=(n_events,)
             a set of rating scores
         score_domain : optional, tuple or 1d-array of tuple
-            min and max of scores, and the interval between scores
+            min and max of scores, and the interval between scores.
+            If None, these values are estimated from an array of scores.
         event_feature : optional, array_like, shape=(n_events, variable)
             feature of events
         """
@@ -147,6 +148,11 @@ class EventWithScoreData(EventData, ScoreUtilMixin):
         super(EventWithScoreData, self).set_event(event, event_feature)
 
         self.score = np.asarray(score)
+        if score_domain is None:
+            score_domain = [
+                np.min(self.score),
+                np.max(self.score),
+                np.min(np.diff(np.unique(self.score)))]
         self.score_domain = np.asanyarray(score_domain)
         self.n_score_levels = (
             int((score_domain[1] - score_domain[0]) / score_domain[2]) + 1)
