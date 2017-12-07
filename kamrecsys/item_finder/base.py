@@ -68,6 +68,9 @@ class BaseExplicitItemFinder(
         the number of score levels
     """
 
+    task_type = 'item_finder'
+    explicit_ratings = True
+
     def __init__(self, random_state=None):
         super(BaseExplicitItemFinder, self).__init__(random_state=random_state)
 
@@ -131,6 +134,9 @@ class BaseImplicitItemFinder(with_metaclass(ABCMeta, BaseEventRecommender)):
     """
     Recommenders to find good items from event data
     """
+
+    task_type = 'item_finder'
+    explicit_ratings = True
 
     def __init__(self, random_state=None):
         super(BaseImplicitItemFinder, self).__init__(random_state=random_state)

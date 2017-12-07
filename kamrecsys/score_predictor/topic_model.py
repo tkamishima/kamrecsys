@@ -295,8 +295,8 @@ class MultinomialPLSA(BaseScorePredictor):
         self.fit_results_['n_items'] = n_objects[1]
         self.fit_results_['n_events'] = self.n_events
         self.fit_results_['success'] = (self.fit_results_['status'] == 0)
-        self.fit_results_['message'] = get_fit_status_message(
-            self.fit_results_['status'])
+        self.fit_results_['message'] = (
+            get_fit_status_message(self.fit_results_['status']))
 
         # add parameters for unknown users and items
         self.pXgZ_ = np.r_[self.pXgZ_, np.ones((1, self.k), dtype=float)]

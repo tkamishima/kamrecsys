@@ -89,13 +89,13 @@ import json
 import logging
 import os
 import sys
+from copy import copy
 
 import numpy as np
 from sklearn.model_selection import LeaveOneGroupOut
 
 from kamrecsys import __version__ as kamrecsys_version
-from kamrecsys.data import EventWithScoreData
-from kamrecsys.datasets import event_dtype_timestamp
+from kamrecsys.datasets import event_dtype_timestamp, load_event_with_score
 from kamrecsys.model_selection import interlace_group
 from kamrecsys.utils import get_system_info, get_version_info, json_decodable
 
@@ -108,7 +108,7 @@ from kamrecsys.utils import get_system_info, get_version_info, json_decodable
 # =============================================================================
 
 __author__ = "Toshihiro Kamishima ( http://www.kamishima.net/ )"
-__date__ = "2014/07/06"
+__date__ = "2014-07-06"
 __version__ = "3.4.0"
 __copyright__ = "Copyright (c) 2014 Toshihiro Kamishima all rights reserved."
 __license__ = "MIT License: http://www.opensource.org/licenses/mit-license.php"
@@ -132,7 +132,7 @@ __all__ = ['do_task']
 # =============================================================================
 
 
-def load_data(fp, ts):
+def load_data(fp, info):
     """
     load event with scores data
 
@@ -140,39 +140,33 @@ def load_data(fp, ts):
     ----------
     fp : string
         input file pointer
-    ts : bool
-        has timestamp field
+    info : dict
+        Information about the target task
 
     Returns
     -------
-    x : array
-        structured array containing event and related information
+    data : :class:`kamrecsys.data.EventWithScoreData`
+        loaded data
     """
 
-    # have timestamp?
-    if ts:
-        dt = np.dtype([
-            ('event', int, 2),
-            ('score', float),
-            ('event_feature', event_dtype_timestamp)
-        ])
-    else:
-        dt = np.dtype([
-            ('event', int, 2),
-            ('score', float)
-        ])
+    has_timestamp = info['data']['has_timestamp']
+    score_domain = info['data']['score_domain']
 
-    # load training data
-    x = np.genfromtxt(fname=fp, delimiter='\t', dtype=dt)
+    # score_domain is explicitly specified?
+    if np.all(np.array(score_domain) == 0):
+        score_domain = None
 
-    # close file
-    if fp is not sys.stdin:
-        fp.close()
+    # load data
+    data = load_event_with_score(
+        fp,
+        event_dtype=event_dtype_timestamp if has_timestamp else None,
+        score_domain=score_domain)
+    info['data']['score_domain'] = data.score_domain
 
-    return x
+    return data
 
 
-def training(info, ev, tsc, event_feature=None, fold=0):
+def training(info, data, fold=0):
     """
     training model
 
@@ -180,12 +174,8 @@ def training(info, ev, tsc, event_feature=None, fold=0):
     ----------
     info : dict
         Information about the target task
-    ev : array, size=(n_events, 2), dtype=int
-        array of events in external ids
-    tsc : array, size=(n_events,), dtype=float
-        true scores
-    event_feature : optional, structured array
-        structured array of event features
+    data : :class:`kamrecsys.data.EventWithScoreData`
+        training data
     fold : int, default=0
         fold No.
 
@@ -198,17 +188,6 @@ def training(info, ev, tsc, event_feature=None, fold=0):
     # start new fold
     n_folds = info['test']['n_folds']
     logger.info("training fold = " + str(fold + 1) + " / " + str(n_folds))
-
-    # generate event data
-    data = EventWithScoreData(n_otypes=2)
-    score_domain = info['data']['score_domain']
-    if np.all(np.array(score_domain) == 0):
-        score_domain = [
-            np.min(tsc), np.max(tsc), np.min(np.diff(np.unique(tsc)))]
-        info['data']['score_domain'] = score_domain
-        logger.info("score domain is changed to " + str(score_domain))
-    data.set_event(
-        ev, tsc, score_domain=score_domain, event_feature=event_feature)
 
     # set starting time
     start_time = datetime.datetime.now()
@@ -328,35 +307,31 @@ def holdout_test(info):
         Information about the target task
     """
 
+    # set information about data and conditions
+    info['test']['n_folds'] = 1
+
     # prepare training data
-    train_x = load_data(
-        info['training']['file'],
-        info['data']['has_timestamp'])
+    train_data = load_data(info['training']['file'], info)
 
     # prepare test data
     if info['test']['file'] is None:
         raise IOError('hold-out test data is required')
-    test_x = load_data(
-        info['test']['file'],
-        info['data']['has_timestamp'])
-    if info['data']['has_timestamp']:
-        ef = train_x['event_feature']
-    else:
-        ef = None
+    test_data = load_data(info['test']['file'], info)
+    test_ev = test_data.to_eid_event(test_data.event)
 
     # training
-    rec = training(info, train_x['event'], train_x['score'], event_feature=ef)
+    rec = training(info, train_data)
 
     # test
-    esc = testing(rec, info, test_x['event'])
+    esc = testing(rec, info, test_ev)
 
     # set predicted result
-    info['prediction']['event'] = test_x['event']
-    info['prediction']['true'] = test_x['score']
+    info['prediction']['event'] = test_data.to_eid_event(test_data.event)
+    info['prediction']['true'] = test_data.score
     info['prediction']['predicted'] = esc
     if info['data']['has_timestamp']:
         info['prediction']['event_feature'] = (
-            {'timestamp': test_x['event_feature']['timestamp']})
+            {'timestamp': test_data.event_feature['timestamp']})
 
 
 def cv_test(info):
@@ -369,29 +344,24 @@ def cv_test(info):
         Information about the target task
     """
 
-    # prepare training data
-    x = load_data(
-        info['training']['file'],
-        info['data']['has_timestamp'])
+    # set information about data and conditions
     info['test']['file'] = info['training']['file']
-    n_events = x.shape[0]
-    ev = x['event']
-    tsc = x['score']
+
+    # prepare training data
+    data = load_data(info['training']['file'], info)
+    n_events = data.n_events
+    ev = data.to_eid_event(data.event)
 
     fold = 0
-    esc = np.empty(n_events, dtype=float)
+    esc = np.zeros(n_events, dtype=float)
     cv = LeaveOneGroupOut()
     for train_i, test_i in cv.split(
             ev, groups=interlace_group(n_events, info['test']['n_folds'])):
 
         # training
-        if info['data']['has_timestamp']:
-            rec = training(
-                info, ev[train_i], tsc[train_i],
-                event_feature=x['event_feature'][train_i], fold=fold)
-        else:
-            rec = training(
-                info, ev[train_i], tsc[train_i], fold=fold)
+        training_data = copy(data)
+        training_data.filter_event(train_i)
+        rec = training(info, training_data, fold)
 
         # test
         esc[test_i] = testing(rec, info, ev[test_i], fold=fold)
@@ -400,11 +370,11 @@ def cv_test(info):
 
     # set predicted result
     info['prediction']['event'] = ev
-    info['prediction']['true'] = tsc
+    info['prediction']['true'] = data.score
     info['prediction']['predicted'] = esc
     if info['data']['has_timestamp']:
         info['prediction']['event_feature'] = {
-            'timestamp': x['event_feature']['timestamp']}
+            'timestamp': data.event_feature['timestamp']}
 
 
 def do_task(info):
@@ -421,9 +391,11 @@ def do_task(info):
     np.seterr(all='ignore')
 
     # update information dictionary
-    info['model']['type'] = 'score_predictor'
-    info['model']['name'] = info['model']['recommender'].__name__
-    info['model']['module'] = info['model']['recommender'].__module__
+    rec = info['model']['recommender']
+    info['model']['task_type'] = rec.task_type
+    info['model']['explicit_ratings'] = rec.explicit_ratings
+    info['model']['name'] = rec.__name__
+    info['model']['module'] = rec.__module__
 
     info['environment']['script'] = {
         'name': os.path.basename(sys.argv[0]), 'version': __version__}
@@ -433,8 +405,6 @@ def do_task(info):
 
     # select validation scheme
     if info['test']['scheme'] == 'holdout':
-        info['test']['n_folds'] = 1
-        logger.info("the nos of folds is set to 1")
         holdout_test(info)
     elif info['test']['scheme'] == 'cv':
         cv_test(info)
@@ -582,15 +552,19 @@ def init_info(opt):
         info['model']['method'] = 'multionomial pLSA - expectation'
         info['model']['recommender'] = MultinomialPLSA
         info['model']['options'] = {
-            'alpha': opt.alpha, 'k': opt.k, 'use_expectation': True,
-            'tol': opt.tol, 'maxiter': opt.maxiter}
+            'alpha': opt.alpha, 'k': opt.k, 'tol': opt.tol,
+            'use_expectation': True}
+        if opt.maxiter is not None:
+            info['model']['options']['maxiter'] = opt.maxiter
     elif opt.method == 'plsamm':
         from kamrecsys.score_predictor import MultinomialPLSA
         info['model']['recommender'] = MultinomialPLSA
         info['model']['method'] = 'multionomial pLSA - mode'
         info['model']['options'] = {
-            'alpha': opt.alpha, 'k': opt.k, 'use_expectation': False,
-            'tol': opt.tol, 'maxiter': opt.maxiter}
+            'alpha': opt.alpha, 'k': opt.k, 'tol': opt.tol,
+            'use_expectation': False}
+        if opt.maxiter is not None:
+            info['model']['options']['maxiter'] = opt.maxiter
     else:
         raise TypeError(
             "Invalid method name: {0:s}".format(info['model']['method']))
@@ -619,6 +593,7 @@ def main():
 
     # do main task
     do_task(info)
+
 
 # top level -------------------------------------------------------------------
 # init logging system

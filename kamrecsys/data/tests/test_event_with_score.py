@@ -41,7 +41,7 @@ from kamrecsys.datasets import load_movielens_mini
 # =============================================================================
 
 
-def load_test_data():
+def load_test_data(score_domain=(1.0, 5.0, 0.5)):
     from kamrecsys.data import EventWithScoreData
     from kamrecsys.datasets import SAMPLE_PATH
 
@@ -49,7 +49,7 @@ def load_test_data():
     dtype = np.dtype([('event', 'U18', 2), ('score', float)])
     x = np.genfromtxt(fname=infile, delimiter='\t', dtype=dtype)
     data = EventWithScoreData(n_otypes=2, event_otypes=np.array([0, 1]))
-    data.set_event(x['event'], x['score'], score_domain=(1.0, 5.0, 0.5))
+    data.set_event(x['event'], x['score'], score_domain=score_domain)
     return data, x
 
 
@@ -64,6 +64,12 @@ class TestEventWithScoreData(TestCase):
         data, x = load_test_data()
 
         # test info related to scores
+        assert_allclose(data.score[:5], [3., 4., 3.5, 5., 3.])
+        assert_allclose(data.score_domain, [1.0, 5.0, 0.5])
+        self.assertEqual(data.n_score_levels, 9)
+
+        # estimating score_domain
+        data, x = load_test_data(score_domain=None)
         assert_allclose(data.score[:5], [3., 4., 3.5, 5., 3.])
         assert_allclose(data.score_domain, [1.0, 5.0, 0.5])
         self.assertEqual(data.n_score_levels, 9)
