@@ -307,6 +307,9 @@ def holdout_test(info):
         Information about the target task
     """
 
+    # set information about data and conditions
+    info['test']['n_folds'] = 1
+
     # prepare training data
     train_data = load_data(info['training']['file'], info)
 
@@ -341,9 +344,11 @@ def cv_test(info):
         Information about the target task
     """
 
+    # set information about data and conditions
+    info['test']['file'] = info['training']['file']
+
     # prepare training data
     data = load_data(info['training']['file'], info)
-    info['test']['file'] = info['training']['file']
     n_events = data.n_events
     ev = data.to_eid_event(data.event)
 
@@ -400,8 +405,6 @@ def do_task(info):
 
     # select validation scheme
     if info['test']['scheme'] == 'holdout':
-        info['test']['n_folds'] = 1
-        logger.info("the nos of folds is set to 1")
         holdout_test(info)
     elif info['test']['scheme'] == 'cv':
         cv_test(info)
