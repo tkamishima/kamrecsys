@@ -546,8 +546,7 @@ def init_info(opt):
         from kamrecsys.item_finder import LogisticPMF
         info['model']['method'] = 'logistic probabilistic matrix factorization'
         info['model']['recommender'] = LogisticPMF
-        info['model']['options'] = {
-            'C': opt.C, 'k': opt.k, 'tol': opt.tol, 'maxiter': opt.maxiter}
+        info['model']['options'] = {'C': opt.C, 'k': opt.k, 'tol': opt.tol}
         if opt.maxiter is not None:
             info['model']['options']['maxiter'] = opt.maxiter
     else:

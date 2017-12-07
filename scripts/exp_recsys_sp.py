@@ -552,15 +552,19 @@ def init_info(opt):
         info['model']['method'] = 'multionomial pLSA - expectation'
         info['model']['recommender'] = MultinomialPLSA
         info['model']['options'] = {
-            'alpha': opt.alpha, 'k': opt.k, 'use_expectation': True,
-            'tol': opt.tol, 'maxiter': opt.maxiter}
+            'alpha': opt.alpha, 'k': opt.k, 'tol': opt.tol,
+            'use_expectation': True}
+        if opt.maxiter is not None:
+            info['model']['options']['maxiter'] = opt.maxiter
     elif opt.method == 'plsamm':
         from kamrecsys.score_predictor import MultinomialPLSA
         info['model']['recommender'] = MultinomialPLSA
         info['model']['method'] = 'multionomial pLSA - mode'
         info['model']['options'] = {
-            'alpha': opt.alpha, 'k': opt.k, 'use_expectation': False,
-            'tol': opt.tol, 'maxiter': opt.maxiter}
+            'alpha': opt.alpha, 'k': opt.k, 'tol': opt.tol,
+            'use_expectation': False}
+        if opt.maxiter is not None:
+            info['model']['options']['maxiter'] = opt.maxiter
     else:
         raise TypeError(
             "Invalid method name: {0:s}".format(info['model']['method']))
