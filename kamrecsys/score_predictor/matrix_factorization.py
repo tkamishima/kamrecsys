@@ -187,10 +187,13 @@ class PMF(BaseScorePredictor):
                 (sc[i] -
                  (self.mu_[0] + self.bu_[ev[i, 0]] + self.bi_[ev[i, 1]])) ** 2)
         var /= n_events
-        self.p_[0:n_users, :] = (
-            self._rng.normal(0.0, np.sqrt(var), (n_users, k)))
-        self.q_[0:n_items, :] = (
-            self._rng.normal(0.0, np.sqrt(var), (n_items, k)))
+
+        mask = np.bincount(ev[:, 0], minlength=n_users).nonzero()[0]
+        self.p_[mask, :] = (
+            self._rng.normal(0.0, np.sqrt(var), (len(mask), k)))
+        mask = np.bincount(ev[:, 1], minlength=n_items).nonzero()[0]
+        self.q_[mask, :] = (
+            self._rng.normal(0.0, np.sqrt(var), (len(mask), k)))
 
         # scale a regularization term by the number of parameters
         self._reg = self.C / (1 + (k + 1) * (n_users + n_items))
@@ -369,11 +372,11 @@ class PMF(BaseScorePredictor):
         self.fit_results_['n_users'] = n_objects[0]
         self.fit_results_['n_items'] = n_objects[1]
         self.fit_results_['n_events'] = self.n_events
-        self.fit_results_['optimizer_success'] = res.success
-        self.fit_results_['termination_status'] = res.status
-        self.fit_results_['termination_message'] = res.message
+        self.fit_results_['success'] = res.success
+        self.fit_results_['status'] = res.status
+        self.fit_results_['message'] = res.message
         self.fit_results_['final_loss'] = res.fun
-        self.fit_results_['n_optimizer_iterations'] = res.nit
+        self.fit_results_['n_iterations'] = res.nit
         self.fit_results_['func_calls'] = res.nfev
         self.fit_results_['grad_calls'] = res.njev
         self.fit_results_['optimizer_method'] = optimizer_method
