@@ -372,11 +372,11 @@ class PMF(BaseScorePredictor):
         self.fit_results_['n_users'] = n_objects[0]
         self.fit_results_['n_items'] = n_objects[1]
         self.fit_results_['n_events'] = self.n_events
-        self.fit_results_['optimizer_success'] = res.success
-        self.fit_results_['termination_status'] = res.status
-        self.fit_results_['termination_message'] = res.message
+        self.fit_results_['success'] = res.success
+        self.fit_results_['status'] = res.status
+        self.fit_results_['message'] = res.message
         self.fit_results_['final_loss'] = res.fun
-        self.fit_results_['n_optimizer_iterations'] = res.nit
+        self.fit_results_['n_iterations'] = res.nit
         self.fit_results_['func_calls'] = res.nfev
         self.fit_results_['grad_calls'] = res.njev
         self.fit_results_['optimizer_method'] = optimizer_method
