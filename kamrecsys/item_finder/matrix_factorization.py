@@ -190,9 +190,11 @@ class LogisticPMF(BaseExplicitItemFinder):
                     np.sum(sc[j] - (self.mu_[0] + self.bu_[ev[j, 0]])) /
                     len(j))
 
-        # fill cross terms by normal randoms whose s.d.'s are mean residuals
-        self.p_[0:n_users, :] = (self._rng.normal(0.0, 1.0, (n_users, k)))
-        self.q_[0:n_items, :] = (self._rng.normal(0.0, 1.0, (n_items, k)))
+        # fill cross terms by normal randoms
+        mask = np.bincount(ev[:, 0], minlength=n_users).nonzero()[0]
+        self.p_[mask, :] = self._rng.normal(0.0, 1.0, (len(mask), k))
+        mask = np.bincount(ev[:, 1], minlength=n_items).nonzero()[0]
+        self.q_[mask, :] = self._rng.normal(0.0, 1.0, (len(mask), k))
 
         # scale a regularization term by the number of parameters
         self._reg = self.C / (1 + (k + 1) * (n_users + n_items))
@@ -554,9 +556,11 @@ class ImplicitLogisticPMF(BaseImplicitItemFinder):
         self.bu_[:] = ev.sum(axis=1).ravel() / n_items
         self.bi_[:] = ev.sum(axis=0).ravel() / n_users
 
-        # fill cross terms by normal randoms whose s.d.'s are mean residuals
-        self.p_[0:n_users, :] = (self._rng.normal(0.0, 1.0, (n_users, k)))
-        self.q_[0:n_items, :] = (self._rng.normal(0.0, 1.0, (n_items, k)))
+        # fill cross terms by normal randoms
+        mask = np.bincount(ev[:, 0], minlength=n_users).nonzero()[0]
+        self.p_[mask, :] = self._rng.normal(0.0, 1.0, (len(mask), k))
+        mask = np.bincount(ev[:, 1], minlength=n_items).nonzero()[0]
+        self.q_[mask, :] = self._rng.normal(0.0, 1.0, (len(mask), k))
 
         # scale a regularization term by the number of parameters
         self._reg = self.C / (1 + (k + 1) * (n_users + n_items))
