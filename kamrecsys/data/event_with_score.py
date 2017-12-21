@@ -147,7 +147,7 @@ class EventWithScoreData(EventData, ScoreUtilMixin):
 
         super(EventWithScoreData, self).set_event(event, event_feature)
 
-        self.score = np.asarray(score)
+        self.score = np.array(score)
         if score_domain is None:
             score_domain = [
                 np.min(self.score),
