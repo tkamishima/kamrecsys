@@ -138,10 +138,10 @@ class ObjectUtilMixin(object):
         iid : dict
             map from external id to internal id
         """
-        eid = np.sort(np.unique(event))
-        iid = {}
-        for i in xrange(len(eid)):
-            iid[eid[i]] = i
+
+        eid = np.unique(event)
+        iid = {k: i for (i, k) in enumerate(eid)}
+
         return len(eid), eid, iid
 
 
