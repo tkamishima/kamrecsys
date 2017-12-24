@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 """
 Experimentation script for Score Predictors
 
@@ -96,7 +98,7 @@ import numpy as np
 
 from kamrecsys.datasets import event_dtype_timestamp, load_event_with_score
 
-from exp_recsys_common import do_task
+from exp_recsys_util import do_task
 
 # =============================================================================
 # Module metadata variables
@@ -104,7 +106,7 @@ from exp_recsys_common import do_task
 
 __author__ = "Toshihiro Kamishima ( http://www.kamishima.net/ )"
 __date__ = "2014-07-06"
-__version__ = "3.4.0"
+__version__ = "4.0.0"
 __copyright__ = "Copyright (c) 2014 Toshihiro Kamishima all rights reserved."
 __license__ = "MIT License: http://www.opensource.org/licenses/mit-license.php"
 
