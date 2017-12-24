@@ -16,9 +16,11 @@ from six.moves import xrange
 # =============================================================================
 
 import logging
-import numpy as np
+from copy import copy
 from abc import ABCMeta
 from six import with_metaclass
+
+import numpy as np
 
 from . import BaseData
 
@@ -187,7 +189,7 @@ class EventData(BaseData, EventUtilMixin):
         else:
             event_otypes = np.array(event_otypes)
             if (event_otypes.ndim != 1 or np.min(event_otypes) < 0 or
-                np.max(event_otypes) >= n_otypes):
+                    np.max(event_otypes) >= n_otypes):
                 raise ValueError("Illegal event_otypes specification")
             self.s_event = event_otypes.shape[0]
             self.event_otypes = event_otypes
@@ -220,14 +222,20 @@ class EventData(BaseData, EventUtilMixin):
 
     def filter_event(self, filter_cond):
         """
-        replace event data with those consisting of events whose corresponding
-        `filter_cond` is `True`.   
+        Returns a copy of data whose events are filtered based on
+        `filter_cond` .  Information about the objects that is not contained
+        in a filtered event set are eliminated as well.
 
         Parameters
         ----------
         filter_cond : array, dtype=bool, shape=(n_events,)
             Boolean array that specifies whether each event should be included
             in a new event array.
+
+        Returns
+        -------
+        data : :class:`kamrecsys.EventData`
+            A copy of data whose events are filtered.
         """
 
         # check whether event info is available
@@ -237,13 +245,43 @@ class EventData(BaseData, EventUtilMixin):
         # re-arrange filter
         filter_cond = np.asarray(filter_cond)
 
-        # filter out event data
-        self.event = self.event[filter_cond, :]
-        self.n_events = self.event.shape[0]
+        # copy data
+        data = copy(self)
+
+        # generate a copy of filtered events
+        data.event = self.event[filter_cond, :].copy()
+        data.n_events = data.event.shape[0]
+
+        # update object info and iid's in an event set
+        data.n_objects = self.n_objects.copy()
+        data.eid = self.eid.copy()
+        data.iid = self.iid.copy()
+        data.feature = self.feature.copy()
+        # data.event_otypes = self.event_otypes.copy()
+
+        for otype in xrange(data.n_otypes):
+
+            # indexes of objects contained in a filtered event set
+            sub_index = np.unique(data.event[:, data.event_otypes == otype])
+
+            # update iid's in an event set
+            table = self._gen_id_substitution_table(self.eid[otype], sub_index)
+            data.event[:, self.event_otypes == otype] = table[
+                data.event[:, self.event_otypes == otype]]
+
+            # filter object info
+            data.eid[otype] = self.eid[otype][sub_index]
+            data.iid[otype] = {k: i for (i, k) in enumerate(data.eid[otype])}
+            data.n_objects[otype] = data.eid[otype].shape[0]
+            if self.feature[otype] is not None:
+                data.feature[otype] = self.feature[otype][sub_index]
 
         # filter out event features
         if self.event_feature is not None:
-            self.event_feature = self.event_feature[filter_cond]
+            data.event_feature = self.event_feature[filter_cond]
+
+        return data
+
 
 # =============================================================================
 # Functions
@@ -274,6 +312,7 @@ def _test():
     doctest.testmod()
 
     sys.exit(0)
+
 
 # Check if this is call as command script -------------------------------------
 
