@@ -105,12 +105,12 @@ def do_task(opt):
     info = json.load(opt.infile, encoding='utf-8')
 
     # calculate statistics
-    if info['model']['type'] == 'score_predictor':
+    if info['model']['task_type'] == 'score_predictor':
         stats = score_predictor_statistics(
             info['prediction']['true'],
             info['prediction']['predicted'],
             score_domain=info['data']['score_domain'])
-    elif info['model']['type'] == 'item_finder':
+    elif info['model']['task_type'] == 'item_finder':
         stats = item_finder_statistics(info['prediction']['true'],
             info['prediction']['predicted'])
     else:

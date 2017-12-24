@@ -147,7 +147,7 @@ class EventWithScoreData(EventData, ScoreUtilMixin):
 
         super(EventWithScoreData, self).set_event(event, event_feature)
 
-        self.score = np.asarray(score)
+        self.score = np.array(score)
         if score_domain is None:
             score_domain = [
                 np.min(self.score),
@@ -207,14 +207,20 @@ class EventWithScoreData(EventData, ScoreUtilMixin):
 
     def filter_event(self, filter_cond):
         """
-        replace event data with those consisting of events whose corresponding
-        `filter_cond` is `True`.   
+        Returns a copy of data whose events are filtered based on
+        `filter_cond` .  Information about the objects that is not contained
+        in a filtered event set are eliminated as well.
 
         Parameters
         ----------
         filter_cond : array, dtype=bool, shape=(n_events,)
             Boolean array that specifies whether each event should be included
             in a new event array.
+
+        Returns
+        -------
+        data : :class:`kamrecsys.EventDataWithScore`
+            A copy of data whose events are filtered.
         """
 
         # check whether event info is available
@@ -222,11 +228,13 @@ class EventWithScoreData(EventData, ScoreUtilMixin):
             return
 
         # filter out event related information
-        super(EventWithScoreData, self).filter_event(filter_cond)
+        data = super(EventWithScoreData, self).filter_event(filter_cond)
 
         # filter out event data
         if self.score is not None:
-            self.score = self.score[filter_cond]
+            data.score = self.score[filter_cond]
+
+        return data
 
 
 # =============================================================================
@@ -258,6 +266,7 @@ def _test():
     doctest.testmod()
 
     sys.exit(0)
+
 
 # Check if this is call as command script -------------------------------------
 
