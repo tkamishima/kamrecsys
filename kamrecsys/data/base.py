@@ -221,9 +221,9 @@ class BaseData(with_metaclass(ABCMeta, ObjectUtilMixin, object)):
             raise ValueError("n_otypes must be >= 1")
         self.n_otypes = n_otypes
         self.n_objects = np.zeros(self.n_otypes, dtype=int)
-        self.eid = np.empty(self.n_otypes, dtype=np.object)
-        self.iid = np.empty(self.n_otypes, dtype=np.object)
-        self.feature = np.empty(self.n_otypes, dtype=np.object)
+        self.eid = np.tile(None, self.n_otypes)
+        self.iid = np.tile(None, self.n_otypes)
+        self.feature = np.tile(None, self.n_otypes)
 
     def set_feature(self, otype, eid, feature):
         """

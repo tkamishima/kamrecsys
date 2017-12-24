@@ -12,12 +12,22 @@ from six.moves import xrange
 # =============================================================================
 
 from numpy.testing import (
+    TestCase,
+    run_module_suite,
+    assert_,
+    assert_almost_equal,
+    assert_approx_equal,
+    assert_array_almost_equal,
+    assert_allclose,
+    assert_array_almost_equal_nulp,
+    assert_array_max_ulp,
     assert_array_equal,
     assert_array_less,
-    assert_allclose,
-    assert_array_max_ulp,
-    assert_array_almost_equal_nulp)
-import unittest
+    assert_equal,
+    assert_raises,
+    assert_raises_regex,
+    assert_warns,
+    assert_string_equal)
 
 import os
 import numpy as np
@@ -42,12 +52,12 @@ def load_test_data():
     data.set_event(x['event'])
     return data, x
 
+
 # =============================================================================
 # Test Classes
 # =============================================================================
 
-
-class TestEventUtilMixin(unittest.TestCase):
+class TestEventUtilMixin(TestCase):
 
     def test_to_eid_event(self):
         data, x = load_test_data()
@@ -76,39 +86,69 @@ class TestEventUtilMixin(unittest.TestCase):
         assert_array_equal(data.event, check)
 
 
-class TestEventData(unittest.TestCase):
+class TestEventData(TestCase):
 
     def test_filter_event(self):
+        from kamrecsys.data import EventWithScoreData
 
         # load movie_lens
         data = load_movielens_mini()
 
-        data.filter_event(np.arange(data.n_events) % 3 == 0)
-        assert_array_equal(
-            data.event_feature, np.array(
-            [(875636053,), (877889130,), (891351328,), (879362287,),
-             (878543541,), (875072484,), (889751712,), (883599478,),
-             (883599205,), (878542960,)], dtype=[('timestamp', '<i8')]))
-        assert_array_equal(
-            data.to_eid(0, data.event[:, 0]),
-            [5, 10, 7, 8, 1, 1, 1, 6, 6, 1])
-        assert_array_equal(
-            data.to_eid(1, data.event[:, 1]),
-            [2, 4, 8, 7, 9, 8, 5, 1, 9, 3])
+        # filter events
+        filter_cond = np.arange(data.n_events) % 3 == 0
+        filtered_data = super(
+            EventWithScoreData, data).filter_event(filter_cond)
 
-        # dummry event data
+        assert_array_equal(
+            filtered_data.event[:, 0], [1, 5, 3, 4, 0, 0, 0, 2, 2, 0])
+        assert_array_equal(
+            filtered_data.event[:, 1], [1, 3, 6, 5, 7, 6, 4, 0, 7, 2])
+
+        assert_array_equal(
+            filtered_data.to_eid(0, filtered_data.event[:, 0]),
+            data.to_eid(0, data.event[filter_cond, 0]))
+        assert_array_equal(
+            filtered_data.to_eid(1, filtered_data.event[:, 1]),
+            data.to_eid(1, data.event[filter_cond, 1]))
+
+        assert_array_equal(
+            filtered_data.event_feature['timestamp'],
+            [875636053, 877889130, 891351328, 879362287, 878543541,
+             875072484, 889751712, 883599478, 883599205, 878542960])
+
+        assert_array_equal(filtered_data.eid[0], [1, 5, 6, 7, 8, 10])
+        assert_array_equal(filtered_data.eid[1], [1, 2, 3, 4, 5, 7, 8, 9])
+
+        assert_equal(
+            filtered_data.iid[0],
+            {1: 0, 5: 1, 6: 2, 7: 3, 8: 4, 10: 5})
+        assert_equal(
+            filtered_data.iid[1],
+            {1: 0, 2: 1, 3: 2, 4: 3, 5: 4, 7: 5, 8: 6, 9: 7})
+
+        assert_equal(
+            filtered_data.feature[0]['zip'],
+            [u'85711', u'15213', u'98101', u'91344', u'05201', u'90703'])
+        assert_equal(
+            filtered_data.feature[1]['name'],
+            [u'Toy Story (1995)', u'GoldenEye (1995)', u'Four Rooms (1995)',
+             u'Get Shorty (1995)', u'Copycat (1995)', u'Twelve Monkeys (1995)',
+             u'Babe (1995)', u'Dead Man Walking (1995)'])
+
+        # dummy event data
         data = EventData()
         data.set_event(np.tile(np.arange(5), (2, 2)).T)
-        data.filter_event(
+        filtered_data = data.filter_event(
             [True, False, True, True, False, False, True, True, False, False])
 
-        self.assertEqual(data.n_events, 5)
+        assert_equal(filtered_data.n_events, 5)
         assert_array_equal(
-            data.event, [[0, 0], [2, 2], [3, 3], [1, 1], [2, 2]])
+            filtered_data.event, [[0, 0], [2, 2], [3, 3], [1, 1], [2, 2]])
+
 
 # =============================================================================
 # Main Routines
 # =============================================================================
 
 if __name__ == '__main__':
-    unittest.main()
+    run_module_suite()
