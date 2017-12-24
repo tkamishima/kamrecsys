@@ -95,14 +95,14 @@ class TestEventWithScoreData(TestCase):
     def test_filter_event(self):
         data = load_movielens_mini()
 
-        data.filter_event(data.score > 3)
+        filtered_data = data.filter_event(data.score > 3)
         assert_allclose(
-            data.score,
+            filtered_data.score,
             [4., 4., 4., 5., 4., 5., 5., 5., 4., 5.,
              4., 5., 5., 4., 5., 4., 4., 4., 4., 4., 4.])
 
         assert_allclose(
-            data.to_eid(0, data.event[:, 0]),
+            filtered_data.to_eid(0, filtered_data.event[:, 0]),
             [10, 5, 10, 1, 7, 7, 9, 7, 10, 1,
              2, 1, 7, 6, 7, 6, 1, 9, 1, 6, 10])
 

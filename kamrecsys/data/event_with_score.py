@@ -228,11 +228,13 @@ class EventWithScoreData(EventData, ScoreUtilMixin):
             return
 
         # filter out event related information
-        super(EventWithScoreData, self).filter_event(filter_cond)
+        data = super(EventWithScoreData, self).filter_event(filter_cond)
 
         # filter out event data
         if self.score is not None:
-            self.score = self.score[filter_cond]
+            data.score = self.score[filter_cond]
+
+        return data
 
 
 # =============================================================================
@@ -264,6 +266,7 @@ def _test():
     doctest.testmod()
 
     sys.exit(0)
+
 
 # Check if this is call as command script -------------------------------------
 
