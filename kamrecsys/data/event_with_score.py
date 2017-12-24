@@ -207,14 +207,20 @@ class EventWithScoreData(EventData, ScoreUtilMixin):
 
     def filter_event(self, filter_cond):
         """
-        replace event data with those consisting of events whose corresponding
-        `filter_cond` is `True`.   
+        Returns a copy of data whose events are filtered based on
+        `filter_cond` .  Information about the objects that is not contained
+        in a filtered event set are eliminated as well.
 
         Parameters
         ----------
         filter_cond : array, dtype=bool, shape=(n_events,)
             Boolean array that specifies whether each event should be included
             in a new event array.
+
+        Returns
+        -------
+        data : :class:`kamrecsys.EventDataWithScore`
+            A copy of data whose events are filtered.
         """
 
         # check whether event info is available

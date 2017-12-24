@@ -16,9 +16,11 @@ from six.moves import xrange
 # =============================================================================
 
 import logging
-import numpy as np
+from copy import copy
 from abc import ABCMeta
 from six import with_metaclass
+
+import numpy as np
 
 from . import BaseData
 
@@ -220,19 +222,28 @@ class EventData(BaseData, EventUtilMixin):
 
     def filter_event(self, filter_cond):
         """
-        replace event data with those consisting of events whose corresponding
-        `filter_cond` is `True`.   
+        Returns a copy of data whose events are filtered based on
+        `filter_cond` .  Information about the objects that is not contained
+        in a filtered event set are eliminated as well.
 
         Parameters
         ----------
         filter_cond : array, dtype=bool, shape=(n_events,)
             Boolean array that specifies whether each event should be included
             in a new event array.
+
+        Returns
+        -------
+        data : :class:`kamrecsys.EventData`
+            A copy of data whose events are filtered.
         """
 
         # check whether event info is available
         if self.event is None:
             return
+
+        # copy data
+        data = copy(self)
 
         # re-arrange filter
         filter_cond = np.asarray(filter_cond)
