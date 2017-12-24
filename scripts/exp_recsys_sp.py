@@ -359,8 +359,7 @@ def cv_test(info):
             ev, groups=interlace_group(n_events, info['test']['n_folds'])):
 
         # training
-        training_data = copy(data)
-        training_data.filter_event(train_i)
+        training_data = data.filter_event(train_i)
         rec = training(info, training_data, fold)
 
         # test
