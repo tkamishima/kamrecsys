@@ -160,9 +160,6 @@ def holdout_test(info, load_data):
         function for loading data
     """
 
-    # set information about data and conditions
-    info['test']['n_folds'] = 1
-
     # prepare training data
     train_data = load_data(info['training']['file'], info)
 
@@ -171,6 +168,9 @@ def holdout_test(info, load_data):
         raise IOError('hold-out test data is required')
     test_data = load_data(info['test']['file'], info)
     test_ev = test_data.to_eid_event(test_data.event)
+
+    # set information about data and conditions
+    info['test']['n_folds'] = 1
 
     # training
     rec = info['model']['recommender'](**info['model']['options'])
@@ -202,15 +202,19 @@ def cv_test(info, load_data):
         function for loading data
     """
 
-    # set information about data and conditions
-    info['test']['file'] = info['training']['file']
-
     # prepare training data
     data = load_data(info['training']['file'], info)
     n_events = data.n_events
     n_folds = info['test']['n_folds']
     ev = data.to_eid_event(data.event)
 
+    # set information about data and conditions
+    info['training']['n_events'] = data.n_events
+    info['training']['n_users'] = data.n_objects[data.event_otypes[0]]
+    info['training']['n_items'] = data.n_objects[data.event_otypes[1]]
+    info['test']['file'] = info['training']['file']
+
+    # cross validation
     fold = 0
     esc = np.zeros(n_events, dtype=float)
     cv = LeaveOneGroupOut()
