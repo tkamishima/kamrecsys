@@ -51,10 +51,14 @@ Options
 
     * holdout : tested on the specified hold-out data
     * cv : cross validation
+    * cvone : perform one fold in a cross validation scheme
 
 -f <FOLD>, --fold <FOLD>
     the number of folds in cross validation, default=5
--n, --no-timestamp or --timestamp
+-n <FOLD_NO>, --fold-no <FOLD_NO>
+    the target fold in a cvone validation mode. select from the range
+    [0, <FOLD> - 1].
+--no-timestamp or --timestamp
     specify whether .event files has 'timestamp' information,
     default=timestamp
 -d <DOMAIN>, --domain <DOMAIN>
@@ -221,16 +225,15 @@ def command_line_parser():
     ap.add_argument('-m', '--method', type=str, default='lpmf',
                     choices=['lpmf'])
     ap.add_argument('-v', '--validation', type=str, default='holdout',
-                    choices=['holdout', 'cv'])
+                    choices=['holdout', 'cv', 'cvone'])
     ap.add_argument('-f', '--fold', type=int, default=5)
+    ap.add_argument('-n', '--fold-no', dest='fold_no', type=int, default=None)
 
     ap.add_argument('-d', '--domain', nargs=3, default=[0, 0, 0], type=float)
     apg = ap.add_mutually_exclusive_group()
     apg.set_defaults(timestamp=True)
-    apg.add_argument('-n', '--no-timestamp',
-                     dest='timestamp', action='store_false')
-    apg.add_argument('--timestamp',
-                     dest='timestamp', action='store_true')
+    apg.add_argument('--no-timestamp', dest='timestamp', action='store_false')
+    apg.add_argument('--timestamp', dest='timestamp', action='store_true')
 
     ap.add_argument('-C', '--lambda', dest='C', type=float, default=0.01)
     ap.add_argument('-k', '--dim', dest='k', type=int, default=1)
@@ -321,7 +324,7 @@ def main():
     info = init_info(opt)
 
     # do main task
-    do_task(info, load_data)
+    do_task(infoo, load_data, target_fold=opt.fold_n)
 
 
 # top level -------------------------------------------------------------------
