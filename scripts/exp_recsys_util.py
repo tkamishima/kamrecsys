@@ -175,11 +175,11 @@ def holdout_test(info, load_data):
     # training
     rec = info['model']['recommender'](**info['model']['options'])
     training_info = training(rec, train_data)
-    info['training']['results'] = {0: training_info}
+    info['training']['results'] = {'0': training_info}
 
     # test
     esc, test_info = testing(rec, test_ev)
-    info['test']['results'] = {0: test_info}
+    info['test']['results'] = {'0': test_info}
 
     # set predicted result
     info['prediction']['event'] = test_data.to_eid_event(test_data.event)
@@ -190,7 +190,7 @@ def holdout_test(info, load_data):
             {'timestamp': test_data.event_feature['timestamp']})
 
 
-def cv_test(info, load_data):
+def cv_test(info, load_data, target_fold=None):
     """
     tested on specified hold-out test data
 
@@ -200,6 +200,9 @@ def cv_test(info, load_data):
         Information about the target task
     load_data : function
         function for loading data
+    target_fold : int or None
+        If None, all folds are processed; otherwise, specify the fold number
+        to process.
     """
 
     # prepare training data
@@ -220,33 +223,51 @@ def cv_test(info, load_data):
     cv = LeaveOneGroupOut()
     info['training']['results'] = {}
     info['test']['results'] = {}
+    if target_fold is not None:
+        info['test']['mask'] = {}
     for train_i, test_i in cv.split(
             ev, groups=interlace_group(n_events, n_folds)):
+
+        # in a `cvone` mode, non target folds are ignored
+        if target_fold is not None and fold != target_fold:
+            fold += 1
+            continue
 
         # training
         logger.info("training fold = " + str(fold + 1) + " / " + str(n_folds))
         training_data = data.filter_event(train_i)
         rec = info['model']['recommender'](**info['model']['options'])
         training_info = training(rec, training_data)
-        info['training']['results'][fold] = training_info
+        info['training']['results'][str(fold)] = training_info
 
         # test
         logger.info("test fold = " + str(fold + 1) + " / " + str(n_folds))
         esc[test_i], test_info = testing(rec, ev[test_i])
-        info['test']['results'][fold] = test_info
+        info['test']['results'][str(fold)] = test_info
+        if target_fold is not None:
+            info['test']['mask'][str(fold)] = test_i
 
         fold += 1
 
     # set predicted result
-    info['prediction']['event'] = ev
-    info['prediction']['true'] = data.score
-    info['prediction']['predicted'] = esc
-    if info['data']['has_timestamp']:
-        info['prediction']['event_feature'] = {
-            'timestamp': data.event_feature['timestamp']}
+    if target_fold is None:
+        info['prediction']['event'] = ev
+        info['prediction']['true'] = data.score
+        info['prediction']['predicted'] = esc
+        if info['data']['has_timestamp']:
+            info['prediction']['event_feature'] = {
+                'timestamp': data.event_feature['timestamp']}
+    else:
+        mask = info['test']['mask'][str(target_fold)]
+        info['prediction']['event'] = ev[mask, :]
+        info['prediction']['true'] = data.score[mask]
+        info['prediction']['predicted'] = esc[mask]
+        if info['data']['has_timestamp']:
+            info['prediction']['event_feature'] = {
+                'timestamp': data.event_feature['timestamp'][mask]}
 
 
-def do_task(info, load_data):
+def do_task(info, load_data, target_fold=None):
     """
     Main task
 
@@ -256,6 +277,9 @@ def do_task(info, load_data):
         Information about the target task
     load_data : function
         function for loading data
+    target_fold : int or None
+        when a validation scheme is `cvone` , specify the fold number to
+        process.
     """
 
     # suppress warnings in numerical computation
@@ -279,6 +303,13 @@ def do_task(info, load_data):
         holdout_test(info, load_data)
     elif info['test']['scheme'] == 'cv':
         cv_test(info, load_data)
+    elif info['test']['scheme'] == 'cvone':
+        if (target_fold is not None and
+                0 <= target_fold < info['test']['n_folds']):
+            cv_test(info, load_data, target_fold=target_fold)
+        else:
+            TypeError("Illegal specification of the target fold: {:s}".format(
+                str(target_fold)))
     else:
         raise TypeError("Invalid validation scheme: {0:s}".format(opt.method))
 
