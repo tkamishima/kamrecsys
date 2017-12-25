@@ -56,7 +56,7 @@ __all__ = ['do_task']
 # =============================================================================
 
 
-def training(info, data, fold=0):
+def training(info, data):
     """
     training model
 
@@ -66,26 +66,23 @@ def training(info, data, fold=0):
         Information about the target task
     data : :class:`kamrecsys.data.EventWithScoreData`
         training data
-    fold : int, default=0
-        fold No.
 
     Returns
     -------
     rec : EventScorePredictor
-        trained recommender
+        Trained recommender
+    res_info : dict
+        Info of training results
     """
 
-    # start new fold
-    n_folds = info['test']['n_folds']
-    logger.info("training fold = " + str(fold + 1) + " / " + str(n_folds))
+    # info of results
+    res_info = {}
 
     # set starting time
     start_time = datetime.datetime.now()
     start_utime = os.times()[0]
-    if 'start_time' not in info['training']:
-        info['training']['start_time'] = [0] * n_folds
-    info['training']['start_time'][fold] = start_time.isoformat()
-    logger.info("training_start_time = " + start_time.isoformat())
+    res_info['start_time'] = start_time.isoformat()
+    logger.info("training_start_time = " + res_info['start_time'])
 
     # create and learning model
     rec = info['model']['recommender'](**info['model']['options'])
@@ -94,35 +91,20 @@ def training(info, data, fold=0):
     # set end and elapsed time
     end_time = datetime.datetime.now()
     end_utime = os.times()[0]
-    elapsed_time = end_time - start_time
-    elapsed_utime = end_utime - start_utime
-    if 'end_time' not in info['training']:
-        info['training']['end_time'] = [0] * n_folds
-    info['training']['end_time'][fold] = end_time.isoformat()
-    logger.info("training_end_time = " + end_time.isoformat())
-
-    if 'elapsed_time' not in info['training']:
-        info['training']['elapsed_time'] = elapsed_time
-    else:
-        info['training']['elapsed_time'] += elapsed_time
-    logger.info(
-        "training_elapsed_time = " + str(info['training']['elapsed_time']))
-    if 'elapsed_utime' not in info['training']:
-        info['training']['elapsed_utime'] = elapsed_utime
-    else:
-        info['training']['elapsed_utime'] += elapsed_utime
-    logger.info(
-        "training_elapsed_utime = " + str(info['training']['elapsed_utime']))
+    res_info['end_time'] = end_time.isoformat()
+    res_info['elapsed_time'] = end_time - start_time
+    res_info['elapsed_utime'] = end_utime - start_utime
+    logger.info("training_end_time = " + res_info['end_time'])
+    logger.info("training_elapsed_time = " + str(res_info['elapsed_time']))
+    logger.info("training_elapsed_utime = " + str(res_info['elapsed_utime']))
 
     # preserve optimizer's outputs
-    if 'results' not in info['training']:
-        info['training']['results'] = [{}] * n_folds
-    info['training']['results'][fold] = rec.fit_results_
+    res_info.update(rec.fit_results_)
 
-    return rec
+    return rec, res_info
 
 
-def testing(rec, info, ev, fold=0):
+def testing(rec, info, ev):
     """
     test and output results
 
@@ -134,26 +116,23 @@ def testing(rec, info, ev, fold=0):
         Information about the target task
     ev : array, size=(n_events, 2), dtype=int
         array of events in external ids
-    fold : int, default=0
-        fold No.
 
     Returns
     -------
     esc : array, shape=(n_events,), dtype=float
-        estimated scores
+        Estimated scores
+    res_info : dict
+        Info of training results
     """
 
-    # start new fold
-    n_folds = info['test']['n_folds']
-    logger.info("test fold = " + str(fold + 1) + " / " + str(n_folds))
+    # info of results
+    res_info = {}
 
     # set starting time
     start_time = datetime.datetime.now()
     start_utime = os.times()[0]
-    if 'start_time' not in info['test']:
-        info['test']['start_time'] = [0] * n_folds
-    info['test']['start_time'][fold] = start_time.isoformat()
-    logger.info("test_start_time = " + start_time.isoformat())
+    res_info['start_time'] = start_time.isoformat()
+    logger.info("test_start_time = " + res_info['start_time'])
 
     # prediction
     esc = rec.predict(ev)
@@ -161,30 +140,17 @@ def testing(rec, info, ev, fold=0):
     # set end and elapsed time
     end_time = datetime.datetime.now()
     end_utime = os.times()[0]
-    elapsed_time = end_time - start_time
-    elapsed_utime = end_utime - start_utime
+    res_info['end_time'] = start_time.isoformat()
+    res_info['elapsed_time'] = end_time - start_time
+    res_info['elapsed_utime'] = end_utime - start_utime
+    logger.info("test_end_time = " + res_info['end_time'])
+    logger.info("test_elapsed_time = " + str(res_info['elapsed_time']))
+    logger.info("test_elapsed_utime = " + str(res_info['elapsed_utime']))
 
-    if 'end_time' not in info['test']:
-        info['test']['end_time'] = [0] * n_folds
-    info['test']['end_time'][fold] = start_time.isoformat()
-    logger.info("test_end_time = " + end_time.isoformat())
-    if 'elapsed_time' not in info['test']:
-        info['test']['elapsed_time'] = elapsed_time
-    else:
-        info['test']['elapsed_time'] += elapsed_time
-    logger.info("test_elapsed_time = " + str(info['test']['elapsed_time']))
-    if 'elapsed_utime' not in info['test']:
-        info['test']['elapsed_utime'] = elapsed_utime
-    else:
-        info['test']['elapsed_utime'] += elapsed_utime
-    logger.info("test_elapsed_utime = " + str(info['test']['elapsed_utime']))
+    # preserve test info
+    res_info['n_events'] = ev.shape[0]
 
-    # preserve predictor's outputs
-    if 'results' not in info['test']:
-        info['test']['results'] = [{}] * n_folds
-    info['test']['results'][fold] = {'n_events': ev.shape[0]}
-
-    return esc
+    return esc, res_info
 
 
 def holdout_test(info, load_data):
@@ -212,10 +178,12 @@ def holdout_test(info, load_data):
     test_ev = test_data.to_eid_event(test_data.event)
 
     # training
-    rec = training(info, train_data)
+    rec, training_info = training(info, train_data)
+    info['training']['results'] = {0: training_info}
 
     # test
-    esc = testing(rec, info, test_ev)
+    esc, test_info = testing(rec, info, test_ev)
+    info['test']['results'] = {0: test_info}
 
     # set predicted result
     info['prediction']['event'] = test_data.to_eid_event(test_data.event)
@@ -244,19 +212,26 @@ def cv_test(info, load_data):
     # prepare training data
     data = load_data(info['training']['file'], info)
     n_events = data.n_events
+    n_folds = info['test']['n_folds']
     ev = data.to_eid_event(data.event)
 
     fold = 0
     esc = np.zeros(n_events, dtype=float)
     cv = LeaveOneGroupOut()
+    info['training']['results'] = {}
+    info['test']['results'] = {}
     for train_i, test_i in cv.split(
-            ev, groups=interlace_group(n_events, info['test']['n_folds'])):
+            ev, groups=interlace_group(n_events, n_folds)):
         # training
+        logger.info("training fold = " + str(fold + 1) + " / " + str(n_folds))
         training_data = data.filter_event(train_i)
-        rec = training(info, training_data, fold)
+        rec, training_info = training(info, training_data)
+        info['training']['results'][fold] = training_info
 
         # test
-        esc[test_i] = testing(rec, info, ev[test_i], fold=fold)
+        logger.info("test fold = " + str(fold + 1) + " / " + str(n_folds))
+        esc[test_i], test_info = testing(rec, info, ev[test_i])
+        info['test']['results'][fold] = test_info
 
         fold += 1
 
