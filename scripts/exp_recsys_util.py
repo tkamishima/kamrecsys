@@ -56,21 +56,19 @@ __all__ = ['do_task']
 # =============================================================================
 
 
-def training(info, data):
+def training(rec, data):
     """
     training model
 
     Parameters
     ----------
-    info : dict
-        Information about the target task
+    rec : EventScorePredictor
+        recommender object
     data : :class:`kamrecsys.data.EventWithScoreData`
         training data
 
     Returns
     -------
-    rec : EventScorePredictor
-        Trained recommender
     res_info : dict
         Info of training results
     """
@@ -85,7 +83,6 @@ def training(info, data):
     logger.info("training_start_time = " + res_info['start_time'])
 
     # create and learning model
-    rec = info['model']['recommender'](**info['model']['options'])
     rec.fit(data)
 
     # set end and elapsed time
@@ -101,10 +98,10 @@ def training(info, data):
     # preserve optimizer's outputs
     res_info.update(rec.fit_results_)
 
-    return rec, res_info
+    return res_info
 
 
-def testing(rec, info, ev):
+def testing(rec, ev):
     """
     test and output results
 
@@ -112,8 +109,6 @@ def testing(rec, info, ev):
     ----------
     rec : EventScorePredictor
         trained recommender
-    info : dict
-        Information about the target task
     ev : array, size=(n_events, 2), dtype=int
         array of events in external ids
 
@@ -178,11 +173,12 @@ def holdout_test(info, load_data):
     test_ev = test_data.to_eid_event(test_data.event)
 
     # training
-    rec, training_info = training(info, train_data)
+    rec = info['model']['recommender'](**info['model']['options'])
+    training_info = training(rec, train_data)
     info['training']['results'] = {0: training_info}
 
     # test
-    esc, test_info = testing(rec, info, test_ev)
+    esc, test_info = testing(rec, test_ev)
     info['test']['results'] = {0: test_info}
 
     # set predicted result
@@ -222,15 +218,17 @@ def cv_test(info, load_data):
     info['test']['results'] = {}
     for train_i, test_i in cv.split(
             ev, groups=interlace_group(n_events, n_folds)):
+
         # training
         logger.info("training fold = " + str(fold + 1) + " / " + str(n_folds))
         training_data = data.filter_event(train_i)
-        rec, training_info = training(info, training_data)
+        rec = info['model']['recommender'](**info['model']['options'])
+        training_info = training(rec, training_data)
         info['training']['results'][fold] = training_info
 
         # test
         logger.info("test fold = " + str(fold + 1) + " / " + str(n_folds))
-        esc[test_i], test_info = testing(rec, info, ev[test_i])
+        esc[test_i], test_info = testing(rec, ev[test_i])
         info['test']['results'][fold] = test_info
 
         fold += 1
