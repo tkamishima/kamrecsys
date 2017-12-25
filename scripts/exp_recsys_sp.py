@@ -91,7 +91,6 @@ from six.moves import xrange
 
 import argparse
 import logging
-import os
 import sys
 
 import numpy as np
@@ -339,7 +338,7 @@ def main():
 
 # top level -------------------------------------------------------------------
 # init logging system
-logger = logging.getLogger(os.path.basename(sys.argv[0]))
+logger = logging.getLogger('exp_recsys')
 logging.basicConfig(level=logging.INFO,
                     format='[%(name)s: %(levelname)s'
                            ' @ %(asctime)s] %(message)s')
