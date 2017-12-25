@@ -298,7 +298,7 @@ def do_task(info, load_data):
 # =============================================================================
 
 # init logging system
-logger = logging.getLogger('exp_recsys')
+logger = logging.getLogger('kamrecsys')
 if not logger.handlers:
     logger.addHandler(logging.NullHandler())
 
