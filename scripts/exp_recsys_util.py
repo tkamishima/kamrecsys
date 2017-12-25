@@ -56,7 +56,7 @@ __all__ = ['do_task']
 # =============================================================================
 
 
-def training(info, data, fold=0):
+def training(info, data):
     """
     training model
 
@@ -66,8 +66,6 @@ def training(info, data, fold=0):
         Information about the target task
     data : :class:`kamrecsys.data.EventWithScoreData`
         training data
-    fold : int, default=0
-        fold No.
 
     Returns
     -------
@@ -79,10 +77,6 @@ def training(info, data, fold=0):
 
     # info of results
     res_info = {}
-
-    # start new fold
-    n_folds = info['test']['n_folds']
-    logger.info("training fold = " + str(fold + 1) + " / " + str(n_folds))
 
     # set starting time
     start_time = datetime.datetime.now()
@@ -110,7 +104,7 @@ def training(info, data, fold=0):
     return rec, res_info
 
 
-def testing(rec, info, ev, fold=0):
+def testing(rec, info, ev):
     """
     test and output results
 
@@ -122,8 +116,6 @@ def testing(rec, info, ev, fold=0):
         Information about the target task
     ev : array, size=(n_events, 2), dtype=int
         array of events in external ids
-    fold : int, default=0
-        fold No.
 
     Returns
     -------
@@ -132,10 +124,6 @@ def testing(rec, info, ev, fold=0):
     res_info : dict
         Info of training results
     """
-
-    # start new fold
-    n_folds = info['test']['n_folds']
-    logger.info("test fold = " + str(fold + 1) + " / " + str(n_folds))
 
     # info of results
     res_info = {}
@@ -224,6 +212,7 @@ def cv_test(info, load_data):
     # prepare training data
     data = load_data(info['training']['file'], info)
     n_events = data.n_events
+    n_folds = info['test']['n_folds']
     ev = data.to_eid_event(data.event)
 
     fold = 0
@@ -232,14 +221,16 @@ def cv_test(info, load_data):
     info['training']['results'] = {}
     info['test']['results'] = {}
     for train_i, test_i in cv.split(
-            ev, groups=interlace_group(n_events, info['test']['n_folds'])):
+            ev, groups=interlace_group(n_events, n_folds)):
         # training
+        logger.info("training fold = " + str(fold + 1) + " / " + str(n_folds))
         training_data = data.filter_event(train_i)
-        rec, training_info = training(info, training_data, fold)
+        rec, training_info = training(info, training_data)
         info['training']['results'][fold] = training_info
 
         # test
-        esc[test_i], test_info = testing(rec, info, ev[test_i], fold=fold)
+        logger.info("test fold = " + str(fold + 1) + " / " + str(n_folds))
+        esc[test_i], test_info = testing(rec, info, ev[test_i])
         info['test']['results'][fold] = test_info
 
         fold += 1
