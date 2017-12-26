@@ -160,9 +160,6 @@ def holdout_test(info, load_data):
         function for loading data
     """
 
-    # set information about data and conditions
-    info['test']['n_folds'] = 1
-
     # prepare training data
     train_data = load_data(info['training']['file'], info)
 
@@ -172,14 +169,24 @@ def holdout_test(info, load_data):
     test_data = load_data(info['test']['file'], info)
     test_ev = test_data.to_eid_event(test_data.event)
 
+    # set information about data and conditions
+    info['test']['n_folds'] = 1
+    info['training']['n_events'] = train_data.n_events
+    info['training']['n_users'] = train_data.n_objects[data.event_otypes[0]]
+    info['training']['n_items'] = train_data.n_objects[data.event_otypes[1]]
+    info['test']['file'] = info['training']['file']
+    info['training']['n_events'] = test_data.n_events
+    info['training']['n_users'] = test_data.n_objects[data.event_otypes[0]]
+    info['training']['n_items'] = test_data.n_objects[data.event_otypes[1]]
+
     # training
     rec = info['model']['recommender'](**info['model']['options'])
     training_info = training(rec, train_data)
-    info['training']['results'] = {0: training_info}
+    info['training']['results'] = {'0': training_info}
 
     # test
     esc, test_info = testing(rec, test_ev)
-    info['test']['results'] = {0: test_info}
+    info['test']['results'] = {'0': test_info}
 
     # set predicted result
     info['prediction']['event'] = test_data.to_eid_event(test_data.event)
@@ -190,7 +197,7 @@ def holdout_test(info, load_data):
             {'timestamp': test_data.event_feature['timestamp']})
 
 
-def cv_test(info, load_data):
+def cv_test(info, load_data, target_fold=None):
     """
     tested on specified hold-out test data
 
@@ -200,10 +207,10 @@ def cv_test(info, load_data):
         Information about the target task
     load_data : function
         function for loading data
+    target_fold : int or None
+        If None, all folds are processed; otherwise, specify the fold number
+        to process.
     """
-
-    # set information about data and conditions
-    info['test']['file'] = info['training']['file']
 
     # prepare training data
     data = load_data(info['training']['file'], info)
@@ -211,38 +218,61 @@ def cv_test(info, load_data):
     n_folds = info['test']['n_folds']
     ev = data.to_eid_event(data.event)
 
+    # set information about data and conditions
+    info['training']['n_events'] = data.n_events
+    info['training']['n_users'] = data.n_objects[data.event_otypes[0]]
+    info['training']['n_items'] = data.n_objects[data.event_otypes[1]]
+    info['test']['file'] = info['training']['file']
+    info['test']['n_events'] = info['training']['n_events']
+    info['test']['n_users'] = info['training']['n_users']
+    info['test']['n_items'] = info['training']['n_items']
+
+    # cross validation
     fold = 0
     esc = np.zeros(n_events, dtype=float)
     cv = LeaveOneGroupOut()
     info['training']['results'] = {}
     info['test']['results'] = {}
+    if target_fold is not None:
+        info['test']['mask'] = {}
     for train_i, test_i in cv.split(
             ev, groups=interlace_group(n_events, n_folds)):
+
+        # in a `cvone` mode, non target folds are ignored
+        if target_fold is not None and fold != target_fold:
+            fold += 1
+            continue
 
         # training
         logger.info("training fold = " + str(fold + 1) + " / " + str(n_folds))
         training_data = data.filter_event(train_i)
         rec = info['model']['recommender'](**info['model']['options'])
         training_info = training(rec, training_data)
-        info['training']['results'][fold] = training_info
+        info['training']['results'][str(fold)] = training_info
 
         # test
         logger.info("test fold = " + str(fold + 1) + " / " + str(n_folds))
         esc[test_i], test_info = testing(rec, ev[test_i])
-        info['test']['results'][fold] = test_info
+        info['test']['results'][str(fold)] = test_info
+        if target_fold is not None:
+            info['test']['mask'][str(fold)] = test_i
 
         fold += 1
 
     # set predicted result
     info['prediction']['event'] = ev
     info['prediction']['true'] = data.score
-    info['prediction']['predicted'] = esc
+    if target_fold is None:
+        info['prediction']['predicted'] = esc
+    else:
+        mask = info['test']['mask'][str(target_fold)]
+        info['prediction']['predicted'] = esc[mask]
     if info['data']['has_timestamp']:
         info['prediction']['event_feature'] = {
             'timestamp': data.event_feature['timestamp']}
 
 
-def do_task(info, load_data):
+def do_task(info, load_data, target_fold=None):
     """
     Main task
 
@@ -252,6 +282,9 @@ def do_task(info, load_data):
         Information about the target task
     load_data : function
         function for loading data
+    target_fold : int or None
+        when a validation scheme is `cvone` , specify the fold number to
+        process.
     """
 
     # suppress warnings in numerical computation
@@ -275,15 +308,21 @@ def do_task(info, load_data):
         holdout_test(info, load_data)
     elif info['test']['scheme'] == 'cv':
         cv_test(info, load_data)
+    elif info['test']['scheme'] == 'cvone':
+        if (target_fold is not None and
+                0 <= target_fold < info['test']['n_folds']):
+            cv_test(info, load_data, target_fold=target_fold)
+        else:
+            raise TypeError(
+                "Illegal specification of the target fold: {:s}".format(
+                    str(target_fold)))
     else:
         raise TypeError("Invalid validation scheme: {0:s}".format(opt.method))
 
     # output information
     outfile = info['prediction']['file']
     info['prediction']['file'] = str(outfile)
-    for k in info.keys():
-        if k not in ['prediction']:
-            json_decodable(info)
+    json_decodable(info)
     outfile.write(json.dumps(info))
     if outfile is not sys.stdout:
         outfile.close()
@@ -298,7 +337,7 @@ def do_task(info, load_data):
 # =============================================================================
 
 # init logging system
-logger = logging.getLogger('kamrecsys')
+logger = logging.getLogger('exp_recsys')
 if not logger.handlers:
     logger.addHandler(logging.NullHandler())
 
