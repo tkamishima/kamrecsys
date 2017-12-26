@@ -315,7 +315,7 @@ def do_task(info, load_data, target_fold=None):
         else:
             raise TypeError(
                 "Illegal specification of the target fold: {:s}".format(
-                str(target_fold)))
+                    str(target_fold)))
     else:
         raise TypeError("Invalid validation scheme: {0:s}".format(opt.method))
 
