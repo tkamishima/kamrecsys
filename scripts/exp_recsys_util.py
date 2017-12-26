@@ -171,6 +171,13 @@ def holdout_test(info, load_data):
 
     # set information about data and conditions
     info['test']['n_folds'] = 1
+    info['training']['n_events'] = train_data.n_events
+    info['training']['n_users'] = train_data.n_objects[data.event_otypes[0]]
+    info['training']['n_items'] = train_data.n_objects[data.event_otypes[1]]
+    info['test']['file'] = info['training']['file']
+    info['training']['n_events'] = test_data.n_events
+    info['training']['n_users'] = test_data.n_objects[data.event_otypes[0]]
+    info['training']['n_items'] = test_data.n_objects[data.event_otypes[1]]
 
     # training
     rec = info['model']['recommender'](**info['model']['options'])
@@ -216,6 +223,9 @@ def cv_test(info, load_data, target_fold=None):
     info['training']['n_users'] = data.n_objects[data.event_otypes[0]]
     info['training']['n_items'] = data.n_objects[data.event_otypes[1]]
     info['test']['file'] = info['training']['file']
+    info['test']['n_events'] = info['training']['n_events']
+    info['test']['n_users'] = info['training']['n_users']
+    info['test']['n_items'] = info['training']['n_items']
 
     # cross validation
     fold = 0
