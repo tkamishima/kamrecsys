@@ -322,9 +322,7 @@ def do_task(info, load_data, target_fold=None):
     # output information
     outfile = info['prediction']['file']
     info['prediction']['file'] = str(outfile)
-    for k in info.keys():
-        if k not in ['prediction']:
-            json_decodable(info)
+    json_decodable(info)
     outfile.write(json.dumps(info))
     if outfile is not sys.stdout:
         outfile.close()
