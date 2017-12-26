@@ -303,7 +303,8 @@ def do_task(info, load_data, target_fold=None):
                 0 <= target_fold < info['test']['n_folds']):
             cv_test(info, load_data, target_fold=target_fold)
         else:
-            TypeError("Illegal specification of the target fold: {:s}".format(
+            raise TypeError(
+                "Illegal specification of the target fold: {:s}".format(
                 str(target_fold)))
     else:
         raise TypeError("Invalid validation scheme: {0:s}".format(opt.method))
