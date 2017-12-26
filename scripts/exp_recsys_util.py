@@ -250,21 +250,16 @@ def cv_test(info, load_data, target_fold=None):
         fold += 1
 
     # set predicted result
+    info['prediction']['event'] = ev
+    info['prediction']['true'] = data.score
     if target_fold is None:
-        info['prediction']['event'] = ev
-        info['prediction']['true'] = data.score
         info['prediction']['predicted'] = esc
-        if info['data']['has_timestamp']:
-            info['prediction']['event_feature'] = {
-                'timestamp': data.event_feature['timestamp']}
     else:
         mask = info['test']['mask'][str(target_fold)]
-        info['prediction']['event'] = ev[mask, :]
-        info['prediction']['true'] = data.score[mask]
         info['prediction']['predicted'] = esc[mask]
-        if info['data']['has_timestamp']:
-            info['prediction']['event_feature'] = {
-                'timestamp': data.event_feature['timestamp'][mask]}
+    if info['data']['has_timestamp']:
+        info['prediction']['event_feature'] = {
+            'timestamp': data.event_feature['timestamp']}
 
 
 def do_task(info, load_data, target_fold=None):
