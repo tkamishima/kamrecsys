@@ -324,7 +324,7 @@ def main():
     info = init_info(opt)
 
     # do main task
-    do_task(info, load_data, target_fold=opt.fold_n)
+    do_task(info, load_data, target_fold=opt.fold_no)
 
 
 # top level -------------------------------------------------------------------
