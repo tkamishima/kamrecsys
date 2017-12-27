@@ -104,7 +104,7 @@ def first_fold(fp):
     cv_info['test']['merged'] = True
 
     # get fold number
-    fold = list(info['training']['results'].keys())[0]
+    fold = next(iter(info['training']['results']))
 
     # copy computation environments for this fold
     cv_info['environment']['environment_fold'] = { fold: info['environment'] }
@@ -140,7 +140,7 @@ def rest_fold(fp, cv_info):
     info = json.load(fp, encoding='utf-8')
 
     # get fold number
-    fold = list(info['training']['results'].keys())[0]
+    fold = next(iter(info['training']['results']))
 
     # copy computation environments for this fold
     cv_info['environment']['environment_fold'][fold] = info['environment']
