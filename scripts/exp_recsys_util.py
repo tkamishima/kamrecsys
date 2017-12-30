@@ -172,12 +172,16 @@ def holdout_test(info, load_data):
     # set information about data and conditions
     info['test']['n_folds'] = 1
     info['training']['n_events'] = train_data.n_events
-    info['training']['n_users'] = train_data.n_objects[data.event_otypes[0]]
-    info['training']['n_items'] = train_data.n_objects[data.event_otypes[1]]
+    info['training']['n_users'] = (
+        train_data.n_objects[train_data.event_otypes[0]])
+    info['training']['n_items'] = (
+        train_data.n_objects[train_data.event_otypes[1]])
     info['test']['file'] = info['training']['file']
     info['training']['n_events'] = test_data.n_events
-    info['training']['n_users'] = test_data.n_objects[data.event_otypes[0]]
-    info['training']['n_items'] = test_data.n_objects[data.event_otypes[1]]
+    info['training']['n_users'] = (
+        test_data.n_objects[test_data.event_otypes[0]])
+    info['training']['n_items'] = (
+        test_data.n_objects[test_data.event_otypes[1]])
 
     # training
     rec = info['model']['recommender'](**info['model']['options'])
