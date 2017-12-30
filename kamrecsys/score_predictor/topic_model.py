@@ -53,14 +53,15 @@ class MultinomialPLSA(BaseScorePredictor):
     ----------
     k : int, default=1
         nos of latent factors
-    maxiter : int, default=100
-        maximum number of iterations
     alpha : float, default=1.0
         Laplace smoothing parameter
-    tol : float
-        tolerance parameter of conversion, default=1e-10
     use_expectation : bool, default=True
         use expectation in prediction if True, use mode if False
+    optimizer_kwargs : dict
+        keyword arguments passed to optimizer
+
+        * tol (float) : tolerance parameter of conversion, default=1e-10
+        * maxiter (int) : maximum number of iterations, default=100
 
     Attributes
     ----------
@@ -88,17 +89,20 @@ class MultinomialPLSA(BaseScorePredictor):
     """
 
     def __init__(
-            self, k=1, tol=1e-10, maxiter=100, alpha=1.0, use_expectation=True,
-            random_state=None):
+            self, k=1, alpha=1.0, use_expectation=True,
+            random_state=None, **optimizer_kwargs):
 
         super(MultinomialPLSA, self).__init__(random_state=random_state)
 
         # parameters
         self.k = k
-        self.tol = tol
-        self.maxiter = maxiter
         self.alpha = alpha
         self.use_expectation = use_expectation
+        self.optimizer_kwargs = optimizer_kwargs
+        self.optimizer_kwargs['maxiter'] = (
+            self.optimizer_kwargs.get('maxiter', 100))
+        self.optimizer_kwargs['tol'] = (
+            self.optimizer_kwargs.get('tol', 1e-10))
 
         # attributes
         self.pZ_ = None
@@ -250,10 +254,14 @@ class MultinomialPLSA(BaseScorePredictor):
             self.fit_results_['initial_loss']))
         pre_loss = self.fit_results_['initial_loss']
 
+        # get optimizer parameters
+        maxiter = self.optimizer_kwargs['maxiter']
+        tol = self.optimizer_kwargs['tol']
+
         # main loop
         iter_no = 0
         cur_loss = np.inf
-        for iter_no in xrange(self.maxiter):
+        for iter_no in xrange(maxiter):
 
             # E-Step
 
@@ -272,18 +280,18 @@ class MultinomialPLSA(BaseScorePredictor):
             cur_loss = self.loss(ev, sc)
             logger.info("iter {:d}: {:.15g}".format(iter_no + 1, cur_loss))
             precision = np.abs((cur_loss - pre_loss) / cur_loss)
-            if precision < self.tol:
+            if precision < tol:
                 logger.info(
                     "Reached to specified tolerance:"
                     " {:.15g}".format(precision))
                 break
             pre_loss = cur_loss
 
-        if iter_no >= self.maxiter - 1:
+        if iter_no >= maxiter - 1:
             self.fit_results_['status'] = 2
             logger.warning(
                 "Exceeded the maximum number of iterations: {:d}".format(
-                    self.maxiter))
+                    maxiter))
 
         logger.info("final: {:.15g}".format(cur_loss))
         logger.info("nos of iterations: {:d}".format(iter_no + 1))
@@ -297,6 +305,7 @@ class MultinomialPLSA(BaseScorePredictor):
         self.fit_results_['success'] = (self.fit_results_['status'] == 0)
         self.fit_results_['message'] = (
             get_fit_status_message(self.fit_results_['status']))
+        self.fit_results_['optimizer_kwargs'] = self.optimizer_kwargs
 
         # add parameters for unknown users and items
         self.pXgZ_ = np.r_[self.pXgZ_, np.ones((1, self.k), dtype=float)]
