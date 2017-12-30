@@ -16,7 +16,6 @@ from numpy.testing import (
     TestCase,
     run_module_suite,
     assert_,
-    assert_almost_equal,
     assert_allclose,
     assert_array_almost_equal_nulp,
     assert_array_max_ulp,
