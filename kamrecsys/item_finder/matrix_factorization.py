@@ -121,9 +121,21 @@ class LogisticPMF(BaseExplicitItemFinder):
 
         super(LogisticPMF, self).__init__(random_state=random_state)
 
+        # model hyper parameter
         self.C = float(C)
         self.k = int(k)
+
+        # optimizer parameter
         self.optimizer_kwargs = optimizer_kwargs
+        self.optimizer_kwargs['options'] = (
+            self.optimizer_kwargs.get('options', {}))
+        self.optimizer_kwargs['options']['disp'] = (
+            self.optimizer_kwargs['options'].get('disp', False))
+        opt_maxiter = self.optimizer_kwargs.pop('maxiter', None)
+        if opt_maxiter is not None:
+            self.optimizer_kwargs['options']['maxiter'] = opt_maxiter
+
+        # learned parameter
         self.mu_ = None
         self.bu_ = None
         self.bi_ = None
@@ -339,12 +351,6 @@ class LogisticPMF(BaseExplicitItemFinder):
         # check optimization parameters
         optimizer_kwargs = self.optimizer_kwargs.copy()
         optimizer_method = optimizer_kwargs.pop('method', 'CG')
-        optimizer_kwargs['options'] = optimizer_kwargs.get('options', {})
-        optimizer_kwargs['options']['disp'] = (
-            optimizer_kwargs['options'].get('disp', False))
-        opt_maxiter = optimizer_kwargs.pop('maxiter', None)
-        if opt_maxiter is not None:
-            optimizer_kwargs['options']['maxiter'] = opt_maxiter
 
         # get initial loss
         self.fit_results_['initial_loss'] = self.loss(
@@ -497,9 +503,21 @@ class ImplicitLogisticPMF(BaseImplicitItemFinder):
     def __init__(self, C=1.0, k=1, random_state=None, **optimizer_kwargs):
         super(ImplicitLogisticPMF, self).__init__(random_state=random_state)
 
+        # model parameter
         self.C = float(C)
         self.k = int(k)
+
+        # optimizer parameter
         self.optimizer_kwargs = optimizer_kwargs
+        self.optimizer_kwargs['options'] = (
+            self.optimizer_kwargs.get('options', {}))
+        self.optimizer_kwargs['options']['disp'] = (
+            self.optimizer_kwargs['options'].get('disp', False))
+        opt_maxiter = self.optimizer_kwargs.pop('maxiter', None)
+        if opt_maxiter is not None:
+            self.optimizer_kwargs['options']['maxiter'] = opt_maxiter
+
+        # learned parameter
         self.mu_ = None
         self.bu_ = None
         self.bi_ = None
@@ -696,12 +714,6 @@ class ImplicitLogisticPMF(BaseImplicitItemFinder):
         # check optimization parameters
         optimizer_kwargs = self.optimizer_kwargs.copy()
         optimizer_method = optimizer_kwargs.pop('method', 'CG')
-        optimizer_kwargs['options'] = optimizer_kwargs.get('options', {})
-        optimizer_kwargs['options']['disp'] = (
-            optimizer_kwargs['options'].get('disp', False))
-        opt_maxiter = optimizer_kwargs.pop('maxiter', None)
-        if opt_maxiter is not None:
-            optimizer_kwargs['options']['maxiter'] = opt_maxiter
 
         # get initial loss
         self.fit_results_['initial_loss'] = self.loss(
