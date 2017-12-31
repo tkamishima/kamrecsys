@@ -52,7 +52,7 @@ __all__ = []
 
 
 class BaseScorePredictor(
-    with_metaclass(ABCMeta, BaseEventRecommender, ScoreUtilMixin)):
+        with_metaclass(ABCMeta, BaseEventRecommender, ScoreUtilMixin)):
     """
     Recommenders to predict preference scores from event data
 
@@ -114,6 +114,7 @@ class BaseScorePredictor(
         # set object information in data
         self._set_score_info(data)
 
+
 # =============================================================================
 # Module initialization
 # =============================================================================
@@ -139,6 +140,7 @@ def _test():
     doctest.testmod()
 
     sys.exit(0)
+
 
 # Check if this is call as command script
 

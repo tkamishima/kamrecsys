@@ -76,6 +76,7 @@ class TestBaseScorePredictor(TestCase):
         assert_allclose(rec.score_domain, [1., 5., 1.])
         self.assertEqual(rec.n_score_levels, 5)
 
+
 # =============================================================================
 # Main Routine
 # =============================================================================

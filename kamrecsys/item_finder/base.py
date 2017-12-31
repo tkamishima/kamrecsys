@@ -122,7 +122,7 @@ class BaseExplicitItemFinder(
         # check whether scores are binary
         if (
                 (not np.array_equal(data.score_domain, [0, 1, 1])) or
-                (not is_binary_score(data.score, allow_uniorm=False)) or
+                (not is_binary_score(data.score, allow_uniform=False)) or
                 (data.n_score_levels != 2)):
             raise ValueError('Scores are not binary type')
 
@@ -158,7 +158,7 @@ class BaseImplicitItemFinder(with_metaclass(ABCMeta, BaseEventRecommender)):
     def get_event_array(self, sparse_type='csr'):
         """
         Set statistics of input dataset, and generate a matrix representing
-        implicit feedbacks.
+        implicit feedback.
 
         Parameters
         ----------
@@ -227,6 +227,7 @@ def _test():
     doctest.testmod()
 
     sys.exit(0)
+
 
 # Check if this is call as command script
 

@@ -58,7 +58,7 @@ def load_event(infile, n_otypes=2, event_otypes=None, event_dtype=None):
     """
     load event file
 
-    Tab separated file.  The contnts of columns are as follows:
+    Tab separated file.  The counts of columns are as follows:
 
     * the first s_events columns are sets of object IDs representing events 
     * the rest of columns corresponds to event features
@@ -107,7 +107,7 @@ def load_event_with_score(
     """
     load event file with rating score
 
-    Tab separated file.  The contnts of columns are as follows:
+    Tab separated file.  The counts of columns are as follows:
     
     * the first s_events columns are sets of object IDs representing events 
     * the subsequent one column is a set of scores
@@ -154,6 +154,7 @@ def load_event_with_score(
 
     return data
 
+
 # =============================================================================
 # Module initialization
 # =============================================================================
@@ -180,6 +181,7 @@ def _test():
     doctest.testmod()
 
     sys.exit(0)
+
 
 # Check if this is call as command script
 

@@ -21,7 +21,7 @@ import logging
 import numpy as np
 
 from ..data import EventWithScoreData
-from .base import SAMPLE_PATH, load_event_with_score, event_dtype_timestamp
+from . import SAMPLE_PATH, load_event_with_score, event_dtype_timestamp
 
 # =============================================================================
 # Public symbols
@@ -308,6 +308,7 @@ def load_movielens1m(infile=None, event_dtype=event_dtype_timestamp):
 
     return data
 
+
 # =============================================================================
 # Module initialization
 # =============================================================================
@@ -332,6 +333,7 @@ def _test():
     doctest.testmod()
 
     sys.exit(0)
+
 
 # Check if this is call as command script -------------------------------------
 

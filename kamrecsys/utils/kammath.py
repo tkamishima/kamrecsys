@@ -42,6 +42,7 @@ __all__ = []
 # Functions
 # =============================================================================
 
+
 def safe_sigmoid(x):
     """
     safe_sigmoid function
@@ -98,6 +99,7 @@ def _test():
     doctest.testmod()
 
     sys.exit(0)
+
 
 # Check if this is call as command script
 

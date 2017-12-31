@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Utlities for Model Selection
+Utilities for Model Selection
 """
 
 from __future__ import (
@@ -71,6 +71,7 @@ def _test():
     doctest.testmod()
 
     sys.exit(0)
+
 
 # Check if this is call as command script
 

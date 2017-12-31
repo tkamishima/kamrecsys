@@ -45,6 +45,7 @@ class Recommender(BaseRecommender):
     def predict(self, eev):
         pass
 
+
 class EventRecommender(BaseEventRecommender):
 
     def __init__(self):
@@ -142,6 +143,7 @@ class TestBaseEventRecommender(TestCase):
         self.assertIsNone(rec.event)
         self.assertIsNone(rec.event_feature)
         assert_array_equal(rec.event_index, (1, 0))
+
 
 # =============================================================================
 # Main Routine

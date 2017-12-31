@@ -10,8 +10,8 @@ Input file is formatted in json.  Prediction data is stored in the entry with a
 top-level key: `prediction`.  The sub-entries in this entry are as follows:
  
 * `event` : a list of user-item pairs represented by external IDs. 
-* `true` : true rating scores corrsponding to an event 
-* `predicted` : predicted rating scores corrsponding to an event
+* `true` : true rating scores corresponding to an event
+* `predicted` : predicted rating scores corresponding to an event
 * `event_feature` : event features except for a sensitive feature
 
 Output file
@@ -111,7 +111,8 @@ def do_task(opt):
             info['prediction']['predicted'],
             score_domain=info['data']['score_domain'])
     elif info['model']['task_type'] == 'item_finder':
-        stats = item_finder_statistics(info['prediction']['true'],
+        stats = item_finder_statistics(
+            info['prediction']['true'],
             info['prediction']['predicted'])
     else:
         raise TypeError('Unsupported type of recommendation models')
@@ -205,6 +206,7 @@ def main():
 
     # do main task
     do_task(opt)
+
 
 # top level -------------------------------------------------------------------
 # Call main routine if this is invoked as a top-level script environment.

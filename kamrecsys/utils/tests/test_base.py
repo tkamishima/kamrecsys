@@ -41,14 +41,15 @@ def test_is_binary_score():
     from kamrecsys.utils import is_binary_score
 
     assert_(is_binary_score([0, 1, 1, 0, 1]))
-    assert_(is_binary_score(np.identity(3), allow_uniorm=True))
+    assert_(is_binary_score(np.identity(3), allow_uniform=True))
     assert_(is_binary_score([0, 0, 0]))
-    assert_(is_binary_score([1], allow_uniorm=True))
+    assert_(is_binary_score([1], allow_uniform=True))
 
-    assert_(is_binary_score([0, 1, 1, 0, 1], allow_uniorm=False))
-    assert_(is_binary_score(np.identity(3), allow_uniorm=False))
-    assert_(not is_binary_score([0, 0, 0], allow_uniorm=False))
-    assert_(not is_binary_score([1], allow_uniorm=False))
+    assert_(is_binary_score([0, 1, 1, 0, 1], allow_uniform=False))
+    assert_(is_binary_score(np.identity(3), allow_uniform=False))
+    assert_(not is_binary_score([0, 0, 0], allow_uniform=False))
+    assert_(not is_binary_score([1], allow_uniform=False))
+
 
 # =============================================================================
 # Test Classes
