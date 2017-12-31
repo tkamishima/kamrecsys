@@ -13,13 +13,19 @@ import six
 # =============================================================================
 
 from numpy.testing import (
+    TestCase,
+    run_module_suite,
+    assert_,
+    assert_allclose,
+    assert_array_almost_equal_nulp,
+    assert_array_max_ulp,
     assert_array_equal,
     assert_array_less,
-    assert_allclose,
-    assert_array_max_ulp,
-    assert_array_almost_equal_nulp)
-import unittest
-
+    assert_equal,
+    assert_raises,
+    assert_raises_regex,
+    assert_warns,
+    assert_string_equal)
 import numpy as np
 
 # =============================================================================
@@ -35,20 +41,20 @@ import numpy as np
 # =============================================================================
 
 
-class TestLoadMovielens100k(unittest.TestCase):
+class TestLoadMovielens100k(TestCase):
     def test_load_movielens100k(self):
         from kamrecsys.datasets import load_movielens100k
 
         data = load_movielens100k()
-        self.assertListEqual(
+        assert_array_equal(
             sorted(data.__dict__.keys()),
             sorted(['event_otypes', 'n_otypes', 'n_events', 'n_score_levels',
                     'feature', 'event', 'iid', 'event_feature',
                     'score', 'eid', 'n_objects', 's_event', 'score_domain']))
         assert_array_equal(data.event_otypes, [0, 1])
-        self.assertEqual(data.n_otypes, 2)
-        self.assertEqual(data.n_events, 100000)
-        self.assertEqual(data.s_event, 2)
+        assert_equal(data.n_otypes, 2)
+        assert_equal(data.n_events, 100000)
+        assert_equal(data.s_event, 2)
         assert_array_equal(data.n_objects, [943, 1682])
         assert_array_equal(data.score_domain, [1., 5., 1.])
         assert_array_equal(
@@ -61,8 +67,8 @@ class TestLoadMovielens100k(unittest.TestCase):
         assert_array_equal(data.eid[0][-5:], [939, 940, 941, 942, 943])
         assert_array_equal(data.eid[1][:5], [1, 2, 3, 4, 5])
         assert_array_equal(data.eid[1][-5:], [1678, 1679, 1680, 1681, 1682])
-        self.assertListEqual(data.event_feature.dtype.descr,
-                             [('timestamp', '<i8')])
+        assert_array_equal(
+            data.event_feature.dtype.descr, [('timestamp', '<i8')])
         assert_array_equal(
             data.event_feature[:5].astype(int),
             [881250949, 891717742, 878887116, 880606923, 886397596])
@@ -96,30 +102,31 @@ class TestLoadMovielens100k(unittest.TestCase):
             data.feature[0]['zip'][-3:],
             [six.u('97229'), six.u('78209'), six.u('77841')])
 
-        self.assertEqual(len(data.feature[0]), 943)
-        self.assertEqual(data.feature[1][0][0], six.u('Toy Story (1995)'))
-        self.assertEqual(data.feature[1][0][1], 1)
-        self.assertEqual(data.feature[1][0][2], 1)
-        self.assertEqual(data.feature[1][0][3], 1995)
+        assert_equal(len(data.feature[0]), 943)
+        assert_equal(data.feature[1][0][0], six.u('Toy Story (1995)'))
+        assert_equal(data.feature[1][0][1], 1)
+        assert_equal(data.feature[1][0][2], 1)
+        assert_equal(data.feature[1][0][3], 1995)
         assert_array_equal(
             data.feature[1][0][4],
             [0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
-        self.assertEqual(
+        assert_equal(
             data.feature[1][0][5],
             six.u('http://us.imdb.com/M/title-exact?Toy%20Story%20(1995)'))
-        self.assertEqual(data.feature[1][-1][0],
-                         six.u('Scream of Stone (Schrei aus Stein) (1991)'))
-        self.assertEqual(data.feature[1][-1][1], 8)
-        self.assertEqual(data.feature[1][-1][2], 3)
-        self.assertEqual(data.feature[1][-1][3], 1996)
+        assert_equal(
+            data.feature[1][-1][0],
+            six.u('Scream of Stone (Schrei aus Stein) (1991)'))
+        assert_equal(data.feature[1][-1][1], 8)
+        assert_equal(data.feature[1][-1][2], 3)
+        assert_equal(data.feature[1][-1][3], 1996)
         assert_array_equal(
             data.feature[1][-1][4],
             [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
-        self.assertEqual(
+        assert_equal(
             data.feature[1][-1][5],
             six.u('http://us.imdb.com/M/title-exact'
                   '?Schrei%20aus%20Stein%20(1991)'))
-        self.assertEqual(len(data.feature[1]), 1682)
+        assert_equal(len(data.feature[1]), 1682)
 
     def test_MOVIELENS100K_INFO(self):
         from kamrecsys.datasets import MOVIELENS100K_INFO
@@ -139,12 +146,12 @@ class TestLoadMovielens100k(unittest.TestCase):
              'War', 'Western'])
 
 
-class TestLoadMovielens1m(unittest.TestCase):
+class TestLoadMovielens1m(TestCase):
     def test_load_movielens1m(self):
         from kamrecsys.datasets import load_movielens1m
 
         data = load_movielens1m()
-        self.assertListEqual(
+        assert_array_equal(
             sorted(data.__dict__.keys()),
             sorted([
                 'event_otypes', 'n_otypes', 'n_events',
@@ -152,9 +159,9 @@ class TestLoadMovielens1m(unittest.TestCase):
                 'event_feature', 'score', 'eid', 'n_objects',
                 's_event', 'score_domain']))
         assert_array_equal(data.event_otypes, [0, 1])
-        self.assertEqual(data.n_otypes, 2)
-        self.assertEqual(data.n_events, 1000209)
-        self.assertEqual(data.s_event, 2)
+        assert_equal(data.n_otypes, 2)
+        assert_equal(data.n_events, 1000209)
+        assert_equal(data.s_event, 2)
         assert_array_equal(data.n_objects, [6040, 3706])
         assert_array_equal(data.score_domain, [1., 5., 1.])
         assert_array_equal(
@@ -169,13 +176,13 @@ class TestLoadMovielens1m(unittest.TestCase):
         assert_array_equal(data.eid[0][-5:], [6036, 6037, 6038, 6039, 6040])
         assert_array_equal(data.eid[1][:5], [1, 2, 3, 4, 5])
         assert_array_equal(data.eid[1][-5:], [3948, 3949, 3950, 3951, 3952])
-        self.assertEqual(str(data.event_feature.dtype),
+        assert_equal(str(data.event_feature.dtype),
                          "[('timestamp', '<i8')]")
-        self.assertEqual(
+        assert_equal(
             str(data.event_feature[:5]),
             "[(978300760,) (978302109,) (978301968,)"
             " (978300275,) (978824291,)]")
-        self.assertEqual(
+        assert_equal(
             str(data.event_feature[-5:]),
             "[(956716541,) (956704887,) (956704746,)"
             " (956715648,) (956715569,)]")
@@ -204,21 +211,19 @@ class TestLoadMovielens1m(unittest.TestCase):
         assert_array_equal(data.feature[0]['occupation'][-3:], [1, 0, 6])
         assert_array_equal(data.feature[0]['zip'][-3:],
                            [six.u('14706'), six.u('01060'), six.u('11106')])
-        self.assertEqual(len(data.feature[0]), 6040)
+        assert_equal(len(data.feature[0]), 6040)
 
-        self.assertEqual(data.feature[1][0][0],
-                         six.u('Toy Story (1995)'))
-        self.assertEqual(data.feature[1][0][1], 1995)
+        assert_equal(data.feature[1][0][0], six.u('Toy Story (1995)'))
+        assert_equal(data.feature[1][0][1], 1995)
         assert_array_equal(
             data.feature[1][0][2],
             [0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
-        self.assertEqual(data.feature[1][-1][0],
-                         six.u('Contender, The (2000)'))
-        self.assertEqual(data.feature[1][-1][1], 2000)
+        assert_equal(data.feature[1][-1][0], six.u('Contender, The (2000)'))
+        assert_equal(data.feature[1][-1][1], 2000)
         assert_array_equal(
             data.feature[1][-1][2],
             [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0])
-        self.assertEqual(len(data.feature[1]), 3706)
+        assert_equal(len(data.feature[1]), 3706)
 
     def test_MOVIELENS1M_INFO(self):
         from kamrecsys.datasets import MOVIELENS1M_INFO
@@ -248,4 +253,4 @@ class TestLoadMovielens1m(unittest.TestCase):
 # =============================================================================
 
 if __name__ == '__main__':
-    unittest.main()
+    run_module_suite()

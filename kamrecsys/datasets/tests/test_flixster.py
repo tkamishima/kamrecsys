@@ -12,12 +12,20 @@ from six.moves import xrange
 # =============================================================================
 
 from numpy.testing import (
+    TestCase,
+    run_module_suite,
+    assert_,
+    assert_allclose,
+    assert_array_almost_equal_nulp,
+    assert_array_max_ulp,
     assert_array_equal,
     assert_array_less,
-    assert_allclose,
-    assert_array_max_ulp,
-    assert_array_almost_equal_nulp)
-import unittest
+    assert_equal,
+    assert_raises,
+    assert_raises_regex,
+    assert_warns,
+    assert_string_equal)
+import numpy as np
 
 # =============================================================================
 # Module variables
@@ -32,21 +40,21 @@ import unittest
 # =============================================================================
 
 
-class TestFlixsterClass(unittest.TestCase):
+class TestFlixsterClass(TestCase):
     def test_load_flixster_rating(self):
         from kamrecsys.datasets import load_flixster_rating
 
         data = load_flixster_rating()
 
-        self.assertListEqual(
+        assert_array_equal(
             sorted(data.__dict__.keys()),
             sorted(['event_otypes', 'n_otypes', 'n_events', 'n_score_levels',
                     'feature', 'event', 'iid', 'event_feature',
                     'score', 'eid', 'n_objects', 's_event', 'score_domain']))
         assert_array_equal(data.event_otypes, [0, 1])
-        self.assertEqual(data.n_otypes, 2)
-        self.assertEqual(data.n_events, 8196077)
-        self.assertEqual(data.s_event, 2)
+        assert_equal(data.n_otypes, 2)
+        assert_equal(data.n_events, 8196077)
+        assert_equal(data.s_event, 2)
         assert_array_equal(data.n_objects, [147612, 48794])
 
         # events
@@ -82,4 +90,4 @@ class TestFlixsterClass(unittest.TestCase):
 # =============================================================================
 
 if __name__ == '__main__':
-    unittest.main()
+    run_module_suite()

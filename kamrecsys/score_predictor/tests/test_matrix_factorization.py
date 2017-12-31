@@ -16,13 +16,18 @@ from numpy.testing import (
     TestCase,
     run_module_suite,
     assert_,
+    assert_allclose,
+    assert_array_almost_equal_nulp,
+    assert_array_max_ulp,
     assert_array_equal,
     assert_array_less,
-    assert_allclose,
-    assert_array_max_ulp,
-    assert_array_almost_equal_nulp)
-
+    assert_equal,
+    assert_raises,
+    assert_raises_regex,
+    assert_warns,
+    assert_string_equal)
 import numpy as np
+
 from sklearn.utils import check_random_state
 
 from kamrecsys.datasets import load_movielens_mini
@@ -63,8 +68,9 @@ class TestPMF(TestCase):
         q = rec._coef.view(rec._dt)['q']
 
         # initial parameters
-        self.assertAlmostEqual(rec.loss(rec._coef, ev, sc, n_objects),
-                               0.74652578358324118, delta=1e-5)
+        assert_allclose(
+            rec.loss(rec._coef, ev, sc, n_objects), 0.74652578358324118,
+            rtol=1e-5)
 
         # all zero
         mu[0] = 0.0
@@ -72,8 +78,9 @@ class TestPMF(TestCase):
         bi[0][:] = 0.0
         p[0][:, :] = 0.0
         q[0][:, :] = 0.0
-        self.assertAlmostEqual(rec.loss(rec._coef, ev, sc, n_objects),
-                               15.699999999999999, delta=1e-5)
+        assert_allclose(
+            rec.loss(rec._coef, ev, sc, n_objects), 15.699999999999999,
+            rtol=1e-5)
 
         # all one
         mu[0] = 1.0
@@ -81,8 +88,9 @@ class TestPMF(TestCase):
         bi[0][:] = 1.0
         p[0][:, :] = 1.0
         q[0][:, :] = 1.0
-        self.assertAlmostEqual(rec.loss(rec._coef, ev, sc, n_objects),
-                               2.4648484848484848, delta=1e-5)
+        assert_allclose(
+            rec.loss(rec._coef, ev, sc, n_objects), 2.4648484848484848,
+            rtol=1e-5)
 
         mu[0] = 1.0
         bu[0][:] = np.arange(0.0, 0.8, 0.1)
@@ -91,8 +99,9 @@ class TestPMF(TestCase):
         p[0][:, 1] = 1.0
         q[0][:, 0] = 0.2
         q[0][:, 1] = 1.0
-        self.assertAlmostEqual(rec.loss(rec._coef, ev, sc, n_objects),
-                               1.1806969696969696, delta=1e-5)
+        assert_allclose(
+            rec.loss(rec._coef, ev, sc, n_objects), 1.1806969696969696,
+            rtol=1e-5)
 
         mu[0] = 2.0
         bu[0][:] = np.arange(0.8, 0.0, -0.1)
@@ -101,8 +110,9 @@ class TestPMF(TestCase):
         p[0][:, 1] = 1.0
         q[0][:, 0] = np.arange(1.0, 0.0, -0.1) * 0.3 + 2
         q[0][:, 1] = np.arange(0.0, 1.0, 0.1)
-        self.assertAlmostEqual(rec.loss(rec._coef, ev, sc, n_objects),
-                               62.877151622787892, delta=1e-5)
+        assert_allclose(
+            rec.loss(rec._coef, ev, sc, n_objects), 62.877151622787892,
+            rtol=1e-5)
 
     def test_grad_loss(self):
 
@@ -124,7 +134,7 @@ class TestPMF(TestCase):
 
         # initial parameters
         grad = rec.grad_loss(rec._coef, ev, sc, n_objects)
-        self.assertAlmostEqual(grad[0], -0.0212968638573, delta=1e-5)
+        assert_allclose(grad[0], -0.0212968638573, rtol=1e-5)
         assert_allclose(
             grad[1:5],
             [0.0363138387, 0.0167620468, -0.0260414192, -0.0018029422],
@@ -149,7 +159,7 @@ class TestPMF(TestCase):
         p[0][:, :] = 0.0
         q[0][:, :] = 0.0
         grad = rec.grad_loss(rec._coef, ev, sc, n_objects)
-        self.assertAlmostEqual(grad[0], -3.83333333333, delta=1e-5)
+        assert_allclose(grad[0], -3.83333333333, rtol=1e-5)
         assert_allclose(
             grad[1:5],
             [-1.2, -0.2, -0.2333333333, -0.4666666667],
@@ -174,7 +184,7 @@ class TestPMF(TestCase):
         p[0][:, :] = 1.0
         q[0][:, :] = 1.0
         grad = rec.grad_loss(rec._coef, ev, sc, n_objects)
-        self.assertAlmostEqual(grad[0], 1.16666666667, delta=1e-5)
+        assert_allclose(grad[0], 1.16666666667, rtol=1e-5)
         assert_allclose(
             grad[1:5],
             [0.4684848485, 0.1351515152, 0.1018181818, 0.2018181818],
@@ -200,7 +210,7 @@ class TestPMF(TestCase):
         q[0][:, 0] = 0.2
         q[0][:, 1] = 1.0
         grad = rec.grad_loss(rec._coef, ev, sc, n_objects)
-        self.assertAlmostEqual(grad[0], 0.02, delta=1e-5)
+        assert_allclose(grad[0], 0.02, rtol=1e-5)
         assert_allclose(
             grad[1:5],
             [-0.0166666667, 0.0435151515, -0.0096363636, 0.0572121212],
@@ -226,7 +236,7 @@ class TestPMF(TestCase):
         q[0][:, 0] = np.arange(1.0, 0.0, -0.1) * 0.3 + 2
         q[0][:, 1] = np.arange(0.0, 1.0, 0.1)
         grad = rec.grad_loss(rec._coef, ev, sc, n_objects)
-        self.assertAlmostEqual(grad[0], 7.82805333333, delta=1e-5)
+        assert_allclose(grad[0], 7.82805333333, rtol=1e-5)
         assert_allclose(
             grad[1:5],
             [2.6081212121, 0.5674860606, 0.4974642424, 1.1014690909],
@@ -251,30 +261,30 @@ class TestPMF(TestCase):
         rec = PMF(C=0.1, k=2, random_state=1234, tol=1e-03)
         rec.fit(data)
 
-        self.assertAlmostEqual(rec.fit_results_['initial_loss'],
-                               0.74652578358324106, delta=1e-5)
-        self.assertAlmostEqual(rec.fit_results_['final_loss'],
-                               0.025638738121075231, delta=1e-5)
+        assert_allclose(rec.fit_results_['initial_loss'],
+                               0.74652578358324106, rtol=1e-5)
+        assert_allclose(rec.fit_results_['final_loss'],
+                               0.025638738121075231, rtol=1e-5)
 
         # single prediction
-        self.assertAlmostEqual(rec.predict((1, 7)),
-                               3.9873641434545979, delta=1e-5)
-        self.assertAlmostEqual(rec.predict((1, 9)),
-                               4.9892118821609106, delta=1e-5)
-        self.assertAlmostEqual(rec.predict((1, 11)),
-                               3.6480799850368273, delta=1e-5)
-        self.assertAlmostEqual(rec.predict((3, 7)),
-                               3.6336318795279228, delta=1e-5)
-        self.assertAlmostEqual(rec.predict((3, 9)),
-                               4.2482001235634943, delta=1e-5)
-        self.assertAlmostEqual(rec.predict((3, 11)),
-                               3.7236984083417841, delta=1e-5)
-        self.assertAlmostEqual(rec.predict((5, 7)),
-                               3.4141968145802597, delta=1e-5)
-        self.assertAlmostEqual(rec.predict((5, 9)),
-                               3.9818882049478654, delta=1e-5)
-        self.assertAlmostEqual(rec.predict((5, 11)),
-                               3.4710520150321895, delta=1e-5)
+        assert_allclose(rec.predict((1, 7)),
+                               3.9873641434545979, rtol=1e-5)
+        assert_allclose(rec.predict((1, 9)),
+                               4.9892118821609106, rtol=1e-5)
+        assert_allclose(rec.predict((1, 11)),
+                               3.6480799850368273, rtol=1e-5)
+        assert_allclose(rec.predict((3, 7)),
+                               3.6336318795279228, rtol=1e-5)
+        assert_allclose(rec.predict((3, 9)),
+                               4.2482001235634943, rtol=1e-5)
+        assert_allclose(rec.predict((3, 11)),
+                               3.7236984083417841, rtol=1e-5)
+        assert_allclose(rec.predict((5, 7)),
+                               3.4141968145802597, rtol=1e-5)
+        assert_allclose(rec.predict((5, 9)),
+                               3.9818882049478654, rtol=1e-5)
+        assert_allclose(rec.predict((5, 11)),
+                               3.4710520150321895, rtol=1e-5)
 
         # multiple prediction
         x = np.array([

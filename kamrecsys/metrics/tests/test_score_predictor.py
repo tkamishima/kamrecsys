@@ -16,11 +16,16 @@ from numpy.testing import (
     TestCase,
     run_module_suite,
     assert_,
+    assert_allclose,
+    assert_array_almost_equal_nulp,
+    assert_array_max_ulp,
     assert_array_equal,
     assert_array_less,
-    assert_allclose,
-    assert_array_max_ulp,
-    assert_array_almost_equal_nulp)
+    assert_equal,
+    assert_raises,
+    assert_raises_regex,
+    assert_warns,
+    assert_string_equal)
 
 # =============================================================================
 # Variables
@@ -46,19 +51,15 @@ class TestScorePredictorReport(TestCase):
         from kamrecsys.metrics import score_predictor_report
 
         stats = score_predictor_report(y_true, y_pred, disp=False)
-        self.assertEqual(stats['n_samples'], 10)
-        self.assertAlmostEqual(
-            stats['mean absolute error'], 0.9534215971390001, delta=1e-5)
-        self.assertAlmostEqual(
-            stats['root mean squared error'], 1.1597394143516166, delta=1e-5)
-        self.assertAlmostEqual(
-            stats['true']['mean'], 4.1, delta=1e-5)
-        self.assertAlmostEqual(
-            stats['true']['stdev'], 1.04403065089, delta=1e-5)
-        self.assertAlmostEqual(
-            stats['predicted']['mean'], 3.99361964567, delta=1e-5)
-        self.assertAlmostEqual(
-            stats['predicted']['stdev'], 0.383771468193, delta=1e-5)
+        assert_equal(stats['n_samples'], 10)
+        assert_allclose(
+            stats['mean absolute error'], 0.9534215971390001, rtol=1e-5)
+        assert_allclose(
+            stats['root mean squared error'], 1.1597394143516166, rtol=1e-5)
+        assert_allclose(stats['true']['mean'], 4.1, rtol=1e-5)
+        assert_allclose(stats['true']['stdev'], 1.04403065089, rtol=1e-5)
+        assert_allclose(stats['predicted']['mean'], 3.99361964567, rtol=1e-5)
+        assert_allclose(stats['predicted']['stdev'], 0.383771468193, rtol=1e-5)
 
 
 class TestScorePredictorStatistics(TestCase):
@@ -69,28 +70,21 @@ class TestScorePredictorStatistics(TestCase):
         stats = score_predictor_statistics(
             y_true, y_pred, score_domain=(1, 5, 1))
 
-        self.assertEqual(stats['n_samples'], 10)
+        assert_equal(stats['n_samples'], 10)
         assert_allclose(stats['score levels'], (1, 2, 3, 4, 5))
 
         sub_stats = stats['mean absolute error']
-        self.assertAlmostEqual(
-            sub_stats['mean'], 0.9534215971390001, delta=1e-5)
-        self.assertAlmostEqual(
-            sub_stats['stdev'], 0.6602899115612394, delta=1e-5)
+        assert_allclose(sub_stats['mean'], 0.9534215971390001, rtol=1e-5)
+        assert_allclose(sub_stats['stdev'], 0.6602899115612394, rtol=1e-5)
 
         sub_stats = stats['mean squared error']
-        self.assertAlmostEqual(
-            sub_stats['rmse'], 1.1597394143516166, delta=1e-5)
-        self.assertAlmostEqual(
-            sub_stats['mean'], 1.3449955092006309, delta=1e-5)
-        self.assertAlmostEqual(
-            sub_stats['stdev'], 1.4418716080648177, delta=1e-5)
+        assert_allclose(sub_stats['rmse'], 1.1597394143516166, rtol=1e-5)
+        assert_allclose(sub_stats['mean'], 1.3449955092006309, rtol=1e-5)
+        assert_allclose(sub_stats['stdev'], 1.4418716080648177, rtol=1e-5)
 
         sub_stats = stats['true']
-        self.assertAlmostEqual(
-            sub_stats['mean'], 4.1, delta=1e-5)
-        self.assertAlmostEqual(
-            sub_stats['stdev'], 1.04403065089, delta=1e-5)
+        assert_allclose(sub_stats['mean'], 4.1, rtol=1e-5)
+        assert_allclose(sub_stats['stdev'], 1.04403065089, rtol=1e-5)
         assert_array_equal(sub_stats['histogram'], (0, 1, 2, 2, 5))
         assert_allclose(
             sub_stats['histogram density'],
@@ -98,10 +92,8 @@ class TestScorePredictorStatistics(TestCase):
             rtol=1e-5)
 
         sub_stats = stats['predicted']
-        self.assertAlmostEqual(
-            sub_stats['mean'], 3.99361964567, delta=1e-5)
-        self.assertAlmostEqual(
-            sub_stats['stdev'], 0.383771468193, delta=1e-5)
+        assert_allclose(sub_stats['mean'], 3.99361964567, rtol=1e-5)
+        assert_allclose(sub_stats['stdev'], 0.383771468193, rtol=1e-5)
         assert_array_equal(sub_stats['histogram'], (0, 0, 2, 7, 1))
         assert_allclose(
             sub_stats['histogram density'],

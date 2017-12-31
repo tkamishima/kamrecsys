@@ -16,12 +16,16 @@ from numpy.testing import (
     TestCase,
     run_module_suite,
     assert_,
+    assert_allclose,
+    assert_array_almost_equal_nulp,
+    assert_array_max_ulp,
     assert_array_equal,
     assert_array_less,
-    assert_allclose,
-    assert_array_max_ulp,
-    assert_array_almost_equal_nulp)
-
+    assert_equal,
+    assert_raises,
+    assert_raises_regex,
+    assert_warns,
+    assert_string_equal)
 import numpy as np
 
 # =============================================================================
@@ -48,8 +52,8 @@ class TestMeanAbsoluteError(TestCase):
         from kamrecsys.metrics import mean_absolute_error
 
         mean, stdev = mean_absolute_error(y_true, y_pred)
-        self.assertAlmostEqual(mean, 0.9534215971390001, delta=1e-5)
-        self.assertAlmostEqual(stdev, 0.6602899115612394, delta=1e-5)
+        assert_allclose(mean, 0.9534215971390001, rtol=1e-5)
+        assert_allclose(stdev, 0.6602899115612394, rtol=1e-5)
 
 
 class TestMeanSquaredError(TestCase):
@@ -59,9 +63,9 @@ class TestMeanSquaredError(TestCase):
 
         rmse, mean, stdev = mean_squared_error(y_true, y_pred)
 
-        self.assertAlmostEqual(rmse, 1.1597394143516166, delta=1e-5)
-        self.assertAlmostEqual(mean, 1.3449955092006309, delta=1e-5)
-        self.assertAlmostEqual(stdev, 1.4418716080648177, delta=1e-5)
+        assert_allclose(rmse, 1.1597394143516166, rtol=1e-5)
+        assert_allclose(mean, 1.3449955092006309, rtol=1e-5)
+        assert_allclose(stdev, 1.4418716080648177, rtol=1e-5)
 
 
 class TestScoreHistogram(TestCase):
@@ -88,10 +92,10 @@ class TestVarianceWithGammaPrior(TestCase):
     def test_func(self):
         from kamrecsys.metrics import variance_with_gamma_prior as safe_var
 
-        self.assertAlmostEqual(safe_var(y_true), 1.08999999782)
-        self.assertAlmostEqual(safe_var([1], a=1, b=3), 2)
-        self.assertAlmostEqual(safe_var([1], a=1, b=3), 2)
-        self.assertAlmostEqual(safe_var([np.nan, 1, 2]), 0.2499999975)
+        assert_allclose(safe_var(y_true), 1.08999999782)
+        assert_allclose(safe_var([1], a=1, b=3), 2)
+        assert_allclose(safe_var([1], a=1, b=3), 2)
+        assert_allclose(safe_var([np.nan, 1, 2]), 0.2499999975)
         with self.assertRaises(ValueError):
             safe_var([np.nan, 1, 2], force_all_finite=True)
         with self.assertRaises(ValueError):
