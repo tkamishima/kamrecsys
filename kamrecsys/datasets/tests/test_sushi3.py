@@ -13,12 +13,19 @@ import six
 # =============================================================================
 
 from numpy.testing import (
+    TestCase,
+    run_module_suite,
+    assert_,
+    assert_allclose,
+    assert_array_almost_equal_nulp,
+    assert_array_max_ulp,
     assert_array_equal,
     assert_array_less,
-    assert_allclose,
-    assert_array_max_ulp,
-    assert_array_almost_equal_nulp)
-import unittest
+    assert_equal,
+    assert_raises,
+    assert_raises_regex,
+    assert_warns,
+    assert_string_equal)
 
 # =============================================================================
 # Module variables
@@ -33,22 +40,22 @@ import unittest
 # =============================================================================
 
 
-class TestSushi3Class(unittest.TestCase):
+class TestSushi3Class(TestCase):
     def test_load_sushi3_score(self):
         from kamrecsys.datasets import load_sushi3b_score
 
         data = load_sushi3b_score()
 
-        self.assertListEqual(
+        assert_array_equal(
             sorted(data.__dict__.keys()),
             sorted(['event_otypes', 'n_otypes', 'n_events', 'n_score_levels',
                     'feature', 'event', 'iid', 'event_feature',
                     'score', 'eid', 'n_objects', 's_event',
                     'score_domain']))
         assert_array_equal(data.event_otypes, [0, 1])
-        self.assertEqual(data.n_otypes, 2)
-        self.assertEqual(data.n_events, 50000)
-        self.assertEqual(data.s_event, 2)
+        assert_equal(data.n_otypes, 2)
+        assert_equal(data.n_events, 50000)
+        assert_equal(data.s_event, 2)
         assert_array_equal(data.n_objects, [5000, 100])
 
         # events
@@ -63,7 +70,7 @@ class TestSushi3Class(unittest.TestCase):
             data.event[-5:],
             [[4999, 19], [4999, 23], [4999, 25], [4999, 42], [4999, 47]])
         assert_array_equal(data.eid[0][:5], [0, 1, 2, 3, 4])
-        self.assertEqual(data.eid[0][322], 322)
+        assert_equal(data.eid[0][322], 322)
         assert_array_equal(data.eid[0][-5:], [4995, 4996, 4997, 4998, 4999])
         assert_array_equal(data.eid[1][:5], [0, 1, 2, 3, 4])
         assert_array_equal(data.eid[1][-5:], [95, 96, 97, 98, 99])
@@ -73,31 +80,31 @@ class TestSushi3Class(unittest.TestCase):
         assert_array_equal(data.score[-5:], [4., 2., 0., 2., 4.])
 
         # users
-        self.assertEqual(data.feature[0][322]['original_uid'], 0)
-        self.assertEqual(data.feature[0][322]['gender'], 0)
-        self.assertEqual(data.feature[0][322]['age'], 2)
-        self.assertEqual(data.feature[0][322]['answer_time'], 785)
-        self.assertEqual(data.feature[0][322]['child_prefecture'], 26)
-        self.assertEqual(data.feature[0][322]['child_region'], 6)
-        self.assertEqual(data.feature[0][322]['child_ew'], 1)
-        self.assertEqual(data.feature[0][322]['current_prefecture'], 8)
-        self.assertEqual(data.feature[0][322]['current_region'], 3)
-        self.assertEqual(data.feature[0][322]['current_ew'], 0)
-        self.assertEqual(data.feature[0][322]['moved'], 1)
+        assert_equal(data.feature[0][322]['original_uid'], 0)
+        assert_equal(data.feature[0][322]['gender'], 0)
+        assert_equal(data.feature[0][322]['age'], 2)
+        assert_equal(data.feature[0][322]['answer_time'], 785)
+        assert_equal(data.feature[0][322]['child_prefecture'], 26)
+        assert_equal(data.feature[0][322]['child_region'], 6)
+        assert_equal(data.feature[0][322]['child_ew'], 1)
+        assert_equal(data.feature[0][322]['current_prefecture'], 8)
+        assert_equal(data.feature[0][322]['current_region'], 3)
+        assert_equal(data.feature[0][322]['current_ew'], 0)
+        assert_equal(data.feature[0][322]['moved'], 1)
 
         # items
-        self.assertEqual(data.feature[1][8]['name'], six.u('toro'))
-        self.assertEqual(data.feature[1][8]['maki'], 1)
-        self.assertEqual(data.feature[1][8]['seafood'], 0)
-        self.assertEqual(data.feature[1][8]['genre'], 1)
-        self.assertAlmostEqual(data.feature[1][8]['heaviness'],
-                               0.551854655563967)
-        self.assertAlmostEqual(data.feature[1][8]['frequency'],
-                               2.05753217259652)
-        self.assertAlmostEqual(data.feature[1][8]['price'],
-                               4.48545454545455)
-        self.assertAlmostEqual(data.feature[1][8]['supply'],
-                               0.8)
+        assert_equal(data.feature[1][8]['name'], six.u('toro'))
+        assert_equal(data.feature[1][8]['maki'], 1)
+        assert_equal(data.feature[1][8]['seafood'], 0)
+        assert_equal(data.feature[1][8]['genre'], 1)
+        assert_allclose(
+            data.feature[1][8]['heaviness'], 0.551854655563967)
+        assert_allclose(
+            data.feature[1][8]['frequency'], 2.05753217259652)
+        assert_allclose(
+            data.feature[1][8]['price'], 4.48545454545455)
+        assert_allclose(
+            data.feature[1][8]['supply'], 0.8)
 
 
 # =============================================================================
@@ -105,4 +112,4 @@ class TestSushi3Class(unittest.TestCase):
 # =============================================================================
 
 if __name__ == '__main__':
-    unittest.main()
+    run_module_suite()

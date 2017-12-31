@@ -15,13 +15,19 @@ from six.moves import xrange
 from numpy.testing import (
     TestCase,
     run_module_suite,
+    assert_,
+    assert_allclose,
+    assert_array_almost_equal_nulp,
+    assert_array_max_ulp,
     assert_array_equal,
     assert_array_less,
-    assert_allclose,
-    assert_array_max_ulp,
-    assert_array_almost_equal_nulp)
-
+    assert_equal,
+    assert_raises,
+    assert_raises_regex,
+    assert_warns,
+    assert_string_equal)
 import numpy as np
+
 import sys
 
 from kamrecsys.score_predictor import BaseScorePredictor
@@ -65,7 +71,7 @@ class TestBaseScorePredictor(TestCase):
 
         assert_allclose(rec.score_domain, [1., 5., 1.])
         assert_allclose(rec.score, true_sc)
-        self.assertEqual(rec.n_score_levels, 5)
+        assert_equal(rec.n_score_levels, 5)
 
         # get_score()
         assert_allclose(rec.get_score(), true_sc)
@@ -74,7 +80,7 @@ class TestBaseScorePredictor(TestCase):
         rec.remove_data()
         self.assertIsNone(rec.score)
         assert_allclose(rec.score_domain, [1., 5., 1.])
-        self.assertEqual(rec.n_score_levels, 5)
+        assert_equal(rec.n_score_levels, 5)
 
 
 # =============================================================================

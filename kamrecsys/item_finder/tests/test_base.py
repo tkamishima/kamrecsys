@@ -26,7 +26,6 @@ from numpy.testing import (
     assert_raises_regex,
     assert_warns,
     assert_string_equal)
-
 import numpy as np
 
 from kamrecsys.datasets import load_movielens_mini

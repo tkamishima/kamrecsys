@@ -13,12 +13,19 @@ from six.moves import xrange
 # =============================================================================
 
 from numpy.testing import (
+    TestCase,
+    run_module_suite,
+    assert_,
+    assert_allclose,
+    assert_array_almost_equal_nulp,
+    assert_array_max_ulp,
     assert_array_equal,
     assert_array_less,
-    assert_allclose,
-    assert_array_max_ulp,
-    assert_array_almost_equal_nulp)
-import unittest
+    assert_equal,
+    assert_raises,
+    assert_raises_regex,
+    assert_warns,
+    assert_string_equal)
 
 # =============================================================================
 # Module variables
@@ -33,15 +40,15 @@ import unittest
 # =============================================================================
 
 
-class TestLoadPCISample(unittest.TestCase):
+class TestLoadPCISample(TestCase):
 
     def test_load_pci_sample(self):
         from kamrecsys.datasets import load_pci_sample
 
         data = load_pci_sample()
         assert_array_equal(data.event_otypes, [0, 1])
-        self.assertEqual(data.n_otypes, 2)
-        self.assertEqual(data.n_events, 35)
+        assert_equal(data.n_otypes, 2)
+        assert_equal(data.n_events, 35)
         assert_array_equal(data.feature, [None, None])
         assert_array_equal(
             data.event,
@@ -81,7 +88,7 @@ class TestLoadPCISample(unittest.TestCase):
             ['Just My Luck', 'Lady in the Water', 'Snakes on a Planet',
              'Superman Returns', 'The Night Listener', 'You, Me and Dupree'])
         assert_array_equal(data.n_objects, [7, 6])
-        self.assertEqual(data.s_event, 2)
+        assert_equal(data.s_event, 2)
         assert_array_equal(data.score_domain, [1., 5., 0.5])
 
 
@@ -90,4 +97,4 @@ class TestLoadPCISample(unittest.TestCase):
 # =============================================================================
 
 if __name__ == '__main__':
-    unittest.main()
+    run_module_suite()

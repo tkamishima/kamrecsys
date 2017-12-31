@@ -16,11 +16,16 @@ from numpy.testing import (
     TestCase,
     run_module_suite,
     assert_,
+    assert_allclose,
+    assert_array_almost_equal_nulp,
+    assert_array_max_ulp,
     assert_array_equal,
     assert_array_less,
-    assert_allclose,
-    assert_array_max_ulp,
-    assert_array_almost_equal_nulp)
+    assert_equal,
+    assert_raises,
+    assert_raises_regex,
+    assert_warns,
+    assert_string_equal)
 import numpy as np
 
 from sklearn.model_selection import LeaveOneGroupOut

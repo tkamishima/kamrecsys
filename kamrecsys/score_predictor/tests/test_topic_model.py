@@ -16,11 +16,16 @@ from numpy.testing import (
     TestCase,
     run_module_suite,
     assert_,
+    assert_allclose,
+    assert_array_almost_equal_nulp,
+    assert_array_max_ulp,
     assert_array_equal,
     assert_array_less,
-    assert_allclose,
-    assert_array_max_ulp,
-    assert_array_almost_equal_nulp)
+    assert_equal,
+    assert_raises,
+    assert_raises_regex,
+    assert_warns,
+    assert_string_equal)
 
 from kamrecsys.datasets import load_movielens_mini
 from kamrecsys.score_predictor.topic_model import MultinomialPLSA
@@ -51,44 +56,34 @@ class TestMultinomialPLSA(TestCase):
         # logging.getLogger('kamrecsys').addHandler(logging.StreamHandler())
         rec.fit(data)
 
-        self.assertEqual(rec.fit_results_['n_users'], 8)
-        self.assertEqual(rec.fit_results_['n_items'], 10)
-        self.assertEqual(rec.fit_results_['n_events'], 30)
-        self.assertTrue(rec.fit_results_['success'])
-        self.assertEqual(rec.fit_results_['status'], 0)
-        self.assertAlmostEqual(rec.fit_results_['initial_loss'],
-                               5.41836900049, delta=1e-5)
-        self.assertAlmostEqual(rec.fit_results_['final_loss'],
-                               5.17361298499, delta=1e-5)
-        self.assertEqual(rec.fit_results_['n_iterations'], 38)
-
+        assert_equal(rec.fit_results_['n_users'], 8)
+        assert_equal(rec.fit_results_['n_items'], 10)
+        assert_equal(rec.fit_results_['n_events'], 30)
+        assert_(rec.fit_results_['success'])
+        assert_equal(rec.fit_results_['status'], 0)
+        assert_allclose(
+            rec.fit_results_['initial_loss'], 5.41836900049, rtol=1e-5)
+        assert_allclose(
+            rec.fit_results_['final_loss'], 5.17361298499, rtol=1e-5)
+        assert_equal(rec.fit_results_['n_iterations'], 38)
         assert_allclose(rec.score_levels, [1, 2, 3, 4, 5], rtol=1e-5)
 
         # known user and item
-        self.assertAlmostEqual(rec.predict((1, 7)),
-                               3.64580117249, delta=1e-5)
-        self.assertAlmostEqual(rec.predict((1, 9)),
-                               3.6587422493, delta=1e-5)
-        self.assertAlmostEqual(rec.predict((5, 7)),
-                               3.60707987724, delta=1e-5)
-        self.assertAlmostEqual(rec.predict((5, 9)),
-                               3.62184516985, delta=1e-5)
+        assert_allclose(rec.predict((1, 7)), 3.64580117249, rtol=1e-5)
+        assert_allclose(rec.predict((1, 9)), 3.6587422493, rtol=1e-5)
+        assert_allclose(rec.predict((5, 7)), 3.60707987724, rtol=1e-5)
+        assert_allclose(rec.predict((5, 9)), 3.62184516985, rtol=1e-5)
 
         # known user and unknown item
-        self.assertAlmostEqual(rec.predict((1, 11)),
-                               3.66032199689, delta=1e-5)
-        self.assertAlmostEqual(rec.predict((5, 12)),
-                               3.62387542269, delta=1e-5)
+        assert_allclose(rec.predict((1, 11)), 3.66032199689, rtol=1e-5)
+        assert_allclose(rec.predict((5, 12)), 3.62387542269, rtol=1e-5)
 
         # unknown user and known item
-        self.assertAlmostEqual(rec.predict((3, 7)),
-                               3.60821491793, delta=1e-5)
-        self.assertAlmostEqual(rec.predict((11, 9)),
-                               3.62304301551, delta=1e-5)
+        assert_allclose(rec.predict((3, 7)), 3.60821491793, rtol=1e-5)
+        assert_allclose(rec.predict((11, 9)), 3.62304301551, rtol=1e-5)
 
         # unknown user and item
-        self.assertAlmostEqual(rec.predict((3, 11)),
-                               3.62507437787, delta=1e-5)
+        assert_allclose(rec.predict((3, 11)), 3.62507437787, rtol=1e-5)
 
         x = np.array([
             [1, 7], [1, 9], [1, 11],
