@@ -107,7 +107,7 @@ def first_fold(fp):
     fold = next(iter(info['training']['results']))
 
     # copy computation environments for this fold
-    cv_info['environment']['environment_fold'] = { fold: info['environment'] }
+    cv_info['environment']['environment_fold'] = {fold: info['environment']}
 
     # get mask
     mask = np.array(info['test']['mask'][fold], dtype=int)

@@ -20,7 +20,7 @@ import logging
 import numpy as np
 
 from ..data import EventWithScoreData
-from .base import SAMPLE_PATH
+from . import SAMPLE_PATH
 
 # =============================================================================
 # Public symbols
@@ -85,6 +85,7 @@ def load_pci_sample(infile=None):
 
     return data
 
+
 # =============================================================================
 # Module initialization
 # =============================================================================
@@ -109,6 +110,7 @@ def _test():
     doctest.testmod()
 
     sys.exit(0)
+
 
 # Check if this is call as command script -------------------------------------
 

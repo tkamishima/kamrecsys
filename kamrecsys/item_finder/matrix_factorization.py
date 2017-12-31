@@ -62,7 +62,7 @@ class LogisticPMF(BaseExplicitItemFinder):
     k : int, optional
         the number of latent factors (= sizes of :math:`\mathbf{p}_u` or
         :math:`\mathbf{q}_i`), default=1
-    optimizer_kwargs : dict
+    optimizer_kwargs : keyword arguments, optional
         keyword arguments passed to optimizer
 
     Attributes
@@ -445,7 +445,7 @@ class ImplicitLogisticPMF(BaseImplicitItemFinder):
     k : int, optional
         the number of latent factors (= sizes of :math:`\mathbf{p}_u` or
         :math:`\mathbf{q}_i`), default=1
-    optimizer_kwargs : dict
+    optimizer_kwargs : keyword arguments, optional
         keyword arguments passed to optimizer
 
     Attributes
@@ -820,6 +820,7 @@ def _test():
     doctest.testmod()
 
     sys.exit(0)
+
 
 # Check if this is call as command script -------------------------------------
 

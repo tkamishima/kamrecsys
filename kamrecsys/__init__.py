@@ -76,6 +76,7 @@ def _test():
 
     sys.exit(0)
 
+
 # Check if this is call as command script -------------------------------------
 
 if __name__ == '__main__':

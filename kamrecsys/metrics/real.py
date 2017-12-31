@@ -85,7 +85,7 @@ def mean_absolute_error(y_true, y_pred):
 
 def mean_squared_error(y_true, y_pred):
     """
-    Root mean squre error, mean square error, and its standard deviation.
+    Root mean square error, mean square error, and its standard deviation.
 
     If you need only RMSE, use 
     :func:`sklearn.metrics.mean_absolute_error`
@@ -267,6 +267,7 @@ def _test():
     doctest.testmod()
 
     sys.exit(0)
+
 
 # Check if this is call as command script
 

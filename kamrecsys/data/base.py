@@ -245,6 +245,7 @@ class BaseData(with_metaclass(ABCMeta, ObjectUtilMixin, object)):
                 index[iid[j]] = i
         self.feature[otype] = feature[index].copy()
 
+
 # =============================================================================
 # Functions
 # =============================================================================
@@ -274,6 +275,7 @@ def _test():
     doctest.testmod()
 
     sys.exit(0)
+
 
 # Check if this is call as command script -------------------------------------
 

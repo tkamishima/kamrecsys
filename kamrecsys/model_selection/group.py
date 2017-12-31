@@ -52,7 +52,7 @@ def interlace_group(n_data, n_splits=3):
     The i-th data is assigned to the (i mod n_splits)-th group.
     This is used with :class:`sklearn.model_selection.LeaveOneGroupOut` .
     In a case of a standard k-fold cross validation, subsequent data are tend
-    to be grouped into the same fold.  Howeever, this is incovenient, if
+    to be grouped into the same fold.  However, this is inconvenient, if
     subsequent data are highly correlated.
     
     Parameters
@@ -76,6 +76,7 @@ def interlace_group(n_data, n_splits=3):
         ValueError('n_data must be larger than n_splits.')
 
     return np.arange(n_data, dtype=int) % n_splits
+
 
 # =============================================================================
 # Classes
@@ -106,6 +107,7 @@ def _test():
     doctest.testmod()
 
     sys.exit(0)
+
 
 # Check if this is call as command script
 

@@ -136,14 +136,14 @@ class MultinomialPLSA(BaseScorePredictor):
             negative log-likelihood of current model
         """
 
-        l = np.sum(
+        loss = np.sum(
             self.pZ_[np.newaxis, :] *
             self.pRgZ_[sc, :] *
             self.pXgZ_[ev[:, 0], :] *
             self.pYgZ_[ev[:, 1], :], axis=1)
-        l = -np.sum(np.log(l)) / self.n_events
+        loss = -np.sum(np.log(loss)) / self.n_events
 
-        return l
+        return loss
 
     def _init_params(self, sc):
         """
@@ -349,6 +349,7 @@ class MultinomialPLSA(BaseScorePredictor):
             sc = self.score_levels[np.argmax(pRgXY, axis=1)]
 
         return sc
+
 
 # =============================================================================
 # Functions

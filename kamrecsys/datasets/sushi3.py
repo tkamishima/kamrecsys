@@ -21,7 +21,7 @@ import logging
 import numpy as np
 
 from ..data import EventWithScoreData
-from .base import SAMPLE_PATH, load_event_with_score
+from . import SAMPLE_PATH, load_event_with_score
 
 # =============================================================================
 # Public symbols
@@ -210,6 +210,7 @@ def load_sushi3b_score(infile=None, event_dtype=None):
 
     return data
 
+
 # =============================================================================
 # Module initialization
 # =============================================================================
@@ -234,6 +235,7 @@ def _test():
     doctest.testmod()
 
     sys.exit(0)
+
 
 # Check if this is call as command script -------------------------------------
 

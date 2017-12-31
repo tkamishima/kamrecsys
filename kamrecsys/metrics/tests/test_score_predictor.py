@@ -114,6 +114,7 @@ class TestScorePredictorStatistics(TestCase):
         assert_array_equal(stats['true']['histogram'], [0, 1, 2, 2, 5])
         assert_array_equal(stats['predicted']['histogram'], [0, 0, 2, 7, 1])
 
+
 # =============================================================================
 # Main Routine
 # =============================================================================

@@ -59,7 +59,6 @@ class TestLoadEvent(TestCase):
         assert_array_equal(data.event_otypes, [0, 1])
         self.assertIsNone(data.event_feature)
 
-
         # with event_feature ###
 
         # get data
@@ -75,6 +74,7 @@ class TestLoadEvent(TestCase):
         event_feature = data.event_feature['score']
         assert_array_equal(event_feature[:5], [0, 0, 3, 4, 1])
         assert_array_equal(event_feature[-5:], [3, 4, 4, 4, 3])
+
 
 class TestLoadEventWithScore(TestCase):
 
@@ -139,6 +139,7 @@ class TestLoadEventWithScore(TestCase):
         self.assertIsNone(data.event_feature)
         self.assertEqual(data.n_score_levels, 5)
         assert_allclose(data.score_domain, [0., 4., 1.])
+
 
 # =============================================================================
 # Main Routine

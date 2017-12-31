@@ -83,17 +83,13 @@ def score_predictor_report(y_true, y_pred, disp=True):
     check_consistent_length(y_true, y_pred)
 
     # calc statistics
-    stats = {}
-    stats['mean absolute error'] = skm.mean_absolute_error(y_true, y_pred)
-    stats['root mean squared error'] = np.sqrt(
-        np.maximum(skm.mean_squared_error(y_true, y_pred), 0.))
-    stats['n_samples'] = y_true.size
-    stats['true'] = {
-        'mean': np.mean(y_true),
-        'stdev': np.std(y_true)}
-    stats['predicted'] = {
-        'mean': np.mean(y_pred),
-        'stdev': np.std(y_pred)}
+    stats = {
+        'mean absolute error': skm.mean_absolute_error(y_true, y_pred),
+        'root mean squared error':
+            np.sqrt(np.maximum(skm.mean_squared_error(y_true, y_pred), 0.)),
+        'n_samples': y_true.size,
+        'true': {'mean': np.mean(y_true), 'stdev': np.std(y_true)},
+        'predicted': {'mean': np.mean(y_pred), 'stdev': np.std(y_pred)}}
 
     # display statistics
     if disp:
@@ -151,14 +147,14 @@ def score_predictor_statistics(y_true, y_pred, score_domain=(1, 5, 1)):
 
     # mean absolute error
     mean, stdev = mean_absolute_error(y_true, y_pred)
-    stats['mean absolute error'] = {'mean': mean, 'stdev':stdev}
+    stats['mean absolute error'] = {'mean': mean, 'stdev': stdev}
 
     # root mean squared error
     rmse, mean, stdev = mean_squared_error(y_true, y_pred)
     stats['mean squared error'] = {'rmse': rmse, 'mean': mean, 'stdev': stdev}
 
     # descriptive statistics of ground truth scores
-    stats['true'] = {'mean': np.mean(y_true), 'stdev':np.std(y_true)}
+    stats['true'] = {'mean': np.mean(y_true), 'stdev': np.std(y_true)}
 
     hist, _ = score_histogram(y_true, score_domain=score_domain)
     stats['true']['histogram'] = hist
@@ -203,6 +199,7 @@ def _test():
     doctest.testmod()
 
     sys.exit(0)
+
 
 # Check if this is call as command script
 

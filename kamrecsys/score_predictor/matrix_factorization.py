@@ -57,7 +57,7 @@ class PMF(BaseScorePredictor):
     k : int, optional
         the number of latent factors (= sizes of :math:`\mathbf{p}_u` or
         :math:`\mathbf{q}_i`), default=1
-    optimizer_kwargs : dict
+    optimizer_kwargs : keyword arguments, optional
         keyword arguments passed to optimizer
 
     Attributes

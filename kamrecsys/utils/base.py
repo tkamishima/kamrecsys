@@ -80,7 +80,7 @@ def get_fit_status_message(status):
     return message
 
 
-def is_binary_score(score, allow_uniorm=True):
+def is_binary_score(score, allow_uniform=True):
     """
     check
 
@@ -98,7 +98,7 @@ def is_binary_score(score, allow_uniorm=True):
     """
     elements = np.unique(score)
 
-    if allow_uniorm:
+    if allow_uniform:
         is_binary = (
             np.array_equal(elements, [0, 1]) or
             np.array_equal(elements, [0]) or
@@ -107,6 +107,7 @@ def is_binary_score(score, allow_uniorm=True):
         is_binary = np.array_equal(elements, [0, 1])
 
     return is_binary
+
 
 # =============================================================================
 # Classes
@@ -137,6 +138,7 @@ def _test():
     doctest.testmod()
 
     sys.exit(0)
+
 
 # Check if this is call as command script
 

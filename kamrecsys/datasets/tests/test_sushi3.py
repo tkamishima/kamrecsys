@@ -99,6 +99,7 @@ class TestSushi3Class(unittest.TestCase):
         self.assertAlmostEqual(data.feature[1][8]['supply'],
                                0.8)
 
+
 # =============================================================================
 # Main Routines
 # =============================================================================

@@ -32,7 +32,8 @@ from .topic_model import MultinomialPLSA
 # Public symbols
 # =============================================================================
 
-__all__ = ['BaseScorePredictor',
+__all__ = [
+    'BaseScorePredictor',
     'PMF',
     'MultinomialPLSA']
 
@@ -77,6 +78,7 @@ def _test():
     doctest.testmod()
 
     sys.exit(0)
+
 
 # Check if this is call as command script
 
