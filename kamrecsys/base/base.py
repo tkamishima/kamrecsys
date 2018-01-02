@@ -80,8 +80,10 @@ class BaseRecommender(with_metaclass(ABCMeta, BaseEstimator, ObjectUtilMixin)):
         self.iid = None
 
         self.random_state = random_state
-        self._rng = None
+
         self.fit_results_ = {}
+
+        self._rng = None
 
     def fit(self, data):
         """
@@ -98,6 +100,12 @@ class BaseRecommender(with_metaclass(ABCMeta, BaseEstimator, ObjectUtilMixin)):
 
         # set object information in data
         self._set_object_info(data)
+
+    def remove_data(self):
+        """
+        Remove information related to a training dataset
+        """
+        self._rng = None
 
     @abstractmethod
     def predict(self, eev, **kwargs):
@@ -177,6 +185,8 @@ class BaseEventRecommender(
         """
         Remove information related to a training dataset
         """
+        super(BaseEventRecommender, self).remove_data()
+
         self.event = None
         self.event_feature = None
 
