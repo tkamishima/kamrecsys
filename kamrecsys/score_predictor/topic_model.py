@@ -344,7 +344,7 @@ class MultinomialPLSA(BaseScorePredictor):
         pRgXY /= pRgXY.sum(axis=1, keepdims=True)
 
         if self.use_expectation:
-            sc = np.dot(pRgXY, self.score_levels[:, np.newaxis])
+            sc = np.dot(pRgXY, self.score_levels[:, np.newaxis])[:, 0]
         else:
             sc = self.score_levels[np.argmax(pRgXY, axis=1)]
 

@@ -270,6 +270,18 @@ class TestLogisticPMF(TestCase):
         assert_allclose(
             rec.fit_results_['final_loss'], 0.13320756749404694, rtol=1e-5)
 
+        # raw_predict
+        assert_allclose(
+            rec.raw_predict(np.array([[0, 6]])), 0.99990015298394, rtol=1e-5)
+        assert_allclose(
+            rec.raw_predict(np.array([[8, 8]])), 0.97572124073810, rtol=1e-5)
+        assert_allclose(
+            rec.raw_predict(np.array([[2, 10]])), 0.89135624073902, rtol=1e-5)
+        assert_allclose(
+            rec.raw_predict(np.array([[0, 6], [8, 8], [2, 10]])),
+            [0.99990015298394, 0.97572124073810, 0.89135624073902],
+            rtol=1e-5)
+
         # single prediction
         assert_allclose(rec.predict((1, 7)), 0.9999001529839445, rtol=1e-5)
         assert_allclose(rec.predict((1, 9)), 0.9812735864286053, rtol=1e-5)
@@ -518,6 +530,18 @@ class TestImplicitLogisticPMF(TestCase):
             rec.fit_results_['initial_loss'], 1.3445493746, rtol=1e-5)
         assert_allclose(
             rec.fit_results_['final_loss'], 0.30760976439390564, rtol=1e-5)
+
+        # raw_predict
+        assert_allclose(
+            rec.raw_predict(np.array([[0, 6]])), 0.984542941978, rtol=1e-5)
+        assert_allclose(
+            rec.raw_predict(np.array([[8, 8]])), 0.202161811915, rtol=1e-5)
+        assert_allclose(
+            rec.raw_predict(np.array([[2, 10]])), 0.08288774155, rtol=1e-5)
+        assert_allclose(
+            rec.raw_predict(np.array([[0, 6], [8, 8], [2, 10]])),
+            [0.984542941978, 0.202161811915, 0.08288774155],
+            rtol=1e-5)
 
         # single prediction
         assert_allclose(rec.predict((1, 7)), 0.984542941978, rtol=1e-5)
