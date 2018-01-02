@@ -177,10 +177,10 @@ class LogisticPMF(BaseExplicitItemFinder):
             ('p', float, (n_users, k)),
             ('q', float, (n_items, k))
         ])
+        dt_itemsize = (1 + n_users + n_items + n_users * k + n_items * k)
 
         # memory allocation
-        self._coef = np.zeros(
-            1 + n_users + n_items + n_users * k + n_items * k, dtype=float)
+        self._coef = np.zeros(dt_itemsize, dtype=float)
 
         # set array's view
         self.mu_ = self._coef.view(self._dt)['mu'][0]
@@ -209,7 +209,7 @@ class LogisticPMF(BaseExplicitItemFinder):
         self.q_[mask, :] = self._rng.normal(0.0, 1.0, (len(mask), k))
 
         # scale a regularization term by the number of parameters
-        self._reg = self.C / (1 + (k + 1) * (n_users + n_items))
+        self._reg = self.C / dt_itemsize
 
     def loss(self, coef, ev, sc, n_objects):
         """
@@ -248,8 +248,7 @@ class LogisticPMF(BaseExplicitItemFinder):
         loss = - np.sum(sc * np.log(esc) + (1 - sc) * np.log(1 - esc))
 
         # regularization term
-        reg = (np.sum(bu ** 2) + np.sum(bi ** 2) +
-               np.sum(p ** 2) + np.sum(q ** 2))
+        reg = (np.sum(bu**2) + np.sum(bi**2) + np.sum(p**2) + np.sum(q**2))
 
         return loss / n_events + self._reg * reg
 
@@ -559,8 +558,8 @@ class ImplicitLogisticPMF(BaseImplicitItemFinder):
         ])
 
         # memory allocation
-        self._coef = np.zeros(
-            1 + n_users + n_items + n_users * k + n_items * k, dtype=float)
+        dt_itemsize = (1 + n_users + n_items + n_users * k + n_items * k)
+        self._coef = np.zeros(dt_itemsize, dtype=float)
 
         # set array's view
         self.mu_ = self._coef.view(self._dt)['mu'][0]
@@ -579,7 +578,7 @@ class ImplicitLogisticPMF(BaseImplicitItemFinder):
         self.q_[0:n_items, :] = (self._rng.normal(0.0, 1.0, (n_items, k)))
 
         # scale a regularization term by the number of parameters
-        self._reg = self.C / (1 + (k + 1) * (n_users + n_items))
+        self._reg = self.C / dt_itemsize
 
     def loss(self, coef, ev, n_objects):
         """
@@ -622,8 +621,7 @@ class ImplicitLogisticPMF(BaseImplicitItemFinder):
         loss = loss / n_events
 
         # regularization term
-        reg = (np.sum(bu ** 2) + np.sum(bi ** 2) +
-               np.sum(p ** 2) + np.sum(q ** 2))
+        reg = (np.sum(bu**2) + np.sum(bi**2) + np.sum(p**2) + np.sum(q**2))
 
         return loss + self._reg * reg
 

@@ -69,20 +69,30 @@ class TestMultinomialPLSA(TestCase):
         assert_allclose(rec.score_levels, [1, 2, 3, 4, 5], rtol=1e-5)
 
         # known user and item
+        assert_allclose(
+            rec.raw_predict(np.array([[0, 6]])), 3.64580117249, rtol=1e-5)
+        assert_allclose(
+            rec.raw_predict(np.array([[2, 8]])), 3.62184516985, rtol=1e-5)
         assert_allclose(rec.predict((1, 7)), 3.64580117249, rtol=1e-5)
         assert_allclose(rec.predict((1, 9)), 3.6587422493, rtol=1e-5)
         assert_allclose(rec.predict((5, 7)), 3.60707987724, rtol=1e-5)
         assert_allclose(rec.predict((5, 9)), 3.62184516985, rtol=1e-5)
 
         # known user and unknown item
+        assert_allclose(
+            rec.raw_predict(np.array([[2, 10]])), 3.62387542269, rtol=1e-5)
         assert_allclose(rec.predict((1, 11)), 3.66032199689, rtol=1e-5)
         assert_allclose(rec.predict((5, 12)), 3.62387542269, rtol=1e-5)
 
         # unknown user and known item
+        assert_allclose(
+            rec.raw_predict(np.array([[8, 6]])), 3.60821491793, rtol=1e-5)
         assert_allclose(rec.predict((3, 7)), 3.60821491793, rtol=1e-5)
         assert_allclose(rec.predict((11, 9)), 3.62304301551, rtol=1e-5)
 
         # unknown user and item
+        assert_allclose(
+            rec.raw_predict(np.array([[8, 10]])), 3.62507437787, rtol=1e-5)
         assert_allclose(rec.predict((3, 11)), 3.62507437787, rtol=1e-5)
 
         x = np.array([

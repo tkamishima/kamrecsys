@@ -266,25 +266,28 @@ class TestPMF(TestCase):
         assert_allclose(rec.fit_results_['final_loss'],
                                0.025638738121075231, rtol=1e-5)
 
+        # raw_predict
+        assert_allclose(
+            rec.raw_predict(np.array([[0, 6]])), 3.98736414345459, rtol=1e-5)
+        assert_allclose(
+            rec.raw_predict(np.array([[8, 8]])), 4.24820012356349, rtol=1e-5)
+        assert_allclose(
+            rec.raw_predict(np.array([[2, 10]])), 3.47105201503218, rtol=1e-5)
+        assert_allclose(
+            rec.raw_predict(np.array([[0, 6], [8, 8], [2, 10]])),
+            [3.9873641434545979, 4.2482001235634943, 3.4710520150321895],
+            rtol=1e-5)
+
         # single prediction
-        assert_allclose(rec.predict((1, 7)),
-                               3.9873641434545979, rtol=1e-5)
-        assert_allclose(rec.predict((1, 9)),
-                               4.9892118821609106, rtol=1e-5)
-        assert_allclose(rec.predict((1, 11)),
-                               3.6480799850368273, rtol=1e-5)
-        assert_allclose(rec.predict((3, 7)),
-                               3.6336318795279228, rtol=1e-5)
-        assert_allclose(rec.predict((3, 9)),
-                               4.2482001235634943, rtol=1e-5)
-        assert_allclose(rec.predict((3, 11)),
-                               3.7236984083417841, rtol=1e-5)
-        assert_allclose(rec.predict((5, 7)),
-                               3.4141968145802597, rtol=1e-5)
-        assert_allclose(rec.predict((5, 9)),
-                               3.9818882049478654, rtol=1e-5)
-        assert_allclose(rec.predict((5, 11)),
-                               3.4710520150321895, rtol=1e-5)
+        assert_allclose(rec.predict((1, 7)), 3.9873641434545979, rtol=1e-5)
+        assert_allclose(rec.predict((1, 9)), 4.9892118821609106, rtol=1e-5)
+        assert_allclose(rec.predict((1, 11)), 3.6480799850368273, rtol=1e-5)
+        assert_allclose(rec.predict((3, 7)), 3.6336318795279228, rtol=1e-5)
+        assert_allclose(rec.predict((3, 9)), 4.2482001235634943, rtol=1e-5)
+        assert_allclose(rec.predict((3, 11)), 3.7236984083417841, rtol=1e-5)
+        assert_allclose(rec.predict((5, 7)), 3.4141968145802597, rtol=1e-5)
+        assert_allclose(rec.predict((5, 9)), 3.9818882049478654, rtol=1e-5)
+        assert_allclose(rec.predict((5, 11)), 3.4710520150321895, rtol=1e-5)
 
         # multiple prediction
         x = np.array([
