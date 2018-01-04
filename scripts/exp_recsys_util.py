@@ -170,7 +170,7 @@ def holdout_test(info, load_data):
     test_ev = test_data.to_eid_event(test_data.event)
 
     # set information about data and conditions
-    info['test']['n_folds'] = 1
+    info['condition']['n_folds'] = 1
     info['training']['n_events'] = train_data.n_events
     info['training']['n_users'] = (
         train_data.n_objects[train_data.event_otypes[0]])
@@ -196,7 +196,7 @@ def holdout_test(info, load_data):
     info['prediction']['event'] = test_data.to_eid_event(test_data.event)
     info['prediction']['true'] = test_data.score
     info['prediction']['predicted'] = esc
-    if info['data']['has_timestamp']:
+    if info['condition']['has_timestamp']:
         info['prediction']['event_feature'] = (
             {'timestamp': test_data.event_feature['timestamp']})
 
@@ -219,7 +219,7 @@ def cv_test(info, load_data, target_fold=None):
     # prepare training data
     data = load_data(info['training']['file'], info)
     n_events = data.n_events
-    n_folds = info['test']['n_folds']
+    n_folds = info['condition']['n_folds']
     ev = data.to_eid_event(data.event)
 
     # set information about data and conditions
@@ -271,7 +271,7 @@ def cv_test(info, load_data, target_fold=None):
     else:
         mask = info['test']['mask'][str(target_fold)]
         info['prediction']['predicted'] = esc[mask]
-    if info['data']['has_timestamp']:
+    if info['condition']['has_timestamp']:
         info['prediction']['event_feature'] = {
             'timestamp': data.event_feature['timestamp']}
 
@@ -308,13 +308,13 @@ def do_task(info, load_data, target_fold=None):
     info['environment']['version']['kamrecsys'] = kamrecsys_version
 
     # select validation scheme
-    if info['test']['scheme'] == 'holdout':
+    if info['condition']['scheme'] == 'holdout':
         holdout_test(info, load_data)
-    elif info['test']['scheme'] == 'cv':
+    elif info['condition']['scheme'] == 'cv':
         cv_test(info, load_data)
-    elif info['test']['scheme'] == 'cvone':
+    elif info['condition']['scheme'] == 'cvone':
         if (target_fold is not None and
-                0 <= target_fold < info['test']['n_folds']):
+                0 <= target_fold < info['condition']['n_folds']):
             cv_test(info, load_data, target_fold=target_fold)
         else:
             raise TypeError(

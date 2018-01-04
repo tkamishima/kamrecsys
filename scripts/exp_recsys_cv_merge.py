@@ -100,8 +100,8 @@ def first_fold(fp):
         else:
             cv_info[k] = info[k].copy()
     del cv_info['test']['mask']
-    cv_info['test']['scheme'] = 'cv'
-    cv_info['test']['merged'] = True
+    cv_info['condition']['scheme'] = 'cv'
+    cv_info['condition']['merged'] = True
 
     # get fold number
     fold = next(iter(info['training']['results']))

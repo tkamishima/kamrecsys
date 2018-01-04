@@ -109,7 +109,7 @@ def do_task(opt):
         stats = score_predictor_statistics(
             info['prediction']['true'],
             info['prediction']['predicted'],
-            score_domain=info['data']['score_domain'])
+            score_domain=info['condition']['score_domain'])
     elif info['model']['task_type'] == 'item_finder':
         stats = item_finder_statistics(
             info['prediction']['true'],
