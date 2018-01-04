@@ -23,9 +23,8 @@ Output Format
 Outputs of prediction are stored in a `json` formatted file.  Top-level keys 
 of the outputs are as follows: 
 
-* `data` : the data, such as a domain of rating scores and availability of 
-  timestamp. 
-* `environment` : hardware, system software, and experimental script 
+* `condition` : experimental conditions of experimental schemes and datasets
+* `environment` : hardware, system software, and experimental script
 * `model` : model and its parameters used for prediction 
 * `prediction` : predicted results, user-item pairs and predicted and true 
   rating scores. 
@@ -151,8 +150,8 @@ def load_data(fp, info):
         loaded data
     """
 
-    has_timestamp = info['data']['has_timestamp']
-    score_domain = info['data']['score_domain']
+    has_timestamp = info['condition']['has_timestamp']
+    score_domain = info['condition']['score_domain']
 
     # score_domain is explicitly specified?
     if np.all(np.array(score_domain) == 0):
@@ -163,7 +162,7 @@ def load_data(fp, info):
         fp,
         event_dtype=event_dtype_timestamp if has_timestamp else None,
         score_domain=score_domain)
-    info['data']['score_domain'] = data.score_domain
+    info['condition']['score_domain'] = data.score_domain
 
     # binarize non-binary scores
     data.binarize_score()
@@ -280,7 +279,7 @@ def init_info(opt):
         Information about the target task
     """
 
-    info = {'data': {}, 'environment': {}, 'training': {}, 'test': {},
+    info = {'condition': {}, 'environment': {}, 'training': {}, 'test': {},
             'model': {'options': {}}, 'prediction': {}}
 
     # files
@@ -301,14 +300,12 @@ def init_info(opt):
             "Invalid method name: {0:s}".format(info['model']['method']))
     info['model']['options']['random_state'] = opt.rseed
 
-    # test
-    info['test']['scheme'] = opt.validation
-    info['test']['n_folds'] = opt.fold
-
-    # data
-    info['data']['score_domain'] = list(opt.domain)
-    info['data']['has_timestamp'] = opt.timestamp
-    info['data']['explicit_rating'] = True
+    # condition
+    info['condition']['score_domain'] = list(opt.domain)
+    info['condition']['has_timestamp'] = opt.timestamp
+    info['condition']['explicit_rating'] = True
+    info['condition']['scheme'] = opt.validation
+    info['condition']['n_folds'] = opt.fold
 
     return info
 
