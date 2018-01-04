@@ -198,9 +198,10 @@ def holdout_test(info, load_data):
     info['prediction']['event'] = test_data.to_eid_event(test_data.event)
     info['prediction']['true'] = test_data.score
     info['prediction']['predicted'] = esc
-    if info['condition']['has_timestamp']:
-        info['prediction']['event_feature'] = (
-            {'timestamp': test_data.event_feature['timestamp']})
+    if test_data.event_feature is not None:
+        info['prediction']['event_feature'] = {
+            k: test_data.event_feature[k]
+            for k in test_data.event_feature.dtype.names}
 
 
 def cv_test(info, load_data, target_fold=None):
@@ -273,9 +274,9 @@ def cv_test(info, load_data, target_fold=None):
     else:
         mask = info['test']['mask'][str(target_fold)]
         info['prediction']['predicted'] = esc[mask]
-    if info['condition']['has_timestamp']:
+    if data.event_feature is not None:
         info['prediction']['event_feature'] = {
-            'timestamp': data.event_feature['timestamp']}
+            k: data.event_feature[k] for k in data.event_feature.dtype.names}
 
 
 def do_task(info, load_data, target_fold=None):
