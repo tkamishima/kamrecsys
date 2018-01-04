@@ -170,18 +170,20 @@ def holdout_test(info, load_data):
     test_ev = test_data.to_eid_event(test_data.event)
 
     # set information about data and conditions
-    info['condition']['n_folds'] = 1
     info['training']['n_events'] = train_data.n_events
     info['training']['n_users'] = (
         train_data.n_objects[train_data.event_otypes[0]])
     info['training']['n_items'] = (
         train_data.n_objects[train_data.event_otypes[1]])
+
     info['test']['file'] = info['training']['file']
-    info['training']['n_events'] = test_data.n_events
-    info['training']['n_users'] = (
+    info['test']['n_events'] = test_data.n_events
+    info['test']['n_users'] = (
         test_data.n_objects[test_data.event_otypes[0]])
-    info['training']['n_items'] = (
+    info['test']['n_items'] = (
         test_data.n_objects[test_data.event_otypes[1]])
+
+    info['condition']['n_folds'] = 1
 
     # training
     rec = info['model']['recommender'](**info['model']['options'])
