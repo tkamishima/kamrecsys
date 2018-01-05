@@ -617,12 +617,11 @@ class ImplicitLogisticPMF(BaseImplicitItemFinder):
                 np.sum(p[i, :][np.newaxis, :] * q, axis=1))
             loss = loss - np.sum(
                 evi * np.log(esc) + (1 - evi) * np.log(1. - esc))
-        loss = loss / n_events
 
         # regularization term
         reg = (np.sum(bu**2) + np.sum(bi**2) + np.sum(p**2) + np.sum(q**2))
 
-        return loss + 0.5 * self._reg * reg
+        return loss / n_events + 0.5 * self._reg * reg
 
     def grad_loss(self, coef, ev, n_objects):
         """
