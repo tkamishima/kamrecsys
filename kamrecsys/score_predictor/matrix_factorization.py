@@ -138,6 +138,7 @@ class PMF(BaseScorePredictor):
         # private instance variables
         self._coef = None
         self._dt = None
+        self._reg = 1.0
 
     def _init_coef(self, ev, sc, n_objects):
         """
@@ -388,9 +389,9 @@ class PMF(BaseScorePredictor):
 
         # clean up temporary instance variables
         self.remove_data()
-        del self._coef
-        del self._reg
-        del self._dt
+        self._coef = None
+        self._dt = None
+        self._reg = 1.0
 
     def raw_predict(self, ev):
         """
