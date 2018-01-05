@@ -49,9 +49,6 @@ true_sc = [
 
 class ScorePredictor(BaseScorePredictor):
 
-    def __init__(self):
-        super(ScorePredictor, self).__init__(random_state=1234)
-
     def raw_predict(self):
         pass
 
