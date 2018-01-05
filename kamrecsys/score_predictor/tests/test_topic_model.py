@@ -68,6 +68,16 @@ class TestMultinomialPLSA(TestCase):
         assert_equal(rec.fit_results_['n_iterations'], 38)
         assert_allclose(rec.score_levels, [1, 2, 3, 4, 5], rtol=1e-5)
 
+        # output size
+        assert_array_equal(
+            rec.raw_predict(data.event[0].reshape(1, 2)).shape, (1,))
+        assert_array_equal(rec.raw_predict(data.event).shape, (30,))
+        rec.use_expectation = False
+        assert_array_equal(
+            rec.raw_predict(data.event[0].reshape(1, 2)).shape, (1,))
+        assert_array_equal(rec.raw_predict(data.event).shape, (30,))
+        rec.use_expectation = True
+
         # known user and item
         assert_allclose(
             rec.raw_predict(np.array([[0, 6]])), 3.64580117249, rtol=1e-5)
