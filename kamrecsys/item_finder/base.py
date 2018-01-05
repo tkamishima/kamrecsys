@@ -96,6 +96,7 @@ class BaseExplicitItemFinder(
         Remove information related to a training dataset
         """
         super(BaseExplicitItemFinder, self).remove_data()
+
         self.score = None
 
     def fit(self, data, event_index=(0, 1)):

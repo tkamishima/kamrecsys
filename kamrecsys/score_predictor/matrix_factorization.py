@@ -391,7 +391,6 @@ class PMF(BaseScorePredictor):
         del self._coef
         del self._reg
         del self._dt
-        del self._rng
 
     def raw_predict(self, ev):
         """

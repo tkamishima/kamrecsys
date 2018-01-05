@@ -238,6 +238,7 @@ class MultinomialPLSA(BaseScorePredictor):
 
         # initialization #####
         super(MultinomialPLSA, self).fit(data, event_index)
+
         ev, n_objects = self.get_event()
         sc = self.get_score()
         self.score_levels = self.get_score_levels()

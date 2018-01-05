@@ -397,7 +397,6 @@ class LogisticPMF(BaseExplicitItemFinder):
         del self._coef
         del self._reg
         del self._dt
-        del self._rng
 
     def raw_predict(self, ev):
         """
@@ -759,7 +758,6 @@ class ImplicitLogisticPMF(BaseImplicitItemFinder):
         del self._coef
         del self._reg
         del self._dt
-        del self._rng
 
     def raw_predict(self, ev):
         """
