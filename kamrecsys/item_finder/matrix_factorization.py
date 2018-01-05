@@ -383,6 +383,7 @@ class LogisticPMF(BaseExplicitItemFinder):
         self.fit_results_['n_users'] = n_objects[0]
         self.fit_results_['n_items'] = n_objects[1]
         self.fit_results_['n_events'] = self.n_events
+        self.fit_results_['n_parameters'] = self._coef.size
         self.fit_results_['success'] = res.success
         self.fit_results_['status'] = res.status
         self.fit_results_['message'] = res.message
@@ -744,6 +745,7 @@ class ImplicitLogisticPMF(BaseImplicitItemFinder):
         self.fit_results_['n_users'] = n_objects[0]
         self.fit_results_['n_items'] = n_objects[1]
         self.fit_results_['n_events'] = self.n_events
+        self.fit_results_['n_parameters'] = self._coef.size
         self.fit_results_['success'] = res.success
         self.fit_results_['status'] = res.status
         self.fit_results_['message'] = res.message
