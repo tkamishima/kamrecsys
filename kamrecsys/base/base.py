@@ -62,10 +62,10 @@ class BaseRecommender(with_metaclass(ABCMeta, BaseEstimator, ObjectUtilMixin)):
         conversion table to external ids, succeed from training data sets
     iid : dictionary
         conversion table to internal ids, succeed from training data sets
-    fit_results_ : dict
-        Side information about results of fitting
     random_state : RandomState or an int seed (None by default)
         A random number generator instance
+    fit_results_ : dict
+        Side information about results of fitting
 
     Raises
     ------
