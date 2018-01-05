@@ -149,6 +149,7 @@ class LogisticPMF(BaseExplicitItemFinder):
         # private instance variables
         self._coef = None
         self._dt = None
+        self._reg = 1.0
 
     def _init_coef(self, ev, sc, n_objects):
         """
@@ -177,10 +178,10 @@ class LogisticPMF(BaseExplicitItemFinder):
             ('p', float, (n_users, k)),
             ('q', float, (n_items, k))
         ])
-        dt_itemsize = (1 + n_users + n_items + n_users * k + n_items * k)
+        coef_size = 1 + n_users + n_items + n_users * k + n_items * k
 
         # memory allocation
-        self._coef = np.zeros(dt_itemsize, dtype=float)
+        self._coef = np.zeros(coef_size, dtype=float)
 
         # set array's view
         self.mu_ = self._coef.view(self._dt)['mu'][0]
@@ -209,7 +210,7 @@ class LogisticPMF(BaseExplicitItemFinder):
         self.q_[mask, :] = self._rng.normal(0.0, 1.0, (len(mask), k))
 
         # scale a regularization term by the number of parameters
-        self._reg = self.C / dt_itemsize
+        self._reg = self.C / (coef_size - 1)
 
     def loss(self, coef, ev, sc, n_objects):
         """
@@ -250,7 +251,7 @@ class LogisticPMF(BaseExplicitItemFinder):
         # regularization term
         reg = (np.sum(bu**2) + np.sum(bi**2) + np.sum(p**2) + np.sum(q**2))
 
-        return loss / n_events + self._reg * reg
+        return loss / n_events + 0.5 * self._reg * reg
 
     def grad_loss(self, coef, ev, sc, n_objects):
         """
@@ -382,6 +383,7 @@ class LogisticPMF(BaseExplicitItemFinder):
         self.fit_results_['n_users'] = n_objects[0]
         self.fit_results_['n_items'] = n_objects[1]
         self.fit_results_['n_events'] = self.n_events
+        self.fit_results_['n_parameters'] = self._coef.size
         self.fit_results_['success'] = res.success
         self.fit_results_['status'] = res.status
         self.fit_results_['message'] = res.message
@@ -394,10 +396,9 @@ class LogisticPMF(BaseExplicitItemFinder):
 
         # clean up temporary instance variables
         self.remove_data()
-        del self._coef
-        del self._reg
-        del self._dt
-        del self._rng
+        self._coef = None
+        self._dt = None
+        self._reg = 1.0
 
     def raw_predict(self, ev):
         """
@@ -530,6 +531,7 @@ class ImplicitLogisticPMF(BaseImplicitItemFinder):
         # private instance variables
         self._coef = None
         self._dt = None
+        self._reg = 1.0
 
     def _init_coef(self, ev, n_objects):
         """
@@ -558,8 +560,8 @@ class ImplicitLogisticPMF(BaseImplicitItemFinder):
         ])
 
         # memory allocation
-        dt_itemsize = (1 + n_users + n_items + n_users * k + n_items * k)
-        self._coef = np.zeros(dt_itemsize, dtype=float)
+        coef_size = 1 + n_users + n_items + n_users * k + n_items * k
+        self._coef = np.zeros(coef_size, dtype=float)
 
         # set array's view
         self.mu_ = self._coef.view(self._dt)['mu'][0]
@@ -578,7 +580,7 @@ class ImplicitLogisticPMF(BaseImplicitItemFinder):
         self.q_[0:n_items, :] = (self._rng.normal(0.0, 1.0, (n_items, k)))
 
         # scale a regularization term by the number of parameters
-        self._reg = self.C / dt_itemsize
+        self._reg = self.C / (coef_size - 1)
 
     def loss(self, coef, ev, n_objects):
         """
@@ -618,12 +620,11 @@ class ImplicitLogisticPMF(BaseImplicitItemFinder):
                 np.sum(p[i, :][np.newaxis, :] * q, axis=1))
             loss = loss - np.sum(
                 evi * np.log(esc) + (1 - evi) * np.log(1. - esc))
-        loss = loss / n_events
 
         # regularization term
         reg = (np.sum(bu**2) + np.sum(bi**2) + np.sum(p**2) + np.sum(q**2))
 
-        return loss + self._reg * reg
+        return loss / n_events + 0.5 * self._reg * reg
 
     def grad_loss(self, coef, ev, n_objects):
         """
@@ -744,6 +745,7 @@ class ImplicitLogisticPMF(BaseImplicitItemFinder):
         self.fit_results_['n_users'] = n_objects[0]
         self.fit_results_['n_items'] = n_objects[1]
         self.fit_results_['n_events'] = self.n_events
+        self.fit_results_['n_parameters'] = self._coef.size
         self.fit_results_['success'] = res.success
         self.fit_results_['status'] = res.status
         self.fit_results_['message'] = res.message
@@ -756,10 +758,9 @@ class ImplicitLogisticPMF(BaseImplicitItemFinder):
 
         # clean up temporary instance variables
         self.remove_data()
-        del self._coef
-        del self._reg
-        del self._dt
-        del self._rng
+        self._coef = None
+        self._dt = None
+        self._reg = 1.0
 
     def raw_predict(self, ev):
         """

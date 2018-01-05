@@ -47,17 +47,11 @@ from kamrecsys.item_finder import (
 
 class ExplicitItemFinder(BaseExplicitItemFinder):
 
-    def __init__(self):
-        super(ExplicitItemFinder, self).__init__(random_state=1234)
-
     def raw_predict(self, ev):
         pass
 
 
 class ImplicitItemFinder(BaseImplicitItemFinder):
-
-    def __init__(self):
-        super(ImplicitItemFinder, self).__init__(random_state=1234)
 
     def raw_predict(self):
         pass

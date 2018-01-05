@@ -96,6 +96,7 @@ class BaseExplicitItemFinder(
         Remove information related to a training dataset
         """
         super(BaseExplicitItemFinder, self).remove_data()
+
         self.score = None
 
     def fit(self, data, event_index=(0, 1)):
@@ -137,23 +138,6 @@ class BaseImplicitItemFinder(with_metaclass(ABCMeta, BaseEventRecommender)):
 
     task_type = 'item_finder'
     explicit_ratings = True
-
-    def __init__(self, random_state=None):
-        super(BaseImplicitItemFinder, self).__init__(random_state=random_state)
-
-    def fit(self, data, event_index=(0, 1)):
-        """
-        fitting model
-
-        Parameters
-        ----------
-        data : :class:`kamrecsys.data.BaseData`
-            input data
-        event_index : array_like, shape=(variable,)
-            a set of indexes to specify the elements in events that are used
-            in a recommendation model
-        """
-        super(BaseImplicitItemFinder, self).fit(data, event_index)
 
     def get_event_array(self, sparse_type='csr'):
         """

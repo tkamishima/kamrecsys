@@ -95,6 +95,7 @@ class BaseScorePredictor(
         Remove information related to a training dataset
         """
         super(BaseScorePredictor, self).remove_data()
+
         self.score = None
 
     def fit(self, data, event_index=(0, 1)):

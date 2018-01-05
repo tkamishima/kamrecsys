@@ -138,6 +138,7 @@ class PMF(BaseScorePredictor):
         # private instance variables
         self._coef = None
         self._dt = None
+        self._reg = 1.0
 
     def _init_coef(self, ev, sc, n_objects):
         """
@@ -166,10 +167,10 @@ class PMF(BaseScorePredictor):
             ('p', float, (n_users, k)),
             ('q', float, (n_items, k))
         ])
-        dt_itemsize = (1 + n_users + n_items + n_users * k + n_items * k)
+        coef_size = 1 + n_users + n_items + n_users * k + n_items * k
 
         # memory allocation
-        self._coef = np.zeros(dt_itemsize, dtype=float)
+        self._coef = np.zeros(coef_size, dtype=float)
 
         # set array's view
         self.mu_ = self._coef.view(self._dt)['mu'][0]
@@ -207,7 +208,7 @@ class PMF(BaseScorePredictor):
             self._rng.normal(0.0, np.sqrt(var), (len(mask), k)))
 
         # scale a regularization term by the number of parameters
-        self._reg = self.C / dt_itemsize
+        self._reg = self.C / (coef_size - 1)
 
     def loss(self, coef, ev, sc, n_objects):
         """
@@ -247,7 +248,7 @@ class PMF(BaseScorePredictor):
         # regularization term
         reg = (np.sum(bu**2) + np.sum(bi**2) + np.sum(p**2) + np.sum(q**2))
 
-        return loss / n_events + self._reg * reg
+        return loss / n_events + 0.5 * self._reg * reg
 
     def grad_loss(self, coef, ev, sc, n_objects):
         """
@@ -376,6 +377,7 @@ class PMF(BaseScorePredictor):
         self.fit_results_['n_users'] = n_objects[0]
         self.fit_results_['n_items'] = n_objects[1]
         self.fit_results_['n_events'] = self.n_events
+        self.fit_results_['n_parameters'] = self._coef.size
         self.fit_results_['success'] = res.success
         self.fit_results_['status'] = res.status
         self.fit_results_['message'] = res.message
@@ -388,10 +390,9 @@ class PMF(BaseScorePredictor):
 
         # clean up temporary instance variables
         self.remove_data()
-        del self._coef
-        del self._reg
-        del self._dt
-        del self._rng
+        self._coef = None
+        self._dt = None
+        self._reg = 1.0
 
     def raw_predict(self, ev):
         """

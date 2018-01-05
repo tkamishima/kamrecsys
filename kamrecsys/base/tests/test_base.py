@@ -52,9 +52,6 @@ class Recommender(BaseRecommender):
 
 class EventRecommender(BaseEventRecommender):
 
-    def __init__(self):
-        super(EventRecommender, self).__init__()
-
     def raw_predict(self, ev):
 
         return np.zeros(ev.shape[0])
