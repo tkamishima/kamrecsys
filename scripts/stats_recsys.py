@@ -12,7 +12,7 @@ top-level key: `prediction`.  The sub-entries in this entry are as follows:
 * `event` : a list of user-item pairs represented by external IDs. 
 * `true` : true rating scores corresponding to an event
 * `predicted` : predicted rating scores corresponding to an event
-* `event_feature` : event features except for a sensitive feature
+* `event_feature` : event features
 
 Output file
 -----------
@@ -45,6 +45,10 @@ from __future__ import (
     absolute_import)
 from six.moves import xrange
 
+# =============================================================================
+# Imports
+# =============================================================================
+
 import argparse
 import json
 import sys
@@ -56,16 +60,12 @@ from kamrecsys.metrics import (
 from kamrecsys.utils import json_decodable
 
 # =============================================================================
-# Imports
-# =============================================================================
-
-# =============================================================================
 # Module metadata variables
 # =============================================================================
 
 __author__ = "Toshihiro Kamishima ( http://www.kamishima.net/ )"
-__date__ = "2014/06/17"
-__version__ = "2.0.0"
+__date__ = "2014-06-17"
+__version__ = "3.0.0"
 __copyright__ = "Copyright (c) 2014 Toshihiro Kamishima all rights reserved."
 __license__ = "MIT License: http://www.opensource.org/licenses/mit-license.php"
 
