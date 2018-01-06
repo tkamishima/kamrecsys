@@ -50,7 +50,7 @@ class TestMultinomialPLSA(TestCase):
 
         data = load_movielens_mini()
 
-        rec = MultinomialPLSA(tol=1e-8, k=2, random_state=1234)
+        rec = MultinomialPLSA(k=2, random_state=1234, tol=1e-8)
 
         # import logging
         # logging.getLogger('kamrecsys').addHandler(logging.StreamHandler())
