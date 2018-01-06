@@ -303,6 +303,9 @@ class MultinomialPLSA(BaseScorePredictor):
         self.fit_results_['n_users'] = n_objects[0]
         self.fit_results_['n_items'] = n_objects[1]
         self.fit_results_['n_events'] = self.n_events
+        self.fit_results_['n_parameters'] = (
+            self.pZ_.size + self.pXgZ_.size +
+            self.pYgZ_.size + self.pRgZ_.size)
         self.fit_results_['success'] = (self.fit_results_['status'] == 0)
         self.fit_results_['message'] = (
             get_fit_status_message(self.fit_results_['status']))
