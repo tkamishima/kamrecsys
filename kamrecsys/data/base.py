@@ -16,9 +16,10 @@ from six.moves import xrange
 # =============================================================================
 
 import logging
-from abc import ABCMeta, abstractmethod
-from six import with_metaclass
+from abc import ABCMeta
+
 import numpy as np
+from six import with_metaclass
 
 # =============================================================================
 # Public symbols
