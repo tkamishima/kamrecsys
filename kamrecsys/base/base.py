@@ -108,7 +108,7 @@ class BaseRecommender(with_metaclass(ABCMeta, BaseEstimator, ObjectUtilMixin)):
         self._rng = None
 
     @abstractmethod
-    def predict(self, eev, **kwargs):
+    def predict(self, eev):
         """
         abstract method: predict score of given event represented by external
         ids
@@ -217,7 +217,7 @@ class BaseEventRecommender(
         self.n_objects = self.n_objects.take(self.event_index)
 
     @abstractmethod
-    def raw_predict(self, ev, **kwargs):
+    def raw_predict(self, ev):
         """
         abstract method: predict score of given one event represented by
         internal ids
