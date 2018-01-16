@@ -210,7 +210,7 @@ class LogisticPMF(BaseExplicitItemFinder):
         self.q_[mask, :] = self._rng.normal(0.0, 1.0, (len(mask), k))
 
         # scale a regularization term by the number of parameters
-        self._reg = self.C / (coef_size - 1)
+        self._reg = self.C
 
     def loss(self, coef, ev, sc, n_objects):
         """
@@ -580,7 +580,7 @@ class ImplicitLogisticPMF(BaseImplicitItemFinder):
         self.q_[0:n_items, :] = (self._rng.normal(0.0, 1.0, (n_items, k)))
 
         # scale a regularization term by the number of parameters
-        self._reg = self.C / (coef_size - 1)
+        self._reg = self.C
 
     def loss(self, coef, ev, n_objects):
         """

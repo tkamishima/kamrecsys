@@ -208,7 +208,7 @@ class PMF(BaseScorePredictor):
             self._rng.normal(0.0, np.sqrt(var), (len(mask), k)))
 
         # scale a regularization term by the number of parameters
-        self._reg = self.C / (coef_size - 1)
+        self._reg = self.C
 
     def loss(self, coef, ev, sc, n_objects):
         """
