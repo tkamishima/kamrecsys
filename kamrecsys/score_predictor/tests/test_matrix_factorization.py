@@ -69,7 +69,7 @@ class TestPMF(TestCase):
 
         # initial parameters
         assert_allclose(
-            rec.loss(rec._coef, ev, sc, n_objects), 0.7291206184050988,
+            rec.loss(rec._coef, ev, sc, n_objects), 11.6412258667768,
             rtol=1e-5)
 
         # all zero
@@ -79,7 +79,7 @@ class TestPMF(TestCase):
         p[0][:, :] = 0.0
         q[0][:, :] = 0.0
         assert_allclose(
-            rec.loss(rec._coef, ev, sc, n_objects), 15.7,
+            rec.loss(rec._coef, ev, sc, n_objects), 235.5,
             rtol=1e-5)
 
         # all one
@@ -89,7 +89,7 @@ class TestPMF(TestCase):
         p[0][:, :] = 1.0
         q[0][:, :] = 1.0
         assert_allclose(
-            rec.loss(rec._coef, ev, sc, n_objects), 2.4166666666666665,
+            rec.loss(rec._coef, ev, sc, n_objects), 38.2,
             rtol=1e-5)
 
         mu[0] = 1.0
@@ -100,7 +100,7 @@ class TestPMF(TestCase):
         q[0][:, 0] = 0.2
         q[0][:, 1] = 1.0
         assert_allclose(
-            rec.loss(rec._coef, ev, sc, n_objects), 1.14175,
+            rec.loss(rec._coef, ev, sc, n_objects), 18.7025,
             rtol=1e-5)
 
         mu[0] = 2.0
@@ -111,7 +111,7 @@ class TestPMF(TestCase):
         q[0][:, 0] = np.arange(1.0, 0.0, -0.1) * 0.3 + 2
         q[0][:, 1] = np.arange(0.0, 1.0, 0.1)
         assert_allclose(
-            rec.loss(rec._coef, ev, sc, n_objects), 62.720038744000014,
+            rec.loss(rec._coef, ev, sc, n_objects), 947.15920616,
             rtol=1e-5)
 
     def test_grad_loss(self):
@@ -134,22 +134,22 @@ class TestPMF(TestCase):
 
         # initial parameters
         grad = rec.grad_loss(rec._coef, ev, sc, n_objects)
-        assert_allclose(grad[0], -0.0212968638573, rtol=1e-5)
+        assert_allclose(grad[0], -0.6389059157188512, rtol=1e-5)
         assert_allclose(
             grad[1:5],
-            [0.0363059823, 0.0167339885, -0.0260526426, -0.0018141656],
+            [1.0788090999, 0.464982617, -0.7963940914, -0.0692397823],
             rtol=1e-5)
         assert_allclose(
             grad[15:19],
-            [-0.0757162534, -0.02525473, -0.0393169069, 0.0252035637],
+            [-2.2818579721, -0.7857900494, -1.1561738739, 0.7205513543],
             rtol=1e-5)
         assert_allclose(
             grad[19:23],
-            [0.0047896573, -0.0979586199, 0.012605792, -0.0028619178],
+            [0.1565786903, -2.9713197014, 0.4173437636, -0.0944053917],
             rtol=1e-5)
         assert_allclose(
             grad[-4:],
-            [-0.0108829851, 0.0536257719, 0.0211630636, -0.0097388071],
+            [-0.2978489043, 1.6373689599, 0.6585058144, -0.2955021786],
             rtol=1e-5)
 
         # all zero
@@ -159,14 +159,14 @@ class TestPMF(TestCase):
         p[0][:, :] = 0.0
         q[0][:, :] = 0.0
         grad = rec.grad_loss(rec._coef, ev, sc, n_objects)
-        assert_allclose(grad[0], -3.83333333333, rtol=1e-5)
+        assert_allclose(grad[0], -115, rtol=1e-5)
         assert_allclose(
             grad[1:5],
-            [-1.2, -0.2, -0.2333333333, -0.4666666667],
+            [-36., -6., -7., -14.],
             rtol=1e-5)
         assert_allclose(
             grad[15:19],
-            [-0.7333333333, -0.3333333333, -0.6, -0.3],
+            [-22., -10., -18., -9.],
             rtol=1e-5)
         assert_allclose(
             grad[19:23],
@@ -184,22 +184,22 @@ class TestPMF(TestCase):
         p[0][:, :] = 1.0
         q[0][:, :] = 1.0
         grad = rec.grad_loss(rec._coef, ev, sc, n_objects)
-        assert_allclose(grad[0], 1.16666666667, rtol=1e-5)
+        assert_allclose(grad[0], 35.0, rtol=1e-5)
         assert_allclose(
             grad[1:5],
-            [0.4685185185, 0.1351851852, 0.1018518519, 0.2018518519],
+            [14.1, 4.1, 3.1, 6.1],
             rtol=1e-5)
         assert_allclose(
             grad[15:19],
-            [0.2685185185, 0.1685185185, 0.0685185185, 0.2018518519],
+            [8.1, 5.1, 2.1, 6.1],
         rtol=1e-5)
         assert_allclose(
             grad[19:23],
-            [0.4685185185, 0.4685185185, 0.1351851852, 0.1351851852],
+            [14.1, 14.1, 4.1, 4.1],
             rtol=1e-5)
         assert_allclose(
             grad[-4:],
-            [0.0685185185, 0.0685185185, 0.2018518519, 0.2018518519],
+            [2.1, 2.1, 6.1, 6.1],
             rtol=1e-5)
 
         mu[0] = 1.0
@@ -210,22 +210,22 @@ class TestPMF(TestCase):
         q[0][:, 0] = 0.2
         q[0][:, 1] = 1.0
         grad = rec.grad_loss(rec._coef, ev, sc, n_objects)
-        assert_allclose(grad[0], 0.02, rtol=1e-5)
+        assert_allclose(grad[0], 0.6000000000000028, rtol=1e-5)
         assert_allclose(
             grad[1:5],
-            [-0.0166666667, 0.0435185185, -0.0096296296, 0.0572222222],
+            [-0.5, 1.31, -0.28, 1.73],
             rtol=1e-4)
         assert_allclose(
             grad[15:19],
-            [0.092962963, 0.0731481481, -0.03, 0.1201851852],
+            [2.86, 2.27, -0.82, 3.69],
             rtol=1e-5)
         assert_allclose(
             grad[19:23],
-            [-0.0024074074, -0.0148148148, 0.0095925926, 0.0451851852],
+            [-0.05, -0.4, 0.31, 1.4],
             rtol=1e-5)
         assert_allclose(
             grad[-4:],
-            [-0.0162962963, -0.0314814815, 0.0587037037, 0.1185185185],
+            [-0.48, -0.9, 1.77, 3.6],
             rtol=1e-5)
 
         mu[0] = 2.0
@@ -236,22 +236,22 @@ class TestPMF(TestCase):
         q[0][:, 0] = np.arange(1.0, 0.0, -0.1) * 0.3 + 2
         q[0][:, 1] = np.arange(0.0, 1.0, 0.1)
         grad = rec.grad_loss(rec._coef, ev, sc, n_objects)
-        assert_allclose(grad[0], 7.82805333333, rtol=1e-5)
+        assert_allclose(grad[0], 234.84160000000003, rtol=1e-5)
         assert_allclose(
             grad[1:5],
-            [2.6081481481, 0.5675096296, 0.4974844444, 1.1014859259],
+            [78.28, 17.0564, 14.9512, 33.0668],
             rtol=1e-5)
         assert_allclose(
             grad[15:19],
-            [1.6601851852, 0.868142963, 1.0316474074, 0.9287518519],
+            [49.89, 26.1354, 31.0472, 27.967],
             rtol=1e-5)
         assert_allclose(
             grad[19:23],
-            [5.6287888889, 1.2421851852, 1.2161727704, 0.3079238519],
+            [168.997, 37.31, 36.622072, 9.28216],
             rtol=1e-5)
         assert_allclose(
             grad[-4:],
-            [3.3865753481, 1.0290548148, 2.8936547259, 0.9260666667],
+            [101.688816, 30.9072, 86.899864, 27.822],
             rtol=1e-5)
 
     def test_class(self):
@@ -262,32 +262,32 @@ class TestPMF(TestCase):
         rec.fit(data)
 
         assert_allclose(
-            rec.fit_results_['initial_loss'], 0.7291206184050988, rtol=1e-5)
+            rec.fit_results_['initial_loss'], 11.6412258667768, rtol=1e-5)
         assert_allclose(
-            rec.fit_results_['final_loss'], 0.013777730279425669, rtol=1e-5)
+            rec.fit_results_['final_loss'], 0.683795023344032, rtol=1e-5)
 
         # raw_predict
         assert_allclose(
-            rec.raw_predict(np.array([[0, 6]])), 3.997101590073, rtol=1e-5)
+            rec.raw_predict(np.array([[0, 6]])), 3.98981537208499, rtol=1e-5)
         assert_allclose(
-            rec.raw_predict(np.array([[8, 8]])), 4.24151516373, rtol=1e-5)
+            rec.raw_predict(np.array([[8, 8]])), 4.25466828602487, rtol=1e-5)
         assert_allclose(
-            rec.raw_predict(np.array([[2, 10]])), 3.498237262002, rtol=1e-5)
+            rec.raw_predict(np.array([[2, 10]])), 3.45221824936513, rtol=1e-5)
         assert_allclose(
             rec.raw_predict(np.array([[0, 6], [8, 8], [2, 10]])),
-            [3.997101590073, 4.24151516373, 3.498237262002],
+            [3.9898153721, 4.254668286, 3.4522182494],
             rtol=1e-5)
 
         # single prediction
-        assert_allclose(rec.predict((1, 7)), 3.997101590073, rtol=1e-5)
-        assert_allclose(rec.predict((1, 9)), 4.977093755711, rtol=1e-5)
-        assert_allclose(rec.predict((1, 11)), 3.62779086784, rtol=1e-5)
-        assert_allclose(rec.predict((3, 7)), 3.683330861026, rtol=1e-5)
-        assert_allclose(rec.predict((3, 9)), 4.24151516373, rtol=1e-5)
-        assert_allclose(rec.predict((3, 11)), 3.70802937382, rtol=1e-5)
-        assert_allclose(rec.predict((5, 7)), 3.521554946725, rtol=1e-5)
-        assert_allclose(rec.predict((5, 9)), 4.000964107588, rtol=1e-5)
-        assert_allclose(rec.predict((5, 11)), 3.498237262002, rtol=1e-5)
+        assert_allclose(rec.predict((1, 7)), 3.98981537208499, rtol=1e-5)
+        assert_allclose(rec.predict((1, 9)), 4.96457075887952, rtol=1e-5)
+        assert_allclose(rec.predict((1, 11)), 3.64937487633011, rtol=1e-5)
+        assert_allclose(rec.predict((3, 7)), 3.56199613750802, rtol=1e-5)
+        assert_allclose(rec.predict((3, 9)), 4.25466828602487, rtol=1e-5)
+        assert_allclose(rec.predict((3, 11)), 3.74991933999025, rtol=1e-5)
+        assert_allclose(rec.predict((5, 7)), 3.27152744041802, rtol=1e-5)
+        assert_allclose(rec.predict((5, 9)), 3.99212459353293, rtol=1e-5)
+        assert_allclose(rec.predict((5, 11)), 3.45221824936513, rtol=1e-5)
 
         # multiple prediction
         x = np.array([
@@ -296,9 +296,9 @@ class TestPMF(TestCase):
             [5, 7], [5, 9], [5, 11]])
         assert_allclose(
             rec.predict(x),
-            [3.997101590073, 4.977093755711, 3.62779086784,
-             3.683330861026, 4.24151516373, 3.70802937382,
-             3.521554946725, 4.000964107588, 3.498237262002],
+            [3.9898153721, 4.9645707589, 3.6493748763,
+             3.5619961375, 4.254668286, 3.74991934,
+             3.2715274404, 3.9921245935, 3.4522182494],
             rtol=1e-5)
 
 

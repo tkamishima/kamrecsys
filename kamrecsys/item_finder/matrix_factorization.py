@@ -149,7 +149,6 @@ class LogisticPMF(BaseExplicitItemFinder):
         # private instance variables
         self._coef = None
         self._dt = None
-        self._reg = 1.0
 
     def _init_coef(self, ev, sc, n_objects):
         """
@@ -209,9 +208,6 @@ class LogisticPMF(BaseExplicitItemFinder):
         mask = np.bincount(ev[:, 1], minlength=n_items).nonzero()[0]
         self.q_[mask, :] = self._rng.normal(0.0, 1.0, (len(mask), k))
 
-        # scale a regularization term by the number of parameters
-        self._reg = self.C
-
     def loss(self, coef, ev, sc, n_objects):
         """
         loss function to optimize
@@ -251,7 +247,7 @@ class LogisticPMF(BaseExplicitItemFinder):
         # regularization term
         reg = (np.sum(bu**2) + np.sum(bi**2) + np.sum(p**2) + np.sum(q**2))
 
-        return loss / n_events + 0.5 * self._reg * reg
+        return loss + 0.5 * self.C * reg
 
     def grad_loss(self, coef, ev, sc, n_objects):
         """
@@ -313,14 +309,11 @@ class LogisticPMF(BaseExplicitItemFinder):
             grad_q[:, i] = np.bincount(
                 ev[:, 1], weights=weights[:, i], minlength=n_items)
 
-        # re-scale gradients
-        grad[:] = grad[:] / n_events
-
         # gradient of regularization term
-        grad_bu[:] += self._reg * bu
-        grad_bi[:] += self._reg * bi
-        grad_p[:, :] += self._reg * p
-        grad_q[:, :] += self._reg * q
+        grad_bu[:] += self.C * bu
+        grad_bi[:] += self.C * bi
+        grad_p[:, :] += self.C * p
+        grad_q[:, :] += self.C * q
 
         return grad
 
@@ -531,7 +524,6 @@ class ImplicitLogisticPMF(BaseImplicitItemFinder):
         # private instance variables
         self._coef = None
         self._dt = None
-        self._reg = 1.0
 
     def _init_coef(self, ev, n_objects):
         """
@@ -579,9 +571,6 @@ class ImplicitLogisticPMF(BaseImplicitItemFinder):
         self.p_[0:n_users, :] = (self._rng.normal(0.0, 1.0, (n_users, k)))
         self.q_[0:n_items, :] = (self._rng.normal(0.0, 1.0, (n_items, k)))
 
-        # scale a regularization term by the number of parameters
-        self._reg = self.C
-
     def loss(self, coef, ev, n_objects):
         """
         loss function to optimize
@@ -624,7 +613,7 @@ class ImplicitLogisticPMF(BaseImplicitItemFinder):
         # regularization term
         reg = (np.sum(bu**2) + np.sum(bi**2) + np.sum(p**2) + np.sum(q**2))
 
-        return loss / n_events + 0.5 * self._reg * reg
+        return loss + 0.5 * self.C * reg
 
     def grad_loss(self, coef, ev, n_objects):
         """
@@ -677,13 +666,11 @@ class ImplicitLogisticPMF(BaseImplicitItemFinder):
             grad_p[i, :] = np.sum(common_term[:, np.newaxis] * q, axis=0)
             grad_q[:, :] += common_term[:, np.newaxis] * p[i, :][np.newaxis, :]
 
-        grad[:] = grad[:] / n_events
-
         # gradient of regularization term
-        grad_bu[:] += self._reg * bu
-        grad_bi[:] += self._reg * bi
-        grad_p[:, :] += self._reg * p
-        grad_q[:, :] += self._reg * q
+        grad_bu[:] += self.C * bu
+        grad_bi[:] += self.C * bi
+        grad_p[:, :] += self.C * p
+        grad_q[:, :] += self.C * q
 
         return grad
 
