@@ -138,7 +138,6 @@ class PMF(BaseScorePredictor):
         # private instance variables
         self._coef = None
         self._dt = None
-        self._reg = 1.0
 
     def _init_coef(self, ev, sc, n_objects):
         """
@@ -207,9 +206,6 @@ class PMF(BaseScorePredictor):
         self.q_[mask, :] = (
             self._rng.normal(0.0, np.sqrt(var), (len(mask), k)))
 
-        # scale a regularization term by the number of parameters
-        self._reg = self.C / (coef_size - 1)
-
     def loss(self, coef, ev, sc, n_objects):
         """
         loss function to optimize
@@ -230,8 +226,6 @@ class PMF(BaseScorePredictor):
         loss : float
             value of loss function
         """
-        # constants
-        n_events = ev.shape[0]
 
         # set array's view
         mu = coef.view(self._dt)['mu'][0]
@@ -243,12 +237,12 @@ class PMF(BaseScorePredictor):
         # loss term
         esc = (mu[0] + bu[ev[:, 0]] + bi[ev[:, 1]] +
                np.sum(p[ev[:, 0], :] * q[ev[:, 1], :], axis=1))
-        loss = np.sum((sc - esc) ** 2)
+        loss = np.sum((sc - esc)**2)
 
         # regularization term
         reg = (np.sum(bu**2) + np.sum(bi**2) + np.sum(p**2) + np.sum(q**2))
 
-        return loss / n_events + 0.5 * self._reg * reg
+        return 0.5 * loss + 0.5 * self.C * reg
 
     def grad_loss(self, coef, ev, sc, n_objects):
         """
@@ -270,8 +264,8 @@ class PMF(BaseScorePredictor):
         grad : array_like, shape=coef.shape
             the first gradient of loss function by coef
         """
+
         # constants
-        n_events = ev.shape[0]
         n_users = n_objects[0]
         n_items = n_objects[1]
 
@@ -294,27 +288,24 @@ class PMF(BaseScorePredictor):
         neg_res = -(sc - (mu[0] + bu[ev[:, 0]] + bi[ev[:, 1]] +
                           np.sum(p[ev[:, 0], :] * q[ev[:, 1], :], axis=1)))
         grad_mu[0] = np.sum(neg_res)
-        grad_bu[:] = np.bincount(ev[:, 0], weights=neg_res,
-                                 minlength=n_users)
-        grad_bi[:] = np.bincount(ev[:, 1], weights=neg_res,
-                                 minlength=n_items)
+        grad_bu[:] = np.bincount(
+            ev[:, 0], weights=neg_res, minlength=n_users)
+        grad_bi[:] = np.bincount(
+            ev[:, 1], weights=neg_res, minlength=n_items)
         weights = neg_res[:, np.newaxis] * q[ev[:, 1], :]
         for i in xrange(self.k):
-            grad_p[:, i] = np.bincount(ev[:, 0], weights=weights[:, i],
-                                       minlength=n_users)
+            grad_p[:, i] = np.bincount(
+                ev[:, 0], weights=weights[:, i], minlength=n_users)
         weights = neg_res[:, np.newaxis] * p[ev[:, 0], :]
         for i in xrange(self.k):
-            grad_q[:, i] = np.bincount(ev[:, 1], weights=weights[:, i],
-                                       minlength=n_items)
-
-        # re-scale gradients
-        grad[:] = grad[:] / n_events
+            grad_q[:, i] = np.bincount(
+                ev[:, 1], weights=weights[:, i], minlength=n_items)
 
         # gradient of regularization term
-        grad_bu[:] += self._reg * bu
-        grad_bi[:] += self._reg * bi
-        grad_p[:, :] += self._reg * p
-        grad_q[:, :] += self._reg * q
+        grad_bu[:] += self.C * bu
+        grad_bi[:] += self.C * bi
+        grad_p[:, :] += self.C * p
+        grad_q[:, :] += self.C * q
 
         return grad
 
