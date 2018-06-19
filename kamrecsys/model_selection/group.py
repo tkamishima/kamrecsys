@@ -45,9 +45,9 @@ __all__ = []
 # =============================================================================
 
 
-def generate_interlace_kfold(n_data, n_splits=3):
+def generate_interlace_kfold(n, n_splits=3):
     """
-    Generate interlace group.
+    Generate k-folds by a interlace grouping.
     
     The i-th data is assigned to the (i mod n_splits)-th group.
     This is used with :class:`sklearn.model_selection.PredefinedSplit` .
@@ -57,25 +57,25 @@ def generate_interlace_kfold(n_data, n_splits=3):
     
     Parameters
     ----------
+    n : int
+        the number of data. It must be n `n > n_splits` .
     n_splits : int, default=3
         Number of folds. It must be `n_splits >= 2` .
-    n_data : int
-        the number of data. It must be n_data `n_data > n_splits` .
 
     Returns
     -------
-    group : array, shape=(n_data,)
-        a sequence of indicator-numbers indicating the group assignment
+    test_fold : array, shape=(n,)
+        a sequence of indicator-numbers representing the group assignment
     """
     n_splits = int(n_splits)
     if n_splits < 2:
         ValueError('n_splits must be larger or equal than 2.')
 
-    n_data = int(n_data)
-    if n_data < n_splits:
-        ValueError('n_data must be larger than n_splits.')
+    n = int(n)
+    if n < n_splits:
+        ValueError('n must be larger than n_splits.')
 
-    return np.arange(n_data, dtype=int) % n_splits
+    return np.arange(n, dtype=int) % n_splits
 
 
 # =============================================================================
