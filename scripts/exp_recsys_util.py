@@ -21,7 +21,7 @@ import sys
 import datetime
 
 import numpy as np
-from sklearn.model_selection import LeaveOneGroupOut
+from sklearn.model_selection import PredefinedSplit
 
 from kamrecsys import __version__ as kamrecsys_version
 from kamrecsys.model_selection import interlace_group
@@ -237,13 +237,12 @@ def cv_test(info, load_data, target_fold=None):
     # cross validation
     fold = 0
     esc = np.zeros(n_events, dtype=float)
-    cv = LeaveOneGroupOut()
+    cv = PredefinedSplit(interlace_group(n_events, n_folds))
     info['training']['results'] = {}
     info['test']['results'] = {}
     if target_fold is not None:
         info['test']['mask'] = {}
-    for train_i, test_i in cv.split(
-            ev, groups=interlace_group(n_events, n_folds)):
+    for train_i, test_i in cv.split(ev):
 
         # in a `cvone` mode, non target folds are ignored
         if target_fold is not None and fold != target_fold:
