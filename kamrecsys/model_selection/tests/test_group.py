@@ -29,7 +29,7 @@ from numpy.testing import (
 import numpy as np
 
 from sklearn.model_selection import LeaveOneGroupOut
-from kamrecsys.model_selection import interlace_group
+from kamrecsys.model_selection import generate_interlace_kfold
 
 # =============================================================================
 # Variables
@@ -48,7 +48,7 @@ class TestInterlaceGroup(TestCase):
 
     def test_function(self):
 
-        group = interlace_group(7, 3)
+        group = generate_interlace_kfold(7, 3)
         assert_array_equal(group, [0, 1, 2, 0, 1, 2, 0])
 
         X = np.arange(7, dtype=int).reshape(-1, 1)

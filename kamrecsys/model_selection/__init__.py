@@ -17,7 +17,7 @@ from six.moves import xrange
 
 import logging
 
-from .group import interlace_group
+from .group import generate_interlace_kfold
 
 # =============================================================================
 # Metadata variables
@@ -27,8 +27,7 @@ from .group import interlace_group
 # Public symbols
 # =============================================================================
 
-__all__ = [
-    'interlace_group']
+__all__ = ['generate_interlace_kfold']
 
 # =============================================================================
 # Constants

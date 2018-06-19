@@ -45,12 +45,12 @@ __all__ = []
 # =============================================================================
 
 
-def interlace_group(n_data, n_splits=3):
+def generate_interlace_kfold(n_data, n_splits=3):
     """
     Generate interlace group.
     
     The i-th data is assigned to the (i mod n_splits)-th group.
-    This is used with :class:`sklearn.model_selection.LeaveOneGroupOut` .
+    This is used with :class:`sklearn.model_selection.PredefinedSplit` .
     In a case of a standard k-fold cross validation, subsequent data are tend
     to be grouped into the same fold.  However, this is inconvenient, if
     subsequent data are highly correlated.

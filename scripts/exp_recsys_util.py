@@ -24,7 +24,7 @@ import numpy as np
 from sklearn.model_selection import PredefinedSplit
 
 from kamrecsys import __version__ as kamrecsys_version
-from kamrecsys.model_selection import interlace_group
+from kamrecsys.model_selection import generate_interlace_kfold
 from kamrecsys.utils import get_system_info, get_version_info, json_decodable
 
 # =============================================================================
@@ -237,7 +237,7 @@ def cv_test(info, load_data, target_fold=None):
     # cross validation
     fold = 0
     esc = np.zeros(n_events, dtype=float)
-    cv = PredefinedSplit(interlace_group(n_events, n_folds))
+    cv = PredefinedSplit(generate_interlace_kfold(n_events, n_folds))
     info['training']['results'] = {}
     info['test']['results'] = {}
     if target_fold is not None:
