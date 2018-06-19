@@ -69,11 +69,11 @@ def generate_interlace_kfold(n, n_splits=3):
     """
     n_splits = int(n_splits)
     if n_splits < 2:
-        ValueError('n_splits must be larger or equal than 2.')
+        raise ValueError('n_splits must be larger or equal than 2.')
 
     n = int(n)
     if n < n_splits:
-        ValueError('n must be larger than n_splits.')
+        raise ValueError('n must be larger than n_splits.')
 
     return np.arange(n, dtype=int) % n_splits
 

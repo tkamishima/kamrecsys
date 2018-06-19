@@ -28,8 +28,6 @@ from numpy.testing import (
     assert_string_equal)
 import numpy as np
 
-from sklearn.model_selection import PredefinedSplit
-
 # =============================================================================
 # Variables
 # =============================================================================
@@ -44,27 +42,19 @@ from sklearn.model_selection import PredefinedSplit
 
 
 def test_generate_interlace_kfold():
+
     from kamrecsys.model_selection import generate_interlace_kfold
 
+    # error handling
+    with assert_raises(ValueError):
+        generate_interlace_kfold(1, 1)
+
+    with assert_raises(ValueError):
+        generate_interlace_kfold(1, 2)
+
+    # check function
     group = generate_interlace_kfold(7, 3)
     assert_array_equal(group, [0, 1, 2, 0, 1, 2, 0])
-
-    X = np.arange(7, dtype=int).reshape(-1, 1)
-
-    cv = PredefinedSplit(group)
-    cv_iter = cv.split(X)
-
-    train_X, test_X = next(cv_iter)
-    assert_array_equal(train_X, [1, 2, 4, 5])
-    assert_array_equal(test_X, [0, 3, 6])
-
-    train_X, test_X = next(cv_iter)
-    assert_array_equal(train_X, [0, 2, 3, 5, 6])
-    assert_array_equal(test_X, [1, 4])
-
-    train_X, test_X = next(cv_iter)
-    assert_array_equal(train_X, [0, 1, 3, 4, 6])
-    assert_array_equal(test_X, [2, 5])
 
 
 # =============================================================================
