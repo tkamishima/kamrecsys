@@ -21,6 +21,7 @@ from six.moves import xrange
 import logging
 
 import numpy as np
+from sklearn.model_selection import KFold
 
 # =============================================================================
 # Metadata variables
@@ -45,37 +46,103 @@ __all__ = []
 # =============================================================================
 
 
-def generate_interlace_kfold(n, n_splits=3):
+def generate_pergroup_kfold(
+        n_samples, groups=None, n_splits=3, shuffle=False, random_state=None):
     """
-    Generate k-folds by a interlace grouping.
-    
-    The i-th data is assigned to the (i mod n_splits)-th group.
+    Generate per Groups K-fold split
+
+    Data are first divided into groups specified by `groups` . Then, each group
+    is further divided into K-folds.  The elements having the same fold number
+    are assigned to the same fold.
     This is used with :class:`sklearn.model_selection.PredefinedSplit` .
-    In a case of a standard k-fold cross validation, subsequent data are tend
-    to be grouped into the same fold.  However, this is inconvenient, if
-    subsequent data are highly correlated.
-    
+
     Parameters
     ----------
-    n : int
-        the number of data. It must be n `n > n_splits` .
+    n_samples : int
+        Total number of elements.
+    groups : array, dtype=int, shape=(n,)
+        the specification of group. If `None` , an entire data is treated as
+        one group.
     n_splits : int, default=3
-        Number of folds. It must be `n_splits >= 2` .
+        Number of folds. Must be at least 2.
+    shuffle : boolean, optional
+        Whether to shuffle the data before splitting into batches.
+    random_state : int, RandomState instance or None, optional, default=None
+        If int, random_state is the seed used by the random number generator;
+        If RandomState instance, random_state is the random number generator;
+        If None, the random number generator is the RandomState instance used
+        by `np.random`. Used when ``shuffle`` == True.
 
     Returns
     -------
     test_fold : array, shape=(n,)
         a sequence of indicator-numbers representing the group assignment
     """
+
+    # error handling
+    if n_splits < 2:
+        raise ValueError('n_splits must be larger or equal than 2.')
+
+    if groups is None:
+        groups = np.zeros(n_samples, dtype=int)
+    else:
+        groups = np.asanyarray(groups, dtype=int)
+        if n_samples != groups.shape[0]:
+            raise ValueError(
+                'Inconsistent size of groups and total number of elements.')
+
+    # generate test_fold
+    cv = KFold(n_splits, shuffle, random_state)
+    test_fold = np.empty(n_samples, dtype=int)
+    test_fold[:] = 5
+    for g in np.unique(groups):
+        fold = 0
+        g_index = np.arange(n_samples, dtype=int)[groups == g]
+
+        if g_index.shape[0] < n_splits:
+            raise ValueError(
+                'the size of each group must be larger than n_splits')
+
+        for train_i, test_i in cv.split(g_index):
+            test_fold[g_index[test_i]] = fold
+            fold += 1
+
+    return test_fold
+
+
+def generate_interlace_kfold(n_samples, n_splits=3):
+    """
+    Generate k-folds by a interlace grouping.
+    
+    The i-th data is assigned to the (i mod n_splits)-th group.
+    This is used with :class:`sklearn.model_selection.PredefinedSplit` .
+
+    In a case of a standard k-fold cross validation, subsequent data are tend
+    to be grouped into the same fold.  However, this is inconvenient, if
+    subsequent data are highly correlated.  This method is useful in such a
+    situation.
+    
+    Parameters
+    ----------
+    n_samples : int
+        the number of data. It must be n `n > n_splits` .
+    n_splits : int, default=3
+        Number of folds. It must be `n_splits >= 2` .
+
+    Returns
+    -------
+    test_fold : array, shape=(n_samples,)
+        a sequence of indicator-numbers representing the group assignment
+    """
     n_splits = int(n_splits)
     if n_splits < 2:
         raise ValueError('n_splits must be larger or equal than 2.')
 
-    n = int(n)
-    if n < n_splits:
-        raise ValueError('n must be larger than n_splits.')
+    n_samples = int(n_samples)
+    if n_samples < n_splits:
+        raise ValueError('n_samples must be larger than n_splits.')
 
-    return np.arange(n, dtype=int) % n_splits
+    return np.arange(n_samples, dtype=int) % n_splits
 
 
 # =============================================================================

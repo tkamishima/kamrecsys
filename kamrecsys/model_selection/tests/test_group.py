@@ -41,6 +41,42 @@ import numpy as np
 # =============================================================================
 
 
+def test_pergroup_kfold():
+
+    from kamrecsys.model_selection import generate_pergroup_kfold
+
+    group = np.array([1, 0, 1, 1, 3, 1, 3, 0, 3, 3, 0, 1, 3])
+
+    # error handling
+    with assert_raises(ValueError):
+        generate_pergroup_kfold(10, None, 1)
+
+    with assert_raises(ValueError):
+        generate_pergroup_kfold(10, np.zeros(9), 3)
+
+    with assert_raises(ValueError):
+        generate_pergroup_kfold(13, group, 4)
+
+    # function
+    # test_fold = generate_pergroup_kfold(13, group, 3)
+    # assert_array_equal(
+    #     test_fold, [0, 0, 0, 1, 0, 1, 0, 1, 1, 1, 2, 2, 2])
+    #
+    # test_fold = generate_pergroup_kfold(13, None, 5)
+    # assert_array_equal(
+    #     test_fold, [0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 4, 4])
+
+    test_fold = generate_pergroup_kfold(
+        13, group, 3, shuffle=True, random_state=1234)
+    assert_array_equal(
+        test_fold, [0, 0, 1, 1, 0, 2, 1, 1, 1, 2, 2, 0, 0])
+
+    test_fold = generate_pergroup_kfold(
+        13, None, 5, shuffle=True, random_state=1234)
+    assert_array_equal(
+        test_fold, [0, 2, 1, 4, 3, 3, 4, 2, 2, 1, 0, 1, 0])
+
+
 def test_generate_interlace_kfold():
 
     from kamrecsys.model_selection import generate_interlace_kfold
