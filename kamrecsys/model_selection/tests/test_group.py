@@ -41,6 +41,70 @@ import numpy as np
 # =============================================================================
 
 
+def test_ShuffleSplitWithinGroups():
+
+    from kamrecsys.model_selection import ShuffleSplitWithinGroups
+
+    groups = np.array([1, 0, 1, 1, 3, 1, 3, 0, 3, 3, 0, 1, 3])
+
+    # error handling
+    with assert_raises(ValueError):
+        cv = ShuffleSplitWithinGroups(n_splits=3)
+        cv.split(np.arange(10), groups=groups).next()
+
+    with assert_raises(ValueError):
+        cv = ShuffleSplitWithinGroups(n_splits=1, test_size=3)
+        cv.split(np.arange(13), groups=groups).next()
+
+    # function
+    cv = ShuffleSplitWithinGroups(n_splits=1, random_state=1234)
+    train_i, test_i = cv.split(
+        np.arange(20), groups=np.r_[np.zeros(10), np.ones(10)]).next()
+    assert_array_equal(
+        train_i,
+        [0, 1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 13, 14, 15, 16, 18, 19])
+    assert_array_equal(test_i, [7, 17])
+
+    cv = ShuffleSplitWithinGroups(n_splits=1, test_size=0.3, random_state=1234)
+    train_i, test_i = cv.split(
+        np.arange(20), groups=np.r_[np.zeros(10), np.ones(10)]).next()
+    assert_array_equal(
+        train_i, [0, 1, 3, 4, 5, 6, 8, 10, 11, 12, 14, 16, 18, 19])
+    assert_array_equal(test_i, [2, 7, 9, 13, 15, 17])
+
+    cv = ShuffleSplitWithinGroups(n_splits=1, test_size=2, random_state=1234)
+    train_i, test_i = cv.split(
+        np.arange(20), groups=np.r_[np.zeros(10), np.ones(10)]).next()
+    assert_array_equal(
+        train_i, [0, 1, 3, 4, 5, 6, 8, 9, 10, 11, 12, 14, 15, 16, 18, 19])
+    assert_array_equal(test_i, [2, 7, 13, 17])
+
+    cv = ShuffleSplitWithinGroups(
+        n_splits=1, test_size=None, train_size=4, random_state=1234)
+    train_i, test_i = cv.split(
+        np.arange(20), groups=np.r_[np.zeros(10), np.ones(10)]).next()
+    assert_array_equal(train_i, [3, 4, 5, 6, 10, 12, 16, 19])
+    assert_array_equal(test_i, [0, 1, 2, 7, 8, 9, 11, 13, 14, 15, 17, 18])
+
+    cv = ShuffleSplitWithinGroups(
+        n_splits=1, test_size=None, train_size=0.6, random_state=1234)
+    train_i, test_i = cv.split(
+        np.arange(20), groups=np.r_[np.zeros(10), np.ones(10)]).next()
+    assert_array_equal(train_i, [0, 3, 4, 5, 6, 8, 10, 12, 14, 16, 18, 19])
+    assert_array_equal(test_i, [1, 2, 7, 9, 11, 13, 15, 17])
+
+    cv = ShuffleSplitWithinGroups(n_splits=2, test_size=0.3, random_state=1234)
+    iter = cv.split(np.arange(13), groups=groups)
+    train_i, test_i = iter.next()
+    assert_array_equal(train_i, [0, 5, 6, 7, 9, 10, 11, 12])
+    assert_array_equal(test_i, [1, 2, 3, 4, 8])
+    train_i, test_i = iter.next()
+    assert_array_equal(train_i, [0, 3, 4, 7, 8, 9, 10, 11])
+    assert_array_equal(test_i, [1, 2, 5, 6, 12])
+    with assert_raises(StopIteration):
+        iter.next()
+
+
 def test_GroupWiseKfold():
 
     from kamrecsys.model_selection import KFoldWithinGroups

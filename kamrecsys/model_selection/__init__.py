@@ -18,6 +18,7 @@ from six.moves import xrange
 import logging
 
 from .group import (
+    ShuffleSplitWithinGroups,
     KFoldWithinGroups,
     InterlacedKFold)
 
@@ -30,6 +31,7 @@ from .group import (
 # =============================================================================
 
 __all__ = [
+    'ShuffleSplitWithinGroups',
     'KFoldWithinGroups',
     'InterlacedKFold',]
 
