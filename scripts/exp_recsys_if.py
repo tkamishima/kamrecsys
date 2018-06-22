@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Experimentation script for Item Finders with Explicit Ratings
+Experimentation script for Item Finders
 
 Input Format
 ------------
