@@ -297,6 +297,9 @@ def do_task(info, load_data, target_fold=None):
     # suppress warnings in numerical computation
     np.seterr(all='ignore')
 
+    # initialize random seed
+    np.random.seed(info['model']['options']['random_state'])
+
     # update information dictionary
     rec = info['model']['recommender']
     info['model']['task_type'] = rec.task_type
