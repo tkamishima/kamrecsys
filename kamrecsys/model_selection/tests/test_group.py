@@ -41,56 +41,150 @@ import numpy as np
 # =============================================================================
 
 
-def test_pergroup_kfold():
+def test_ShuffleSplitWithinGroups():
 
-    from kamrecsys.model_selection import generate_pergroup_kfold
+    from kamrecsys.model_selection import ShuffleSplitWithinGroups
 
-    group = np.array([1, 0, 1, 1, 3, 1, 3, 0, 3, 3, 0, 1, 3])
+    groups = np.array([1, 0, 1, 1, 3, 1, 3, 0, 3, 3, 0, 1, 3])
 
     # error handling
     with assert_raises(ValueError):
-        generate_pergroup_kfold(10, None, 1)
+        cv = ShuffleSplitWithinGroups(n_splits=3)
+        cv.split(np.arange(10), groups=groups).next()
 
     with assert_raises(ValueError):
-        generate_pergroup_kfold(10, np.zeros(9), 3)
-
-    with assert_raises(ValueError):
-        generate_pergroup_kfold(13, group, 4)
+        cv = ShuffleSplitWithinGroups(n_splits=1, test_size=3)
+        cv.split(np.arange(13), groups=groups).next()
 
     # function
-    # test_fold = generate_pergroup_kfold(13, group, 3)
-    # assert_array_equal(
-    #     test_fold, [0, 0, 0, 1, 0, 1, 0, 1, 1, 1, 2, 2, 2])
-    #
-    # test_fold = generate_pergroup_kfold(13, None, 5)
-    # assert_array_equal(
-    #     test_fold, [0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 4, 4])
-
-    test_fold = generate_pergroup_kfold(
-        13, group, 3, shuffle=True, random_state=1234)
+    cv = ShuffleSplitWithinGroups(n_splits=1, random_state=1234)
+    train_i, test_i = cv.split(
+        np.arange(20), groups=np.r_[np.zeros(10), np.ones(10)]).next()
     assert_array_equal(
-        test_fold, [0, 0, 1, 1, 0, 2, 1, 1, 1, 2, 2, 0, 0])
+        train_i,
+        [0, 1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 13, 14, 15, 16, 18, 19])
+    assert_array_equal(test_i, [7, 17])
 
-    test_fold = generate_pergroup_kfold(
-        13, None, 5, shuffle=True, random_state=1234)
+    cv = ShuffleSplitWithinGroups(n_splits=1, test_size=0.3, random_state=1234)
+    train_i, test_i = cv.split(
+        np.arange(20), groups=np.r_[np.zeros(10), np.ones(10)]).next()
+    assert_array_equal(
+        train_i, [0, 1, 3, 4, 5, 6, 8, 10, 11, 12, 14, 16, 18, 19])
+    assert_array_equal(test_i, [2, 7, 9, 13, 15, 17])
+
+    cv = ShuffleSplitWithinGroups(n_splits=1, test_size=2, random_state=1234)
+    train_i, test_i = cv.split(
+        np.arange(20), groups=np.r_[np.zeros(10), np.ones(10)]).next()
+    assert_array_equal(
+        train_i, [0, 1, 3, 4, 5, 6, 8, 9, 10, 11, 12, 14, 15, 16, 18, 19])
+    assert_array_equal(test_i, [2, 7, 13, 17])
+
+    cv = ShuffleSplitWithinGroups(
+        n_splits=1, test_size=None, train_size=4, random_state=1234)
+    train_i, test_i = cv.split(
+        np.arange(20), groups=np.r_[np.zeros(10), np.ones(10)]).next()
+    assert_array_equal(train_i, [3, 4, 5, 6, 10, 12, 16, 19])
+    assert_array_equal(test_i, [0, 1, 2, 7, 8, 9, 11, 13, 14, 15, 17, 18])
+
+    cv = ShuffleSplitWithinGroups(
+        n_splits=1, test_size=None, train_size=0.6, random_state=1234)
+    train_i, test_i = cv.split(
+        np.arange(20), groups=np.r_[np.zeros(10), np.ones(10)]).next()
+    assert_array_equal(train_i, [0, 3, 4, 5, 6, 8, 10, 12, 14, 16, 18, 19])
+    assert_array_equal(test_i, [1, 2, 7, 9, 11, 13, 15, 17])
+
+    cv = ShuffleSplitWithinGroups(n_splits=2, test_size=0.3, random_state=1234)
+    iter = cv.split(np.arange(13), groups=groups)
+    train_i, test_i = iter.next()
+    assert_array_equal(train_i, [0, 5, 6, 7, 9, 10, 11, 12])
+    assert_array_equal(test_i, [1, 2, 3, 4, 8])
+    train_i, test_i = iter.next()
+    assert_array_equal(train_i, [0, 3, 4, 7, 8, 9, 10, 11])
+    assert_array_equal(test_i, [1, 2, 5, 6, 12])
+    with assert_raises(StopIteration):
+        iter.next()
+
+
+def test_GroupWiseKfold():
+
+    from kamrecsys.model_selection import KFoldWithinGroups
+
+    groups = np.array([1, 0, 1, 1, 3, 1, 3, 0, 3, 3, 0, 1, 3])
+
+    # error handling
+    with assert_raises(ValueError):
+        KFoldWithinGroups(n_splits=1)
+
+    with assert_raises(ValueError):
+        cv = KFoldWithinGroups(n_splits=3)
+        cv.split(np.arange(10), groups=np.zeros(9)).next()
+
+    with assert_raises(ValueError):
+        cv = KFoldWithinGroups(n_splits=4)
+        cv.split(np.arange(13), groups=groups).next()
+
+    # function
+    test_fold = np.zeros(13, dtype=np.int)
+    cv = KFoldWithinGroups(3)
+    for i, g in enumerate(cv.split(np.arange(13), groups=groups)):
+        test_fold[g[1]] = i
+    assert_array_equal(
+        test_fold, [0, 0, 0, 1, 0, 1, 0, 1, 1, 1, 2, 2, 2])
+
+    test_fold = np.zeros(13, dtype=np.int)
+    cv = KFoldWithinGroups(5)
+    for i, g in enumerate(cv.split(np.arange(13), groups=None)):
+        test_fold[g[1]] = i
+    assert_array_equal(
+        test_fold, [0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 4, 4])
+
+    test_fold = np.zeros(13, dtype=np.int)
+    cv = KFoldWithinGroups(3, shuffle=True, random_state=1234)
+    for i, g in enumerate(cv.split(np.arange(13), groups=groups)):
+        test_fold[g[1]] = i
+    assert_array_equal(
+        test_fold, [1, 0, 0, 0, 0, 1, 2, 1, 0, 1, 2, 2, 1])
+
+    test_fold = np.zeros(13, dtype=np.int)
+    cv = KFoldWithinGroups(5, shuffle=True, random_state=1234)
+    for i, g in enumerate(cv.split(np.arange(13), groups=None)):
+        test_fold[g[1]] = i
     assert_array_equal(
         test_fold, [0, 2, 1, 4, 3, 3, 4, 2, 2, 1, 0, 1, 0])
 
 
-def test_generate_interlace_kfold():
+def test_InterlacedKFold():
 
-    from kamrecsys.model_selection import generate_interlace_kfold
-
-    # error handling
-    with assert_raises(ValueError):
-        generate_interlace_kfold(1, 1)
+    from kamrecsys.model_selection import InterlacedKFold
 
     with assert_raises(ValueError):
-        generate_interlace_kfold(1, 2)
+        InterlacedKFold(n_splits=1)
 
-    # check function
-    group = generate_interlace_kfold(7, 3)
-    assert_array_equal(group, [0, 1, 2, 0, 1, 2, 0])
+    with assert_raises(ValueError):
+        cv = InterlacedKFold(n_splits=2)
+        cv.split(np.zeros(1))
+
+    with assert_raises(ValueError):
+        cv = InterlacedKFold(n_splits=2)
+        cv.split(np.zeros(3), np.zeros(2))
+
+    test_fold = np.empty(7, dtype=int)
+    cv = InterlacedKFold(n_splits=3)
+    iter = cv.split(np.zeros(7))
+    train_i, test_i = iter.next()
+    assert_array_equal(train_i, [1, 2, 4, 5])
+    assert_array_equal(test_i, [0, 3, 6])
+    test_fold[test_i] = 0
+    train_i, test_i = iter.next()
+    test_fold[test_i] = 1
+    train_i, test_i = iter.next()
+    test_fold[test_i] = 2
+    assert_array_equal(test_fold, [0, 1, 2, 0, 1, 2, 0])
+    with assert_raises(StopIteration):
+        iter.next()
+
+    cv = InterlacedKFold(n_splits=3)
+    assert_equal(cv.get_n_splits(), 3)
 
 
 # =============================================================================

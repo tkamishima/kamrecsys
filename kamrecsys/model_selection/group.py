@@ -21,7 +21,10 @@ from six.moves import xrange
 import logging
 
 import numpy as np
-from sklearn.model_selection import KFold
+from sklearn.utils import indexable, check_random_state
+from sklearn.model_selection import (
+    BaseCrossValidator, PredefinedSplit, ShuffleSplit, KFold)
+from sklearn.model_selection._split import _validate_shuffle_split_init
 
 # =============================================================================
 # Metadata variables
@@ -46,15 +49,138 @@ __all__ = []
 # =============================================================================
 
 
-def generate_pergroup_kfold(
-        n_samples, groups=None, n_splits=3, shuffle=False, random_state=None):
+# =============================================================================
+# Classes
+# =============================================================================
+
+
+class ShuffleSplitWithinGroups(BaseCrossValidator):
     """
-    Generate per Groups K-fold split
+    Generate random splits within each group
+
+    Data are first divided into groups specified by `groups` . Then, for each
+    group, data are split into training ant test sets at random.  The way of
+    splitting data is the same as the
+    :class:`sklearn.model_selection.ShuffleSplit`
+
+    Parameters
+    ----------
+    n_splits : int, default 10
+        Number of re-shuffling & splitting iterations.
+
+    test_size : float, int, None, default=0.1
+        See the specification of :class:`sklearn.model_selection.ShuffleSplit`
+
+    train_size : float, int, or None, default=None
+        See the specification of :class:`sklearn.model_selection.ShuffleSplit`
+
+    random_state : int, RandomState instance or None, optional (default=None)
+        See the specification of :class:`sklearn.model_selection.ShuffleSplit`
+    """
+
+    def __init__(self, n_splits=10, test_size="default", train_size=None,
+            random_state=None):
+
+        super(ShuffleSplitWithinGroups, self).__init__()
+
+        _validate_shuffle_split_init(test_size, train_size)
+        self.n_splits = int(n_splits)
+        self.test_size = test_size
+        self.train_size = train_size
+        self.random_state = random_state
+
+    def split(self, X, y=None, groups=None):
+        """
+        Generate indices to split data into training and test set.
+
+        Parameters
+        ----------
+        X : array-like, shape (n_samples, n_features)
+            Training data, where n_samples is the number of samples
+            and n_features is the number of features.
+
+        y : array-like, shape (n_samples,)
+            The target variable for supervised learning problems.
+
+        groups : array-like, with shape (n_samples,), optional
+            Group labels for the samples used while splitting the dataset into
+            train/test set.
+
+        Yields
+        ------
+        train : ndarray
+            The training set indices for that split.
+
+        test : ndarray
+            The testing set indices for that split.
+        """
+
+        # check arguments
+        X, y, groups = indexable(X, y, groups)
+
+        for train, test in super(
+                ShuffleSplitWithinGroups, self).split(X, y, groups):
+            yield train, test
+
+    def _iter_test_masks(self, X, y=None, groups=None):
+        # yields mask array for test splits
+        n_samples = X.shape[0]
+
+        # if groups is not specified, an entire data is specified as one group
+        if groups is None:
+            groups = np.zeros(n_samples, dtype=int)
+
+        # constants
+        indices = np.arange(n_samples)
+        test_fold = np.empty(n_samples, dtype=bool)
+        rng = check_random_state(self.random_state)
+        group_indices = np.unique(groups)
+        iters = np.empty(group_indices.shape[0], dtype=object)
+
+        # generate iterators
+        cv = ShuffleSplit(self.n_splits, self.test_size, self.train_size, rng)
+        for i, g in enumerate(group_indices):
+            group_member = indices[groups == g]
+            iters[i] = cv.split(group_member)
+
+        # generate training and test splits
+        for fold in xrange(self.n_splits):
+            test_fold[:] = False
+            for i, g in enumerate(group_indices):
+                group_train_i, group_test_i = iters[i].next()
+                test_fold[indices[groups == g][group_test_i]] = True
+            yield test_fold
+
+    def get_n_splits(self, X=None, y=None, groups=None):
+        """Returns the number of splitting iterations in the cross-validator
+
+        Parameters
+        ----------
+        X : object
+            Always ignored, exists for compatibility.
+
+        y : object
+            Always ignored, exists for compatibility.
+
+        groups : object
+            Always ignored, exists for compatibility.
+
+        Returns
+        -------
+        n_splits : int
+            Returns the number of splitting iterations in the cross-validator.
+        """
+        return self.n_splits
+
+
+class KFoldWithinGroups(BaseCrossValidator):
+    """
+    Generate K-fold splits within each group
 
     Data are first divided into groups specified by `groups` . Then, each group
     is further divided into K-folds.  The elements having the same fold number
-    are assigned to the same fold.
-    This is used with :class:`sklearn.model_selection.PredefinedSplit` .
+    are assigned to the same fold.    The way of splitting data is the same as
+    the :class:`sklearn.model_selection.ShuffleSplit`
 
     Parameters
     ----------
@@ -72,82 +198,204 @@ def generate_pergroup_kfold(
         If RandomState instance, random_state is the random number generator;
         If None, the random number generator is the RandomState instance used
         by `np.random`. Used when ``shuffle`` == True.
-
-    Returns
-    -------
-    test_fold : array, shape=(n,)
-        a sequence of indicator-numbers representing the group assignment
     """
 
-    # error handling
-    if n_splits < 2:
-        raise ValueError('n_splits must be larger or equal than 2.')
+    def __init__(self, n_splits=3, shuffle=False, random_state=None):
 
-    if groups is None:
-        groups = np.zeros(n_samples, dtype=int)
-    else:
-        groups = np.asanyarray(groups, dtype=int)
-        if n_samples != groups.shape[0]:
+        super(KFoldWithinGroups, self).__init__()
+
+        n_splits = int(n_splits)
+
+        if n_splits <= 1:
             raise ValueError(
-                'Inconsistent size of groups and total number of elements.')
+                "k-fold cross-validation requires at least one"
+                " train/test split by setting n_splits=2 or more,"
+                " got n_splits={0}.".format(n_splits))
 
-    # generate test_fold
-    cv = KFold(n_splits, shuffle, random_state)
-    test_fold = np.empty(n_samples, dtype=int)
-    test_fold[:] = 5
-    for g in np.unique(groups):
-        fold = 0
-        g_index = np.arange(n_samples, dtype=int)[groups == g]
+        self.n_splits = n_splits
+        self.shuffle = shuffle
+        self.random_state = random_state
 
-        if g_index.shape[0] < n_splits:
+    def split(self, X, y=None, groups=None):
+        """
+        Generate indices to split data into training and test set.
+
+        Parameters
+        ----------
+        X : array-like, shape (n_samples, n_features)
+            Training data, where n_samples is the number of samples
+            and n_features is the number of features.
+
+        y : array-like, shape (n_samples,)
+            The target variable for supervised learning problems.
+
+        groups : array-like, with shape (n_samples,), optional
+            Group labels for the samples used while splitting the dataset into
+            train/test set.
+
+        Yields
+        ------
+        train : ndarray
+            The training set indices for that split.
+
+        test : ndarray
+            The testing set indices for that split.
+        """
+
+        # check arguments
+        X, y, groups = indexable(X, y, groups)
+
+        # get the number of samples
+        n_samples = X.shape[0]
+        if self.n_splits > n_samples:
             raise ValueError(
-                'the size of each group must be larger than n_splits')
+                ("Cannot have number of splits n_splits={0} greater"
+                 " than the number of samples: n_samples={1}."
+                 ).format(self.n_splits, n_samples))
 
-        for train_i, test_i in cv.split(g_index):
-            test_fold[g_index[test_i]] = fold
-            fold += 1
+        for train, test in super(KFoldWithinGroups, self).split(X, y, groups):
+            yield train, test
 
-    return test_fold
+    def _iter_test_masks(self, X, y=None, groups=None):
+        # yields mask array for test splits
+        n_samples = X.shape[0]
+
+        # if groups is not specified, an entire data is specified as one group
+        if groups is None:
+            groups = np.zeros(n_samples, dtype=int)
+
+        # constants
+        indices = np.arange(n_samples)
+        test_fold = np.empty(n_samples, dtype=bool)
+        rng = check_random_state(self.random_state)
+        group_indices = np.unique(groups)
+        iters = np.empty(group_indices.shape[0], dtype=object)
+
+        # generate iterators
+        cv = KFold(self.n_splits, self.shuffle, rng)
+        for i, g in enumerate(group_indices):
+            group_member = indices[groups == g]
+            iters[i] = cv.split(group_member)
+
+        # generate training and test splits
+        for fold in xrange(self.n_splits):
+            test_fold[:] = False
+            for i, g in enumerate(group_indices):
+                group_train_i, group_test_i = iters[i].next()
+                test_fold[indices[groups == g][group_test_i]] = True
+            yield test_fold
+
+    def get_n_splits(self, X=None, y=None, groups=None):
+        """Returns the number of splitting iterations in the cross-validator
+
+        Parameters
+        ----------
+        X : object
+            Always ignored, exists for compatibility.
+
+        y : object
+            Always ignored, exists for compatibility.
+
+        groups : object
+            Always ignored, exists for compatibility.
+
+        Returns
+        -------
+        n_splits : int
+            Returns the number of splitting iterations in the cross-validator.
+        """
+        return self.n_splits
 
 
-def generate_interlace_kfold(n_samples, n_splits=3):
+class InterlacedKFold(BaseCrossValidator):
     """
-    Generate k-folds by a interlace grouping.
-    
+    k-folds by a interlaced grouping.
+
     The i-th data is assigned to the (i mod n_splits)-th group.
-    This is used with :class:`sklearn.model_selection.PredefinedSplit` .
 
-    In a case of a standard k-fold cross validation, subsequent data are tend
-    to be grouped into the same fold.  However, this is inconvenient, if
-    subsequent data are highly correlated.  This method is useful in such a
-    situation.
-    
+    Subsequent data are are grouped into the same fold in a case of a standard
+    k-fold cross validation, but this is inconvenient if subsequent data are
+    highly correlated.  This class is useful in such a situation.
+
     Parameters
     ----------
-    n_samples : int
-        the number of data. It must be n `n > n_splits` .
     n_splits : int, default=3
         Number of folds. It must be `n_splits >= 2` .
-
-    Returns
-    -------
-    test_fold : array, shape=(n_samples,)
-        a sequence of indicator-numbers representing the group assignment
     """
-    n_splits = int(n_splits)
-    if n_splits < 2:
-        raise ValueError('n_splits must be larger or equal than 2.')
 
-    n_samples = int(n_samples)
-    if n_samples < n_splits:
-        raise ValueError('n_samples must be larger than n_splits.')
+    def __init__(self, n_splits=3):
 
-    return np.arange(n_samples, dtype=int) % n_splits
+        super(InterlacedKFold, self).__init__()
 
+        n_splits = int(n_splits)
 
-# =============================================================================
-# Classes
-# =============================================================================
+        if n_splits <= 1:
+            raise ValueError(
+                "k-fold cross-validation requires at least one"
+                " train/test split by setting n_splits=2 or more,"
+                " got n_splits={0}.".format(n_splits))
+
+        self.n_splits = n_splits
+
+    def split(self, X, y=None, groups=None):
+        """Generate indices to split data into training and test set.
+
+        Parameters
+        ----------
+        X : array-like, shape (n_samples, n_features)
+            Training data, where n_samples is the number of samples
+            and n_features is the number of features.
+
+        y : array-like, shape (n_samples,)
+            The target variable for supervised learning problems.
+
+        groups : array-like, with shape (n_samples,), optional
+            Group labels for the samples used while splitting the dataset into
+            train/test set.
+
+        Yields
+        ------
+        train : ndarray
+            The training set indices for that split.
+
+        test : ndarray
+            The testing set indices for that split.
+        """
+        X, y, groups = indexable(X, y, groups)
+        n_samples = X.shape[0]
+        if self.n_splits > n_samples:
+            raise ValueError(
+                ("Cannot have number of splits n_splits={0} greater"
+                 " than the number of samples: n_samples={1}."
+                 ).format(self.n_splits, n_samples))
+
+        # generate test fold
+        test_fold = np.arange(n_samples, dtype=int) % self.n_splits
+        cv = PredefinedSplit(test_fold)
+
+        return(cv.split())
+
+    def get_n_splits(self, X=None, y=None, groups=None):
+        """Returns the number of splitting iterations in the cross-validator
+
+        Parameters
+        ----------
+        X : object
+            Always ignored, exists for compatibility.
+
+        y : object
+            Always ignored, exists for compatibility.
+
+        groups : object
+            Always ignored, exists for compatibility.
+
+        Returns
+        -------
+        n_splits : int
+            Returns the number of splitting iterations in the cross-validator.
+        """
+        return self.n_splits
+
 
 # =============================================================================
 # Module initialization
