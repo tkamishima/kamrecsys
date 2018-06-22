@@ -24,7 +24,7 @@ import numpy as np
 from sklearn.model_selection import PredefinedSplit
 
 from kamrecsys import __version__ as kamrecsys_version
-from kamrecsys.model_selection import interlace_group
+from kamrecsys.model_selection import ShuffleSplitWithinGroups
 from kamrecsys.utils import get_system_info, get_version_info, json_decodable
 
 # =============================================================================
@@ -237,13 +237,14 @@ def cv_test(info, load_data, target_fold=None):
     # cross validation
     fold = 0
     esc = np.zeros(n_events, dtype=float)
-    cv = PredefinedSplit(interlace_group(n_events, n_folds))
     info['training']['results'] = {}
     info['test']['results'] = {}
     if target_fold is not None:
         info['test']['mask'] = {}
-    for train_i, test_i in cv.split(ev):
 
+    # 20% of ratings per user is used for test
+    cv = ShuffleSplitWithinGroups(n_splits=n_folds, test_size=0.2)
+    for train_i, test_i in cv.split(ev, groups=ev[:, 0]):
         # in a `cvone` mode, non target folds are ignored
         if target_fold is not None and fold != target_fold:
             fold += 1
@@ -295,6 +296,9 @@ def do_task(info, load_data, target_fold=None):
 
     # suppress warnings in numerical computation
     np.seterr(all='ignore')
+
+    # initialize random seed
+    np.random.seed(info['model']['options']['random_state'])
 
     # update information dictionary
     rec = info['model']['recommender']

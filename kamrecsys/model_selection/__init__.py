@@ -17,7 +17,10 @@ from six.moves import xrange
 
 import logging
 
-from .group import interlace_group
+from .group import (
+    ShuffleSplitWithinGroups,
+    KFoldWithinGroups,
+    InterlacedKFold)
 
 # =============================================================================
 # Metadata variables
@@ -28,7 +31,9 @@ from .group import interlace_group
 # =============================================================================
 
 __all__ = [
-    'interlace_group']
+    'ShuffleSplitWithinGroups',
+    'KFoldWithinGroups',
+    'InterlacedKFold',]
 
 # =============================================================================
 # Constants
