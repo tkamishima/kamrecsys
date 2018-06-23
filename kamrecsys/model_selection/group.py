@@ -23,7 +23,7 @@ import logging
 import numpy as np
 from sklearn.utils import indexable, check_random_state
 from sklearn.model_selection import (
-    BaseCrossValidator, PredefinedSplit, ShuffleSplit, KFold)
+    BaseCrossValidator, PredefinedSplit, train_test_split, KFold)
 from sklearn.model_selection._split import _validate_shuffle_split_init
 
 # =============================================================================
@@ -74,12 +74,15 @@ class ShuffleSplitWithinGroups(BaseCrossValidator):
     train_size : float, int, or None, default=None
         See the specification of :class:`sklearn.model_selection.ShuffleSplit`
 
+    shuffle : boolean, optional
+        Whether to shuffle the data before splitting into batches.
+
     random_state : int, RandomState instance or None, optional (default=None)
         See the specification of :class:`sklearn.model_selection.ShuffleSplit`
     """
 
-    def __init__(self, n_splits=10, test_size="default", train_size=None,
-            random_state=None):
+    def __init__(self, n_splits=10, test_size=0.1, train_size=None,
+            shuffle=True, random_state=None):
 
         super(ShuffleSplitWithinGroups, self).__init__()
 
@@ -87,6 +90,7 @@ class ShuffleSplitWithinGroups(BaseCrossValidator):
         self.n_splits = int(n_splits)
         self.test_size = test_size
         self.train_size = train_size
+        self.shuffle = shuffle
         self.random_state = random_state
 
     def split(self, X, y=None, groups=None):
@@ -131,24 +135,20 @@ class ShuffleSplitWithinGroups(BaseCrossValidator):
             groups = np.zeros(n_samples, dtype=int)
 
         # constants
-        indices = np.arange(n_samples)
+        indices = np.arange(n_samples, dtype=int)
         test_fold = np.empty(n_samples, dtype=bool)
         rng = check_random_state(self.random_state)
         group_indices = np.unique(groups)
-        iters = np.empty(group_indices.shape[0], dtype=object)
-
-        # generate iterators
-        cv = ShuffleSplit(self.n_splits, self.test_size, self.train_size, rng)
-        for i, g in enumerate(group_indices):
-            group_member = indices[groups == g]
-            iters[i] = cv.split(group_member)
 
         # generate training and test splits
         for fold in xrange(self.n_splits):
             test_fold[:] = False
             for i, g in enumerate(group_indices):
-                group_train_i, group_test_i = iters[i].next()
-                test_fold[indices[groups == g][group_test_i]] = True
+                train_i, test_i = train_test_split(
+                    indices[groups == g],
+                    test_size=self.test_size, train_size=self.train_size,
+                    shuffle=self.shuffle, random_state=rng)
+                test_fold[test_i] = True
             yield test_fold
 
     def get_n_splits(self, X=None, y=None, groups=None):
