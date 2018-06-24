@@ -221,7 +221,6 @@ def cv_test(info, load_data, target_fold=None):
 
     # prepare training data
     data = load_data(info['training']['file'], info)
-    n_events = data.n_events
     n_folds = info['condition']['n_folds']
     ev = data.to_eid_event(data.event)
 
@@ -236,11 +235,15 @@ def cv_test(info, load_data, target_fold=None):
 
     # cross validation
     fold = 0
-    esc = np.zeros(n_events, dtype=float)
     info['training']['results'] = {}
     info['test']['results'] = {}
-    if target_fold is not None:
-        info['test']['mask'] = {}
+    info['prediction']['event'] = {}
+    info['prediction']['true'] = {}
+    info['prediction']['predicted'] = {}
+    info['prediction']['mask'] = {}
+    if data.event_feature is not None:
+        info['prediction']['event_feature'] = {
+            k: {} for k in data.event_feature.dtype.names}
 
     # 20% of ratings per user is used for test
     cv = ShuffleSplitWithinGroups(n_splits=n_folds, test_size=0.2)
@@ -259,24 +262,18 @@ def cv_test(info, load_data, target_fold=None):
 
         # test
         logger.info("test fold = " + str(fold + 1) + " / " + str(n_folds))
-        esc[test_i], test_info = testing(rec, ev[test_i])
+        esc, test_info = testing(rec, ev[test_i])
         info['test']['results'][str(fold)] = test_info
-        if target_fold is not None:
-            info['test']['mask'][str(fold)] = test_i
+        info['prediction']['event'][str(fold)] = ev[test_i, :]
+        info['prediction']['true'][str(fold)] = data.score[test_i]
+        info['prediction']['predicted'][str(fold)] = esc
+        info['prediction']['mask'][str(fold)] = test_i
+        if data.event_feature is not None:
+            for k in data.event_feature.dtype.names:
+                info['prediction']['event_feature'][k][str(fold)] = (
+                    data.event_feature[k][test_i])
 
         fold += 1
-
-    # set predicted result
-    info['prediction']['event'] = ev
-    info['prediction']['true'] = data.score
-    if target_fold is None:
-        info['prediction']['predicted'] = esc
-    else:
-        mask = info['test']['mask'][str(target_fold)]
-        info['prediction']['predicted'] = esc[mask]
-    if data.event_feature is not None:
-        info['prediction']['event_feature'] = {
-            k: data.event_feature[k] for k in data.event_feature.dtype.names}
 
 
 def do_task(info, load_data, target_fold=None):
@@ -300,6 +297,13 @@ def do_task(info, load_data, target_fold=None):
     # initialize random seed
     np.random.seed(info['model']['options']['random_state'])
 
+    # check target fold number
+    if (target_fold is not None and
+            (target_fold < 0 or target_fold >= info['condition']['n_folds'])):
+        raise TypeError(
+            "Illegal specification of the target fold: {:s}".format(
+                str(target_fold)))
+
     # update information dictionary
     rec = info['model']['recommender']
     info['model']['task_type'] = rec.task_type
@@ -317,21 +321,13 @@ def do_task(info, load_data, target_fold=None):
     if info['condition']['scheme'] == 'holdout':
         holdout_test(info, load_data)
     elif info['condition']['scheme'] == 'cv':
-        cv_test(info, load_data)
-    elif info['condition']['scheme'] == 'cvone':
-        if (target_fold is not None and
-                0 <= target_fold < info['condition']['n_folds']):
-            cv_test(info, load_data, target_fold=target_fold)
-        else:
-            raise TypeError(
-                "Illegal specification of the target fold: {:s}".format(
-                    str(target_fold)))
+        cv_test(info, load_data, target_fold=target_fold)
     else:
         raise TypeError("Invalid validation scheme: {0:s}".format(opt.method))
 
     # output information
-    outfile = info['prediction']['file']
-    info['prediction']['file'] = str(outfile)
+    outfile = info['condition']['out_file']
+    info['condition']['out_file'] = str(outfile)
     json_decodable(info)
     outfile.write(json.dumps(info))
     if outfile is not sys.stdout:
