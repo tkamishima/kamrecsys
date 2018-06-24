@@ -281,7 +281,7 @@ class KFoldWithinGroups(BaseCrossValidator):
         for fold in xrange(self.n_splits):
             test_fold[:] = False
             for i, g in enumerate(group_indices):
-                group_train_i, group_test_i = iters[i].next()
+                group_train_i, group_test_i = next(iters[i])
                 test_fold[indices[groups == g][group_test_i]] = True
             yield test_fold
 

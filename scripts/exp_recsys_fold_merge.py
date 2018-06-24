@@ -50,8 +50,8 @@ from kamrecsys.utils import json_decodable
 # =============================================================================
 
 __author__ = "Toshihiro Kamishima ( http://www.kamishima.net/ )"
-__date__ = "2017/12/26"
-__version__ = "1.0.0"
+__date__ = "2017-12-26"
+__version__ = "2.0.0"
 __copyright__ = "Copyright (c) 2017 Toshihiro Kamishima all rights reserved."
 __license__ = "MIT License: http://www.opensource.org/licenses/mit-license.php"
 
@@ -90,33 +90,17 @@ def first_fold(fp):
     """
 
     # load json file of the target fold
-    info = json.load(fp, encoding='utf-8')
+    cv_info = json.load(fp, encoding='utf-8')
 
-    # make container of merged information
-    cv_info = {}
-    for k in info.keys():
-        if k == 'prediction':
-            cv_info[k] = info[k]
-        else:
-            cv_info[k] = info[k].copy()
-    del cv_info['test']['mask']
-    cv_info['condition']['scheme'] = 'cv'
+    # add mmake container of merged information
     cv_info['condition']['merged'] = True
 
     # get fold number
-    fold = next(iter(info['training']['results']))
+    fold = next(iter(cv_info['training']['results']))
 
     # copy computation environments for this fold
-    cv_info['environment']['environment_fold'] = {fold: info['environment']}
-
-    # get mask
-    mask = np.array(info['test']['mask'][fold], dtype=int)
-
-    # set prediction data
-    n_events = info['test']['n_events']
-    orig_predicted = np.array(info['prediction']['predicted'])
-    cv_info['prediction']['predicted'] = np.zeros(n_events, dtype=float)
-    cv_info['prediction']['predicted'][mask] = orig_predicted
+    this_environment = cv_info['environment'].copy()
+    cv_info['environment']['environment_fold'] = {fold: this_environment}
 
     # close file
     fp.close()
@@ -148,13 +132,15 @@ def rest_fold(fp, cv_info):
     # copy results
     cv_info['training']['results'][fold] = info['training']['results'][fold]
     cv_info['test']['results'][fold] = info['test']['results'][fold]
-
-    # get mask
-    mask = np.array(info['test']['mask'][fold], dtype=int)
-
-    # set prediction data
-    cv_info['prediction']['predicted'][mask] = np.array(
-        info['prediction']['predicted'])
+    cv_info['prediction']['event'][fold] = info['prediction']['event'][fold]
+    cv_info['prediction']['true'][fold] = info['prediction']['true'][fold]
+    cv_info['prediction']['predicted'][fold] = (
+        info['prediction']['predicted'][fold])
+    cv_info['prediction']['mask'][fold] = info['prediction']['mask'][fold]
+    if 'event_feature' in cv_info['prediction']:
+        for k in cv_info['prediction']['event_feature']:
+            cv_info['prediction']['event_feature'][k][fold] = (
+                info['prediction']['event_feature'][k][fold])
 
     # close file
     fp.close()
@@ -186,7 +172,7 @@ def do_task(opt):
     # post process #####
 
     # output information
-    cv_info['prediction']['file'] = str(opt.outfile)
+    cv_info['condition']['out_file'] = str(opt.outfile)
     json_decodable(cv_info)
     opt.outfile.write(json.dumps(cv_info))
     if opt.outfile is not sys.stdout:

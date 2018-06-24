@@ -50,13 +50,11 @@ Options
 
     * holdout : tested on the specified hold-out data
     * cv : cross validation
-    * cvone : perform one fold in a cross validation scheme
 
 -f <FOLD>, --fold <FOLD>
     the number of folds in cross validation, default=5
 -n <FOLD_NO>, --fold-no <FOLD_NO>
-    the target fold in a cvone validation mode. select from the range
-    [0, <FOLD> - 1].
+    if specified, only the specified fold is tested.
 --no-timestamp or --timestamp
     specify whether .event files has 'timestamp' information,
     default=timestamp
@@ -110,7 +108,7 @@ from exp_recsys_util import do_task
 
 __author__ = "Toshihiro Kamishima ( http://www.kamishima.net/ )"
 __date__ = "2017-06-18"
-__version__ = "2.0.0"
+__version__ = "3.0.0"
 __copyright__ = "Copyright (c) 2017 Toshihiro Kamishima all rights reserved."
 __license__ = "MIT License: http://www.opensource.org/licenses/mit-license.php"
 
@@ -223,7 +221,7 @@ def command_line_parser():
     ap.add_argument('-m', '--method', type=str, default='lpmf',
                     choices=['lpmf'])
     ap.add_argument('-v', '--validation', type=str, default='holdout',
-                    choices=['holdout', 'cv', 'cvone'])
+                    choices=['holdout', 'cv'])
     ap.add_argument('-f', '--fold', type=int, default=5)
     ap.add_argument('-n', '--fold-no', dest='fold_no', type=int, default=None)
 
@@ -284,7 +282,7 @@ def init_info(opt):
 
     # files
     info['training']['file'] = opt.infile
-    info['prediction']['file'] = opt.outfile
+    info['condition']['out_file'] = opt.outfile
     info['test']['file'] = opt.testfile
 
     # model

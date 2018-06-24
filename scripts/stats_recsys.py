@@ -104,6 +104,26 @@ def do_task(opt):
     # load data
     info = json.load(opt.infile, encoding='utf-8')
 
+    # merge multi-fold data
+    if isinstance(info['prediction']['event'], dict):
+        info['prediction']['event'] = np.vstack(
+            [np.asarray(info['prediction']['event'][k])
+             for k in info['prediction']['event']])
+        info['prediction']['true'] = np.hstack(
+            [np.asarray(info['prediction']['true'][k])
+             for k in info['prediction']['true']])
+        info['prediction']['predicted'] = np.hstack(
+            [np.asarray(info['prediction']['predicted'][k])
+             for k in info['prediction']['predicted']])
+        if 'event_feature' in info['prediction']:
+            ef = info['prediction']['event_feature']
+            for i in ef:
+                features = [np.asarray(ef[i][k]) for k in ef[i]]
+                if features[0].ndim == 2:
+                    ef[i] = np.vstack(features)
+                else:
+                    ef[i] = np.hstack(features)
+
     # calculate statistics
     if info['model']['task_type'] == 'score_predictor':
         stats = score_predictor_statistics(
@@ -120,8 +140,10 @@ def do_task(opt):
     json_decodable(info['statistics'])
 
     # remove input data
-    if not opt.keepdata:
-        del info['prediction']
+    # if not opt.keepdata:
+    #     del info['prediction']
+    # else:
+    json_decodable(info['prediction'])
 
     # output statistics
     opt.outfile.write(json.dumps(info))
