@@ -17,7 +17,7 @@ from six.moves import xrange
 
 import logging
 
-from .group import (
+from .split import (
     ShuffleSplitWithinGroups,
     KFoldWithinGroups,
     InterlacedKFold)

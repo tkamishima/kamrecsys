@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Group Generator for cross validations 
+Data Splitter for hold-out tests or cross validation.
 
-Generated groups will be used with functions using groups, such as
-:class:`sklearn.model_selection.LeaveOneGroupOut` .
+The usage of these splitter classes are similar to the splitters of `sklearn`
+such as :class:`sklearn.model_selection.KFold` .
 """
 
 from __future__ import (
