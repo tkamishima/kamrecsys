@@ -140,10 +140,10 @@ def do_task(opt):
     json_decodable(info['statistics'])
 
     # remove input data
-    # if not opt.keepdata:
-    #     del info['prediction']
-    # else:
-    json_decodable(info['prediction'])
+    if not opt.keepdata:
+        del info['prediction']
+    else:
+        json_decodable(info['prediction'])
 
     # output statistics
     opt.outfile.write(json.dumps(info))
