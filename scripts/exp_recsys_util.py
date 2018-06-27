@@ -248,7 +248,7 @@ def cv_test(info, load_data, target_fold=None):
     # 20% of ratings per user is used for test
     cv = ShuffleSplitWithinGroups(n_splits=n_folds, test_size=0.2)
     for train_i, test_i in cv.split(ev, groups=ev[:, 0]):
-        # in a `cvone` mode, non target folds are ignored
+        # in an one-fold mode, non target folds are ignored
         if target_fold is not None and fold != target_fold:
             fold += 1
             continue
@@ -287,8 +287,7 @@ def do_task(info, load_data, target_fold=None):
     load_data : function
         function for loading data
     target_fold : int or None
-        when a validation scheme is `cvone` , specify the fold number to
-        process.
+        specify the fold number to process in an one-fold mode
     """
 
     # suppress warnings in numerical computation
