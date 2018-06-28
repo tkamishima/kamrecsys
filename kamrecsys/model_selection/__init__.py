@@ -33,7 +33,7 @@ from .split import (
 __all__ = [
     'ShuffleSplitWithinGroups',
     'KFoldWithinGroups',
-    'InterlacedKFold',]
+    'InterlacedKFold']
 
 # =============================================================================
 # Constants
