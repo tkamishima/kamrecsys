@@ -132,15 +132,14 @@ def rest_fold(fp, cv_info):
     # copy results
     cv_info['training']['results'][fold] = info['training']['results'][fold]
     cv_info['test']['results'][fold] = info['test']['results'][fold]
-    cv_info['prediction']['event'][fold] = info['prediction']['event'][fold]
-    cv_info['prediction']['true'][fold] = info['prediction']['true'][fold]
-    cv_info['prediction']['predicted'][fold] = (
-        info['prediction']['predicted'][fold])
-    cv_info['prediction']['mask'][fold] = info['prediction']['mask'][fold]
-    if 'event_feature' in cv_info['prediction']:
-        for k in cv_info['prediction']['event_feature']:
-            cv_info['prediction']['event_feature'][k][fold] = (
-                info['prediction']['event_feature'][k][fold])
+    for sub_info in cv_info['prediction']:
+        if sub_info == 'event_feature':
+            for k in cv_info['prediction']['event_feature']:
+                cv_info['prediction']['event_feature'][k][fold] = (
+                    info['prediction']['event_feature'][k][fold])
+        else:
+            cv_info['prediction'][sub_info][fold] = (
+                info['prediction'][sub_info][fold])
 
     # close file
     fp.close()
