@@ -92,7 +92,7 @@ def first_fold(fp):
     # load json file of the target fold
     cv_info = json.load(fp, encoding='utf-8')
 
-    # add mmake container of merged information
+    # add container of merged information
     cv_info['condition']['merged'] = True
 
     # get fold number
