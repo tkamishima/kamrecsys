@@ -15,7 +15,7 @@ rating behavior. Each column represents is as follows:
 * 4. A timestamp of rating behavior, optional.
 
 Ratings are assumed to be 0 or 1; otherwise, ratings are binarized by a method
-:meth:`binnarize` .
+:meth:`binarize` .
 
 Output Format
 -------------
@@ -41,7 +41,7 @@ Options
 -o <OUTPUT>, --out <OUTPUT>
     specify output file name
 -m <METHOD>, --method <METHOD>
-    specify algorithm: default=pmf
+    specify algorithm: default=lpmf
 
     * lpmf : logistic probabilistic matrix factorization
 

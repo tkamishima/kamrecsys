@@ -21,7 +21,6 @@ import sys
 import datetime
 
 import numpy as np
-from sklearn.model_selection import PredefinedSplit
 
 from kamrecsys import __version__ as kamrecsys_version
 from kamrecsys.model_selection import ShuffleSplitWithinGroups
@@ -33,7 +32,7 @@ from kamrecsys.utils import get_system_info, get_version_info, json_decodable
 
 __author__ = "Toshihiro Kamishima ( http://www.kamishima.net/ )"
 __date__ = "2017-12-25"
-__version__ = "1.0.0"
+__version__ = "2.0.0"
 __copyright__ = "Copyright (c) 2017 Toshihiro Kamishima all rights reserved."
 __license__ = "MIT License: http://www.opensource.org/licenses/mit-license.php"
 
