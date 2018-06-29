@@ -106,34 +106,18 @@ def do_task(opt):
 
     # merge multi-fold data
     if isinstance(info['prediction']['event'], dict):
-        info['prediction']['event'] = np.vstack(
-            [np.asarray(info['prediction']['event'][k])
-             for k in info['prediction']['event']])
-        info['prediction']['true'] = np.hstack(
-            [np.asarray(info['prediction']['true'][k])
-             for k in info['prediction']['true']])
-        info['prediction']['predicted'] = np.hstack(
-            [np.asarray(info['prediction']['predicted'][k])
-             for k in info['prediction']['predicted']])
-        if 'event_feature' in info['prediction']:
-            ef = info['prediction']['event_feature']
-            for i in ef:
-                features = [np.asarray(ef[i][k]) for k in ef[i]]
-                if features[0].ndim == 2:
-                    ef[i] = np.vstack(features)
-                else:
-                    ef[i] = np.hstack(features)
+        y_true = np.concatenate(list(info['prediction']['true'].values()))
+        y_pred = np.concatenate(list(info['prediction']['predicted'].values()))
+    else:
+        y_true = info['prediction']['true']
+        y_pred = info['prediction']['predicted']
 
     # calculate statistics
     if info['model']['task_type'] == 'score_predictor':
         stats = score_predictor_statistics(
-            info['prediction']['true'],
-            info['prediction']['predicted'],
-            score_domain=info['condition']['score_domain'])
+            y_true, y_pred, score_domain=info['condition']['score_domain'])
     elif info['model']['task_type'] == 'item_finder':
-        stats = item_finder_statistics(
-            info['prediction']['true'],
-            info['prediction']['predicted'])
+        stats = item_finder_statistics(y_true, y_pred)
     else:
         raise TypeError('Unsupported type of recommendation models')
     info['statistics'] = stats
@@ -142,8 +126,6 @@ def do_task(opt):
     # remove input data
     if not opt.keepdata:
         del info['prediction']
-    else:
-        json_decodable(info['prediction'])
 
     # output statistics
     opt.outfile.write(json.dumps(info))
