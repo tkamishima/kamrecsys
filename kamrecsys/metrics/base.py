@@ -64,6 +64,51 @@ def generate_score_bins(score_domain):
     return bins
 
 
+def statistics_mean(fun, *arg_list):
+    """
+    Means of statistics computed by the specified function
+
+    This is useful for computing the mean of statistics calculated on
+    different folds of a dataset.
+
+    Parameters
+    ----------
+    fun : function
+        function to calculate statistics
+    arg_list : list of dicts / lists of function arguments
+        list of dictionaries containing
+
+    Returns
+    -------
+    sats_mean : float or array(dtype=float)
+        means of statistics computed by `fun`
+    """
+
+    stats = []
+    if isinstance(arg_list[0], dict):
+
+        # in a case of dict list, collect elements having the same key
+        for k in sorted(arg_list[0]):
+            args = [arg[k] for arg in arg_list]
+            stats.append(fun(*args))
+
+    elif isinstance(arg_list[0], dict):
+
+        # in a case of list list, collect elements at the same position
+        for k in xrange(len(arg_list[0])):
+            args = [arg[k] for arg in arg_list]
+            stats.append(fun(*args))
+    else:
+        raise TypeError('args must be list of dict or list')
+
+    stats = np.asanyarray(stats, dtype=float)
+    if stats.ndim == 0:
+        stats_mean = stats
+    else:
+        stats_mean = np.mean(stats, axis=0)
+
+    return stats_mean
+
 # =============================================================================
 # Classes
 # =============================================================================
