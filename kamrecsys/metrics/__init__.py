@@ -18,7 +18,8 @@ from six.moves import xrange
 import logging
 
 from .base import (
-    generate_score_bins)
+    generate_score_bins,
+    statistics_mean)
 from .real import (
     mean_absolute_error,
     mean_squared_error,
@@ -41,6 +42,7 @@ from .item_finder import (
 
 __all__ = [
     'generate_score_bins',
+    'statistics_mean',
     'mean_absolute_error',
     'mean_squared_error',
     'score_histogram',
