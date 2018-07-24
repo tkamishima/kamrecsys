@@ -308,7 +308,7 @@ def init_info(opt):
             info['model']['options']['maxiter'] = opt.maxiter
     else:
         raise TypeError(
-            "Invalid method name: {0:s}".format(info['model']['method']))
+            "Invalid method name: {0:s}".format(opt.method))
     info['model']['options']['random_state'] = opt.rseed
 
     # condition
