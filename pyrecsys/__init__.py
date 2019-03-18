@@ -9,8 +9,8 @@ PyRecSys: Algorithms for recommender systems in Python
 #==============================================================================
 
 __author__ = "Toshihiro Kamishima ( http://www.kamishima.net/ )"
-__date__ = "2012/03/25"
-__version__ = "0.2.4"
+__date__ = "2012-06-03"
+__version__ = "1.0.0"
 __copyright__ = "Copyright (c) 2012 Toshihiro Kamishima all rights reserved."
 __license__ = "MIT License: http://www.opensource.org/licenses/mit-license.php"
 __docformat__ = "restructuredtext en"
